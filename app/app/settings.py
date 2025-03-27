@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     # installed package
     'ckeditor',
     'ninja',
+    'ninja_extra',
+    'ninja_jwt',
 
     # myapp
     'problems.apps.ProblemsConfig',

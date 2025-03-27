@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from problems.models import Lesson, Problem
+from problems.models import Problem
 from django.db.models import Sum
 from typing import TYPE_CHECKING
 from problems.models import TimeMixsin

@@ -66,21 +66,24 @@ class Function(TimeMixsin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return self.function[:30]
+    
+    class Meta:
+        unique_together = ("problem", "language")
 
 
 class ExecutionTestCase(TimeMixsin):
-    problem = models.ForeignKey(Problem, related_name="test_algorith", on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, related_name="execution_problem", on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, related_name="execution_language", on_delete=models.CASCADE)
     code = models.TextField()
     class Meta:
         unique_together = ("problem", "language")
 
 
 class TestCase(TimeMixsin):
-    problem = models.ForeignKey(Problem, related_name="test_algorith", on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, related_name="test_problem", on_delete=models.CASCADE)
     language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
-    input_txt = models.TextField(help_text="Test Input")
-    output_txt = models.TextField(help_text="Chiqish Output")
+    input_txt = models.CharField(max_length=250, help_text="Test Input")
+    output_txt = models.CharField(max_length=250, help_text="Chiqish Output")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return f"Test for {self.problem.title}"
