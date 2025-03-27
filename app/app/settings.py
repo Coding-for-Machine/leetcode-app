@@ -15,12 +15,12 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
 
 ALLOWED_HOSTS = [
-    "*.railway.app"
+    ".railway.app"
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "*.railway.app"
+    "https://*.railway.app",
+    "http://0.0.0.0:8000",
 ]
-
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
