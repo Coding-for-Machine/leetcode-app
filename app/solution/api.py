@@ -26,28 +26,28 @@ def create_solution(request, payload: SolutionSchema):
 
     # Custom inputlar ko‘p bo‘lishi mumkin
     if payload.custom_inputs:
-        for custom_input, expected_output in payload.custom_inputs:
-            custom_docker_data = {
-                "language": language.name,
-                "user_code": user_code,
-                "custom_input": custom_input
-            }
-            custom_response = post_server(custom_docker_data)
+        custom_docker_data = {
+            "language": language.name,
+            "user_code": user_code,
+            "custom_input": []
+        }
 
-            if custom_response is None:
-                return {"error": "Kod bajarilmadi, Docker API ishlamayapti!"}
+        # To‘g‘ri custom_input list yaratish
+        for custom_input in payload.custom_inputs:
+            custom_docker_data["custom_input"].append({"input": custom_input.input_txt})
 
-            user_output = custom_response.get("output", "").strip()
+        custom_response = post_server(custom_docker_data)
+        if custom_response is None:
+            return {"error": "Kod bajarilmadi, Docker API ishlamayapti!"}
 
-            if user_output != expected_output.strip():
-                return {"error": f"Custom input uchun xato! Kutilgan chiqish: {expected_output}, olingan: {user_output}"}
+        user_outputs = custom_response.get("output", "").strip().split("\n")
 
-            # Agar custom input natijasi to‘g‘ri bo‘lsa, yangi TestCase yaratamiz
+        for input_txt, output_txt in zip(custom_docker_data["custom_input"], user_outputs):
             TestCase.objects.create(
                 problem=problem,
                 language=language,
-                input_txt=custom_input,
-                output_txt=expected_output,
+                input_txt=input_txt["input"],
+                output_txt=output_txt,
                 user=user
             )
 
