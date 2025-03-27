@@ -1,12 +1,11 @@
 from typing import Any
-
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-
 from decouple import config
 
-
 class Command(BaseCommand):
+    help = "Creates an admin user if it does not exist"
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--force",
@@ -17,30 +16,38 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any):
         force = options.get("force", False)
         User = get_user_model()
+
         superusers = User.objects.filter(is_superuser=True)
         if superusers.exists() and not force:
-            self.stdout.write("Superuser(s) already exists")
+            self.stdout.write(self.style.WARNING("Superuser(s) already exist"))
             return
-        admin_username = config("DJANGO_ADMIN_USERNAME", default="asadbek")
+
+        admin_username = config("DJANGO_ADMIN_USERNAME", default="admin")
         admin_password = config("DJANGO_ADMIN_PASSWORD", default=None)
-        admin_email = config("DJANGO_ADMIN_EMAIL", default="=asadbek@gmail.com")
+        admin_email = config("DJANGO_ADMIN_EMAIL", default="admin@example.com")
+
         if admin_password is None:
-            admin_password = "asadbek"
+            admin_password = "admin"
+
         admin_qs = User.objects.filter(username=admin_username)
-        if admin_qs.exists() and force:
-            admin_instance = admin_qs.first()
-            admin_instance.set_password(admin_password)
-            admin_instance.save()
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Successfully updated admin user {admin_username} with new password"
+        if admin_qs.exists():
+            if force:
+                admin_instance = admin_qs.first()
+                admin_instance.set_password(admin_password)
+                admin_instance.save()
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Updated admin user {admin_username} with new password"
+                    )
                 )
-            )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(f"Admin user {admin_username} already exists")
+                )
             return
-        admin_instance = User.objects.create_superuser(
-            username=admin_username,
-            email=admin_email,
-            password=admin_password,
+
+        User.objects.create_superuser(
+            username=admin_username, email=admin_email, password=admin_password
         )
         self.stdout.write(
             self.style.SUCCESS(

@@ -42,7 +42,7 @@ INSTALLED_APPS = [
 
     # myapp
     'problems.apps.ProblemsConfig',
-    'users.apps.UsersConfig',
+    'users',
     'solution.apps.SolutionConfig',
     'userstatus.apps.UserstatusConfig',
 ]
