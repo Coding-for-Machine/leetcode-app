@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # installed package
     'ckeditor',
+    'ninja',
 
     # myapp
     'problems.apps.ProblemsConfig',
     'users.apps.UsersConfig',
+    'solution.apps.SolutionConfig',
+    'userstatus.apps.UserstatusConfig',
 ]
 
 MIDDLEWARE = [
