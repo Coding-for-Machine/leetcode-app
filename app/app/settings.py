@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     # installed package
     'ckeditor',
@@ -46,9 +47,11 @@ INSTALLED_APPS = [
     'solution.apps.SolutionConfig',
     'userstatus.apps.UserstatusConfig',
 ]
-
+if DEBUG:
+    INSTALLED_APPS.append("whitenoise.runserver_nostatic")
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware", # add
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -152,6 +155,12 @@ CKEDITOR_CONFIGS = {
         },
 }
 
+STORAGES = {
+    # ...
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
