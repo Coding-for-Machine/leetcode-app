@@ -89,7 +89,8 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # }
 DATABASES = {
     "default": {
-        "ENGINE": "timescale.db.backends.postgresql",
+        
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
         "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
         "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
