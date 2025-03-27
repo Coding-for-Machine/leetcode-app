@@ -5,7 +5,7 @@ __pycache__/
 myleetcodeenvs/
 # C extensions
 *.so
-staticfile/
+# staticfile/
 sqlite3
 # Distribution / packaging
 .Python
