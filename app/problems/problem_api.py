@@ -25,6 +25,7 @@ class TestCaseSchema(BaseModel):
 
 class FunctionSchema(BaseModel):
     id: int
+    language: str
     function: str
 
 
@@ -42,29 +43,25 @@ class ProblemList(BaseModel):
     functions: List[FunctionSchema]
 
 
-@api_problem_router.get("/", response=List[ProblemList])
+class ProblemsAPiList(BaseModel):
+    id: int
+    title: str
+    slug: str
+    difficulty: str
+    created_at: datetime
+    updated_at: datetime
+
+@api_problem_router.get("/", response=List[ProblemsAPiList])
 def problem_get_api(request):
-    problems = Problem.objects.prefetch_related("language", "test_cases", "functions").all()
+    problems = Problem.objects.all()
     return [
         {
             "id": problem.id,
-            "languages": [
-                {"id": lang.id, "name": lang.name, "slug": lang.slug} for lang in problem.language.all()
-            ],
             "title": problem.title,
             "slug": problem.slug,
-            "description": problem.description,
             "difficulty": problem.difficulty,
             "created_at": problem.created_at,
             "updated_at": problem.updated_at,
-            "execution_test_cases": [{"id": ex.id, "code": ex.code} for ex in problem.execution_problem.all()],
-            "test_cases": [
-                {"id": test.id, "input_txt": test.input_txt, "output_txt": test.output_txt}
-                for test in problem.test_cases.all()[:3]
-            ],
-            "functions": [
-                {"id": func.id, "function": func.function} for func in problem.functions.all()
-            ],
         }
         for problem in problems
     ]
@@ -94,7 +91,7 @@ def problem_detail_api(request, slug: str):
                 for test in problem.test_problem.all()[:3]
             ],
             "functions": [
-                {"id": func.id, "function": func.function} for func in problem.functions.all()
+                {"id": func.id, "language": func.language.name, "function": func.function} for func in problem.functions.all()
             ],
         }
     except Problem.DoesNotExist:

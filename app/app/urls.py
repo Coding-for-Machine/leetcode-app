@@ -13,6 +13,8 @@ api.add_router("solution/", solution_url_api)
 
 
 urlpatterns = [
+    path("", include("problems.urls")),
+    # ------------------------
     path("api/", api.urls),
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A+B Problem | CodePlatform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    
+    <style>
+        .CodeMirror { height: 100% !important; }
+        .split-view {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        .problem-pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #e2e8f0;
+        }
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .console {
+            height: 200px;
+            overflow-y: auto;
+            background-color: #282a36;
+            color: #f8f8f2;
+        }
+        .resize-handle {
+            width: 5px;
+            background: #e2e8f0;
+            cursor: col-resize;
+        }
+        .test-case {
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .test-case-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .test-case-content {
+            display: flex;
+            gap: 20px;
+        }
+        .test-case-io {
+            flex: 1;
+        }
+        .test-case-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .tab-active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .custom-test-case {
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+        }
+        .test-case-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-family: monospace;
+            background-color: #f8fafc;
+        }
+        .result-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .result-tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+            margin-right: 4px;
+            border-radius: 4px 4px 0 0;
+        }
+        .result-tab.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .result-content {
+            display: none;
+            padding: 16px;
+            background-color: #282a36;
+            color: #f8f8f2;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .result-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-600">CodePlatform</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="px-3 py-1 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Problems</button>
+                    <button class="px-3 py-1 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Discuss</button>
+                    <button class="px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700">Premium</button>
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="text-xs font-medium">User</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Split View Container -->
+    <div class="split-view">
+        <!-- Problem Description Pane -->
+        <div class="problem-pane bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">1. A+B</h1>
+                <div class="flex space-x-2">
+                    <button id="bookmark-btn" class="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200">
+                        <i class="far fa-bookmark mr-1"></i> Bookmark
+                    </button>
+                    <button class="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200">
+                        <i class="fas fa-share-alt mr-1"></i> Share
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4 mb-6">
+                <span class="px-2 py-1 text-xs font-medium rounded bg-green-100 text-green-800">Easy</span>
+                <span class="text-sm text-gray-500">ID: 1</span>
+            </div>
+
+            <div class="prose max-w-none mb-6" id="problem-description">
+                <!-- Problem description will be inserted here by JavaScript -->
+            </div>
+            
+            <!-- Custom Test Case Section -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4">Test Case</h3>
+                <div class="custom-test-case test-case p-4">
+                    <div class="mb-3">
+                        <div class="test-case-label">Input</div>
+                        <textarea id="custom-test-input" class="test-case-input" rows="3" placeholder="Enter your test input (e.g. 5 8)"></textarea>
+                    </div>
+                    <div>
+                        <div class="test-case-label">Output</div>
+                        <textarea id="custom-test-output" class="test-case-input" rows="2" placeholder="Output will appear here after running" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resize Handle -->
+        <div class="resize-handle"></div>
+
+        <!-- Editor Pane -->
+        <div class="editor-pane bg-white">
+            <div class="editor-container p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex space-x-1">
+                        <button id="code-tab" class="px-3 py-1 text-sm tab-active rounded-md">Code</button>
+                        <button id="test-tab" class="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200">Test</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="language-select" class="text-sm border rounded px-2 py-1 bg-white">
+                            <!-- Languages will be populated by JavaScript -->
+                        </select>
+                        <button class="p-1 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CodeMirror Editor -->
+                <textarea id="code-editor"></textarea>
+
+                <div class="flex justify-end mt-4">
+                    <button id="reset-btn" class="px-4 py-2 bg-gray-200 rounded-md text-sm font-medium mr-2 hover:bg-gray-300">Reset</button>
+                    <button id="run-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">Run</button>
+                    <button id="submit-btn" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium ml-2 hover:bg-green-700">Submit</button>
+                </div>
+            </div>
+
+            <!-- Result Tabs (hidden by default) -->
+            <div id="result-tabs-container" class="hidden">
+                <div class="result-tabs">
+                    <div class="result-tab active" data-tab="test-case">Test Case</div>
+                    <div class="result-tab" data-tab="result">Result</div>
+                </div>
+                <div id="test-case-content" class="result-content active">
+                    <!-- Test case results will be inserted here -->
+                </div>
+                <div id="result-content" class="result-content">
+                    <!-- Submission results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/go/go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    
+    <script>
+        // Global variables
+        let editor;
+        let problemData;
+        let languageSelect = document.getElementById('language-select');
+
+        // Language modes for CodeMirror
+        const languageModes = {
+            python: 'python',
+            go: 'go'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize everything
+            initializeUI().then(() => {
+                setupTabSwitching();
+                setupResultTabs();
+                
+                // DOM Elements
+                const runBtn = document.getElementById('run-btn');
+                const submitBtn = document.getElementById('submit-btn');
+                const resetBtn = document.getElementById('reset-btn');
+                const bookmarkBtn = document.getElementById('bookmark-btn');
+
+                // Event listeners
+                runBtn.addEventListener('click', function() {
+                    runCustomTest();
+                    showResultTabs('test-case');
+                });
+                
+                submitBtn.addEventListener('click', function() {
+                    submitCode();
+                    showResultTabs('result');
+                });
+                
+                resetBtn.addEventListener('click', function() {
+                    const language = document.getElementById('language-select').value;
+                    updateEditorContent(editor, problemData, language);
+                    hideResultTabs();
+                });
+
+                bookmarkBtn.addEventListener('click', function() {
+                    const isBookmarked = bookmarkBtn.innerHTML.includes('fas fa-bookmark');
+                    if (isBookmarked) {
+                        bookmarkBtn.innerHTML = '<i class="far fa-bookmark mr-1"></i> Bookmark';
+                        bookmarkBtn.classList.remove('bg-blue-100', 'text-blue-700');
+                    } else {
+                        bookmarkBtn.innerHTML = '<i class="fas fa-bookmark mr-1"></i> Bookmarked';
+                        bookmarkBtn.classList.add('bg-blue-100', 'text-blue-700');
+                    }
+                });
+
+                // Resizable split view
+                const resizeHandle = document.querySelector('.resize-handle');
+                const problemPane = document.querySelector('.problem-pane');
+                const editorPane = document.querySelector('.editor-pane');
+
+                resizeHandle.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    document.addEventListener('mousemove', resize);
+                    document.addEventListener('mouseup', stopResize);
+                });
+
+                function resize(e) {
+                    const containerWidth = document.querySelector('.split-view').offsetWidth;
+                    const newLeftWidth = (e.clientX / containerWidth) * 100;
+                    problemPane.style.flex = `0 0 ${newLeftWidth}%`;
+                }
+
+                function stopResize() {
+                    document.removeEventListener('mousemove', resize);
+                }
+            });
+        });
+
+        // Fetch problem data from API
+        async function fetchProblemData() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/ab/');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching problem data:', error);
+                // Fallback data in case API fails
+                return {
+                    "id": 1,
+                    "languages": [
+                        {
+                            "id": 1,
+                            "name": "python",
+                            "slug": "python"
+                        },
+                        {
+                            "id": 2,
+                            "name": "go",
+                            "slug": "go"
+                        }
+                    ],
+                    "title": "A+B",
+                    "slug": "ab",
+                    "description": "<h2>A+B</h2>\r\n\r\n<p>Sizga ikkita natural son beriladi. ularning yig'indisini hisoblash kerak.</p>\r\n\r\n<hr />\r\n<p>Kiruvchi ma'lumotlar:</p>\r\n\r\n<p>Kirish oqimida ikkita butun son, A va B beriladi. Har ikkala son ham 10<sup>9</sup> dan kichik.</p>\r\n\r\n<hr />\r\n<p>Chiquvchi ma'lumotlar:</p>\r\n\r\n<p>Berilgan ikkita sonning yig'indisini ekranga chiqaring.</p>\r\n\r\n<hr />\r\n<p>Misollar</p>\r\n\r\n<table>\r\n\t<tbody>\r\n\t\t<tr>\r\n\t\t\t<th>#</th>\r\n\t\t\t<th>input.txt</th>\r\n\t\t\t<th>output.txt</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td>1</td>\r\n\t\t\t<td>\r\n\t\t\t<pre>\r\n2 3</pre>\r\n\t\t\t</td>\r\n\t\t\t<td>\r\n\t\t\t<pre>\r\n5</pre>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t</tbody>\r\n</table>",
+                    "difficulty": "easy",
+                    "test_cases": [
+                        {
+                            "id": 2,
+                            "input_txt": "20 90",
+                            "output_txt": "110"
+                        },
+                        {
+                            "id": 3,
+                            "input_txt": "20 91",
+                            "output_txt": "111"
+                        },
+                        {
+                            "id": 1,
+                            "input_txt": "5 8",
+                            "output_txt": "13"
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "id": 1,
+                            "language": "python",
+                            "function": "def Add(a, b):\n    # shu yerga yozing\n    return a + b"
+                        },
+                        {
+                            "id": 2,
+                            "language": "go",
+                            "function": "func AddNumber(a int, b int) int {\n    // codni shu yerga yozing\n    return a + b\n}"
+                        }
+                    ],
+                    "execution_test_cases": [
+                        {
+                            "id": 1,
+                            "code": "a, b = map(int, input().split())\nprint(Add(a, b))"
+                        },
+                        {
+                            "id": 2,
+                            "code": "func main() {\n var a int\n var b int\n fmt.Scan(&a)\n fmt.Scan(&b)\n\n fmt.Println(AddNumbers(a, b))\n}"
+                        }
+                    ]
+                };
+            }
+        }
+
+        // Initialize UI with problem data
+        async function initializeUI() {
+            problemData = await fetchProblemData();
+            
+            document.querySelector('h1').textContent = `${problemData.id}. ${problemData.title}`;
+            document.getElementById('problem-description').innerHTML = problemData.description;
+
+            // Populate language dropdown
+            problemData.languages.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.slug;
+                option.textContent = lang.name;
+                languageSelect.appendChild(option);
+            });
+
+            // Initialize CodeMirror with default language
+            editor = initializeEditor(problemData, problemData.languages[0].slug);
+        }
+
+        // Initialize CodeMirror editor
+        function initializeEditor(problemData, defaultLanguage) {
+            const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+                mode: languageModes[defaultLanguage],
+                theme: 'dracula',
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                extraKeys: {
+                    'Ctrl-Enter': function() {
+                        runCustomTest();
+                        showResultTabs('test-case');
+                    },
+                    'Cmd-Enter': function() {
+                        runCustomTest();
+                        showResultTabs('test-case');
+                    }
+                }
+            });
+
+            // Set initial code based on selected language
+            updateEditorContent(editor, problemData, defaultLanguage);
+
+            // Change language
+            languageSelect.addEventListener('change', function() {
+                const language = this.value;
+                editor.setOption('mode', languageModes[language]);
+                updateEditorContent(editor, problemData, language);
+            });
+
+            return editor;
+        }
+
+        // Update editor content based on selected language
+        function updateEditorContent(editor, problemData, language) {
+            const functionForLanguage = problemData.functions.find(fn => fn.language === language);
+            if (functionForLanguage) {
+                editor.setValue(functionForLanguage.function);
+            } else {
+                // Default template if no function found for the language
+                if (language === 'python') {
+                    editor.setValue(`def solution(a, b):\n    # Write your code here\n    return a + b`);
+                } else if (language === 'go') {
+                    editor.setValue(`func solution(a int, b int) int {\n    // Write your code here\n    return a + b\n}`);
+                }
+            }
+        }
+
+        // Run custom test case
+        function runCustomTest() {
+            const customInput = document.getElementById('custom-test-input').value.trim();
+            const outputField = document.getElementById('custom-test-output');
+            
+            if (!customInput) {
+                alert('Please enter a test case input');
+                return;
+            }
+            
+            const testCaseContent = document.getElementById('test-case-content');
+            testCaseContent.innerHTML = '';
+            showResultTabs('test-case');
+            
+            addResultMessage(testCaseContent, '> Running custom test case...', 'text-blue-500');
+            
+            // In a real app, you would send the code and input to your API for execution
+            // For demo, we'll simulate execution with a simple addition
+            setTimeout(() => {
+                addResultMessage(testCaseContent, `Input: ${customInput}`, 'text-gray-300');
+                
+                try {
+                    // Simple parsing for demo (assuming two numbers separated by space)
+                    const numbers = customInput.split(' ').map(Number);
+                    if (numbers.length !== 2 || isNaN(numbers[0]) || isNaN(numbers[1])) {
+                        throw new Error('Invalid input format. Please enter two numbers separated by space.');
+                    }
+                    
+                    const result = numbers[0] + numbers[1];
+                    outputField.value = result.toString();
+                    
+                    addResultMessage(testCaseContent, `Output: ${result}`, 'text-green-500');
+                    addResultMessage(testCaseContent, '✓ Custom test case executed successfully', 'text-green-500');
+                } catch (error) {
+                    addResultMessage(testCaseContent, `✘ Error: ${error.message}`, 'text-red-500');
+                    outputField.value = 'Error: ' + error.message;
+                }
+            }, 300);
+        }
+
+        // Submit code (simulated)
+        function submitCode() {
+            const resultContent = document.getElementById('result-content');
+            resultContent.innerHTML = '';
+            
+            addResultMessage(resultContent, '> Submitting your solution...', 'text-blue-500');
+            
+            setTimeout(() => {
+                const success = Math.random() > 0.2; // 80% success rate for demo
+                
+                if (success) {
+                    addResultMessage(resultContent, '> ✔ Submission accepted!', 'text-green-500');
+                    addResultMessage(resultContent, `> Runtime: ${Math.floor(Math.random() * 100)} ms (faster than ${Math.floor(Math.random() * 90) + 10}% of submissions)`, 'text-gray-400');
+                    addResultMessage(resultContent, `> Memory Usage: ${(Math.random() * 10 + 35).toFixed(1)} MB (less than ${Math.floor(Math.random() * 70) + 30}% of submissions)`, 'text-gray-400');
+                } else {
+                    addResultMessage(resultContent, '> ✘ Submission failed: Time Limit Exceeded', 'text-red-500');
+                    addResultMessage(resultContent, '> Try optimizing your solution', 'text-gray-400');
+                }
+            }, 1500);
+        }
+
+        // Helper functions
+        function addResultMessage(container, message, color = 'text-gray-300') {
+            const messageElement = document.createElement('div');
+            messageElement.className = `mb-1 ${color}`;
+            messageElement.textContent = message;
+            container.appendChild(messageElement);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Tab switching
+        function setupTabSwitching() {
+            const codeTab = document.getElementById('code-tab');
+            const testTab = document.getElementById('test-tab');
+            
+            codeTab.addEventListener('click', () => {
+                codeTab.classList.add('tab-active');
+                codeTab.classList.remove('bg-gray-100');
+                testTab.classList.remove('tab-active');
+                testTab.classList.add('bg-gray-100');
+                // Show code editor, hide test panel
+            });
+            
+            testTab.addEventListener('click', () => {
+                testTab.classList.add('tab-active');
+                testTab.classList.remove('bg-gray-100');
+                codeTab.classList.remove('tab-active');
+                codeTab.classList.add('bg-gray-100');
+                // Show test panel, hide code editor
+            });
+        }
+
+        // Result tabs functionality
+        function setupResultTabs() {
+            const tabs = document.querySelectorAll('.result-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.result-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-content`).classList.add('active');
+                });
+            });
+        }
+
+        function showResultTabs(defaultTab = 'test-case') {
+            const container = document.getElementById('result-tabs-container');
+            container.classList.remove('hidden');
+            
+            // Set the default tab
+            document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.result-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.result-tab[data-tab="${defaultTab}"]`).classList.add('active');
+            document.getElementById(`${defaultTab}-content`).classList.add('active');
+        }
+
+        function hideResultTabs() {
+            document.getElementById('result-tabs-container').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
