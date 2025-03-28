@@ -94,25 +94,25 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASE_URL = config("DATABASE_URL", default=None)
 
-DATABASES = {}
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",  # Agar PostgreSQL yo'q bo'lsa, SQLite ishlaydi
+        "NAME": os.path.join(os.path.dirname(__file__), "sqlite_db.sqlite3"),
+    }
+}
+
+# Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
 if DATABASE_URL:
     tmpPostgres = urlparse(DATABASE_URL)
-
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.lstrip('/'),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': tmpPostgres.port or 5432,
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": tmpPostgres.path.lstrip("/"),
+        "USER": tmpPostgres.username,
+        "PASSWORD": tmpPostgres.password,
+        "HOST": tmpPostgres.hostname,
+        "PORT": tmpPostgres.port or 5432,
     }
-
-# Ikkinchi baza - SQLite
-DATABASES['sqlite_db'] = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': os.path.join(os.path.dirname(__file__), 'sqlite_db.sqlite3'),
-}
 
 
 # DATABASES = {
