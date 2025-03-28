@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 from decouple import config
 from django.core.management.utils import get_random_secret_key
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -90,17 +91,41 @@ WSGI_APPLICATION = 'app.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-DATABASES = {
-    "default": {
-        
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
-        "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
-        "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
-        "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
-        "PORT": config("TIMESCALE_DB_PORT", default="35474"),
+
+DATABASE_URL = config("DATABASE_URL", default=None)
+
+DATABASES = {}
+
+if DATABASE_URL:
+    tmpPostgres = urlparse(DATABASE_URL)
+
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.lstrip('/'),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': tmpPostgres.port or 5432,
     }
+
+# Ikkinchi baza - SQLite
+DATABASES['sqlite_db'] = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(os.path.dirname(__file__), 'sqlite_db.sqlite3'),
 }
+
+
+# DATABASES = {
+#     "default": {
+        
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
+#         "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
+#         "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
+#         "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
+#         "PORT": config("TIMESCALE_DB_PORT", default="35474"),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
