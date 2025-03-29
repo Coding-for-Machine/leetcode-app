@@ -102,16 +102,16 @@ DATABASE_URL = config("DATABASE_URL", default=None)
 
 
 # Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
-# if DATABASE_URL:
-#     tmpPostgres = urlparse(DATABASE_URL)
-#     DATABASES["default"] = {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": tmpPostgres.path.lstrip("/"),
-#         "USER": tmpPostgres.username,
-#         "PASSWORD": tmpPostgres.password,
-#         "HOST": tmpPostgres.hostname,
-#         "PORT": tmpPostgres.port or 5432,
-#     }
+if DATABASE_URL:
+    tmpPostgres = urlparse(DATABASE_URL)
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": tmpPostgres.path.lstrip("/"),
+        "USER": tmpPostgres.username,
+        "PASSWORD": tmpPostgres.password,
+        "HOST": tmpPostgres.hostname,
+        "PORT": tmpPostgres.port or 5432,
+    }
 
 
 # DATABASES = {
