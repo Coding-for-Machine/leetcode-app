@@ -16,6 +16,7 @@ class LanguageSchema(BaseModel):
 
 class ExecutionTestCaseSchema(BaseModel):
     id: int
+    language: str
     code: str
 
 class TestCaseSchema(BaseModel):
@@ -85,7 +86,7 @@ def problem_detail_api(request, slug: str):
             "difficulty": problem.difficulty,
             "created_at": problem.created_at,
             "updated_at": problem.updated_at,
-            "execution_test_cases": [{"id": ex.id, "code": ex.code} for ex in problem.execution_problem.all()],
+            "execution_test_cases": [{"id": ex.id, "language": ex.language.name, "code": ex.code} for ex in problem.execution_problem.all()],
             "test_cases": [
                 {"id": test.id, "input_txt": test.input_txt, "output_txt": test.output_txt}
                 for test in problem.test_problem.all()[:3]

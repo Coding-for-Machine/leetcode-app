@@ -47,7 +47,10 @@ INSTALLED_APPS = [
     'users',
     'solution.apps.SolutionConfig',
     'userstatus.apps.UserstatusConfig',
+    'contest.apps.ContestConfig',
+    'commits.apps.CommitsConfig',
 ]
+AUTH_USER_MODEL = "users.MyUser"
 if DEBUG:
     INSTALLED_APPS.append("whitenoise.runserver_nostatic")
 MIDDLEWARE = [
@@ -74,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'users.context_processors.auth_profile',
             ],
         },
     },
@@ -85,34 +89,29 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 DATABASE_URL = config("DATABASE_URL", default=None)
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",  # Agar PostgreSQL yo'q bo'lsa, SQLite ishlaydi
-        "NAME": os.path.join(os.path.dirname(__file__), "sqlite_db.sqlite3"),
-    }
-}
+
 
 # Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
-if DATABASE_URL:
-    tmpPostgres = urlparse(DATABASE_URL)
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": tmpPostgres.path.lstrip("/"),
-        "USER": tmpPostgres.username,
-        "PASSWORD": tmpPostgres.password,
-        "HOST": tmpPostgres.hostname,
-        "PORT": tmpPostgres.port or 5432,
-    }
+# if DATABASE_URL:
+#     tmpPostgres = urlparse(DATABASE_URL)
+#     DATABASES["default"] = {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": tmpPostgres.path.lstrip("/"),
+#         "USER": tmpPostgres.username,
+#         "PASSWORD": tmpPostgres.password,
+#         "HOST": tmpPostgres.hostname,
+#         "PORT": tmpPostgres.port or 5432,
+#     }
 
 
 # DATABASES = {
@@ -182,6 +181,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfile')
+STATICFILES_DIRS = [
+    BASE_DIR / "statuc"
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

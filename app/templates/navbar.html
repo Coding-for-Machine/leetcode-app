@@ -1,0 +1,184 @@
+<!-- Overlay -->
+<div id="overlay" class="overlay"></div>
+{% load static %}
+<!-- Mobile menu -->
+<div id="mobileMenu" class="mobile-menu">
+    <div class="p-4 h-full flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <a href="{% url 'home' %}" class="text-xl font-bold gradient-text flex items-center">
+                <i class="fas fa-code mr-2"></i>CfM
+            </a>
+            <button id="closeMobileMenu" class="text-slate-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto">
+            <div class="space-y-2 mb-6">
+                <a href="{% url 'home' %}" class="block px-3 py-2 rounded-lg {% if request.path == '/' %}bg-indigo-50 text-indigo-600{% else %}hover:bg-slate-100{% endif %}">
+                    <i class="fas fa-compass mr-2"></i>Explore
+                </a>
+                <a href="{% url 'problems' %}" class="block px-3 py-2 rounded-lg {% if 'problems' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-slate-100{% endif %}">
+                    <i class="fas fa-list-ol mr-2"></i>Masalalar
+                </a>
+                <a href="{% url 'contest' %}" class="block px-3 py-2 rounded-lg {% if 'contest' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-slate-100{% endif %}">
+                    <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                </a>
+                <a href="{% url "comments" %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                    <i class="fas fa-comments mr-2"></i>Munozara
+                </a>
+            </div>
+            
+            <div class="px-3 py-4 border-t border-slate-200">
+                <h3 class="font-medium text-slate-700 mb-3">Profil</h3>
+                {% if user.is_authenticated %}
+                <div class="flex items-center mb-4">
+                    <img src="{% if user_profile.image and user_profile.image.url %}{{ user_profile.image.url }}{% else %}{% static 'user/user.png' %}{% endif %}" 
+                         alt="Profile" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
+                    <div>
+                        <p class="font-medium">{{ user.username }}</p>
+                        <p class="text-xs text-slate-500">
+                            {% if user_profile.is_premium %}Premium a'zo{% else %}Premium a'zo emas{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <a href="#" class="w-full gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2 block text-center">
+                    <i class="fas fa-crown mr-2"></i>Premiumga o'tish
+                </a>
+                <a href="{% url 'logout' %}" class="block text-center text-sm text-slate-600 hover:text-indigo-600 mt-2">
+                    <i class="fas fa-sign-out-alt mr-1"></i>Chiqish
+                </a>
+                {% else %}
+                <div class="space-y-2">
+                    <a href="{% url 'login' %}" class="w-full block bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg font-medium text-center">
+                        Kirish
+                    </a>
+                    <a href="{% url 'register' %}" class="w-full block gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm text-center">
+                        Ro'yxatdan o'tish
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="glass-effect sticky top-0 z-50 shadow-sm">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between h-16 items-center">
+            <!-- Logo va desktop menyu -->
+            <div class="flex items-center space-x-4">
+                <!-- Mobil menyu tugmasi -->
+                <button id="mobileMenuButton" class="lg:hidden text-slate-700">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <a href="{% url 'home' %}" class="text-xl font-bold gradient-text flex items-center">
+                    <i class="fas fa-code mr-2"></i>
+                    <span class="hidden sm:inline">CfM</span>
+                </a>
+                
+                <div class="hidden lg:flex space-x-6">
+                    <a href="{% url 'home' %}" class="nav-link px-1 py-2 text-sm font-medium flex items-center {% if request.path == '/' %}text-indigo-600 border-b-2 border-indigo-600{% else %}text-slate-700 hover:text-indigo-600{% endif %}">
+                        <i class="fas fa-compass mr-2"></i>Explore
+                    </a>
+                    <a href="{% url 'problems' %}" class="nav-link px-1 py-2 text-sm font-medium flex items-center {% if 'problems' in request.path %}text-indigo-600 border-b-2 border-indigo-600{% else %}text-slate-700 hover:text-indigo-600{% endif %}">
+                        <i class="fas fa-list-ol mr-2"></i>Masalalar
+                    </a>
+                    <a href="{% url 'contest' %}" class="nav-link px-1 py-2 text-sm font-medium flex items-center {% if 'contest' in request.path %}text-indigo-600 border-b-2 border-indigo-600{% else %}text-slate-700 hover:text-indigo-600{% endif %}">
+                        <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                    </a>
+                    <a href="{% url "comments" %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-comments mr-2"></i>Munozara
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Qidiruv va profil -->
+            <div class="flex items-center space-x-3">
+                <div class="relative hidden sm:block">
+                    <form action="{% url 'search' %}" method="get">
+                        <input type="text" name="q" placeholder="Qidirish..." 
+                               class="border border-slate-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs bg-white">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    </form>
+                </div>
+                
+                {% if request.user.is_authenticated and request.user.username %}
+                    <a href="#" class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
+                        <i class="fas fa-crown mr-2"></i>Premium
+                    </a>
+                    
+                    <div class="flex items-center space-x-2 ml-2">
+                        <button class="text-slate-500 hover:text-indigo-600 p-1">
+                            <i class="far fa-bell text-lg"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center" id="userMenuButton">
+                                <img src="{% if user_profile.image and user_profile.image.url %}{{ user_profile.image.url }}{% else %}{% static 'user/user.png' %}{% endif %}" 
+                                     alt="Profile" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
+                                <i class="fas fa-caret-down ml-1 text-slate-500 text-xs"></i>
+                            </button>
+                            
+                            <!-- Dropdown menu -->
+                            <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="{% url 'profile' request.user.username %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                    <i class="fas fa-user mr-2"></i>Profil
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                    <i class="fas fa-cog mr-2"></i>Sozlamalar
+                                </a>
+                                <div class="border-t border-slate-200"></div>
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Chiqish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="hidden sm:flex space-x-2">
+                        <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-full text-sm font-medium text-slate-700 hover:text-indigo-600">
+                            Kirish
+                        </a>
+                        <a href="{% url 'register' %}" class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                            Ro'yxatdan o'tish
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Mobile menu functionality
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const closeMobileMenu = document.getElementById('closeMobileMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('overlay');
+
+    function toggleMobileMenu() {
+        mobileMenu.classList.toggle('active');
+        overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+    }
+
+    mobileMenuButton.addEventListener('click', toggleMobileMenu);
+    closeMobileMenu.addEventListener('click', toggleMobileMenu);
+    overlay.addEventListener('click', toggleMobileMenu);
+
+    // User dropdown menu
+    const userMenuButton = document.getElementById('userMenuButton');
+    const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+    if (userMenuButton) {
+        userMenuButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenuDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', () => {
+            userMenuDropdown.classList.add('hidden');
+        });
+    }
+</script>

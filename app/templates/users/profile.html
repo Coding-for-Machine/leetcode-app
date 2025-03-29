@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil | LeetCode Kloni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .shisha-effekt {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-btn:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        
+        .karta-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .karta-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+        }
+        
+        .qiyinlik-oson {
+            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .qiyinlik-o'rta {
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+        
+        .qiyinlik-qiyin {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .tab-faol { 
+            border-bottom: 2px solid #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .hissa-grafik {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        
+        [title] {
+            position: relative;
+        }
+        
+        [title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            margin-bottom: 5px;
+            z-index: 10;
+        }
+        
+        [title]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% - 5px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(0,0,0,0.8);
+            z-index: 11;
+        }
+        
+        #oylar {
+            display: flex;
+            align-items: center;
+        }
+        
+        #oylar div {
+            flex-shrink: 0;
+        }
+        
+        #grid > div[style*="margin-right"] {
+            position: relative;
+        }
+        
+        #grid > div[style*="margin-right"]::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .nishon-progress {
+            background: conic-gradient(#6366f1 var(--progress), #f0f0f0 0deg);
+        }
+
+        /* Mobil menyu */
+        .mobil-menyu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .mobil-menyu.ochiq {
+            left: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.faol {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            .masala-jadval th, 
+            .masala-jadval td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .masala-jadval .yechim-cell {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .masala-jadval .tezlik-cell {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+    
+    <!-- Mobil menyu -->
+    <div id="mobilMenyu" class="mobil-menyu">
+        <div class="p-4 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                    <i class="fas fa-code mr-2"></i>LeetCode
+                </a>
+                <button id="yopishMobilMenyu" class="text-slate-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto">
+                <div class="space-y-2 mb-6">
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-compass mr-2"></i>Kashfiyot
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg bg-indigo-50 text-indigo-600">
+                        <i class="fas fa-list-ol mr-2"></i>Masalalar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-comments mr-2"></i>Munozara
+                    </a>
+                </div>
+                
+                <div class="px-3 py-4 border-t border-slate-200">
+                    <h3 class="font-medium text-slate-700 mb-3">Profil</h3>
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
+                        <div>
+                            <p class="font-medium">Foydalanuvchi</p>
+                            <p class="text-xs text-slate-500">Premium a'zo emas</p>
+                        </div>
+                    </div>
+                    <button class="w-full gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2">
+                        <i class="fas fa-crown mr-2"></i>Premiumga o'tish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigatsiya paneli -->
+    <nav class="shisha-effekt shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo va desktop menyu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Mobil menyu tugmasi -->
+                    <button id="mobilMenyuTugmasi" class="lg:hidden text-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>
+                        <span class="hidden sm:inline">LeetCode</span>
+                    </a>
+                    
+                    <div class="hidden lg:flex space-x-6">
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-compass mr-2"></i>Kashfiyot
+                        </a>
+                        <a href="#" class="text-indigo-600 px-1 py-2 text-sm font-medium flex items-center border-b-2 border-indigo-600">
+                            <i class="fas fa-list-ol mr-2"></i>Masalalar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-comments mr-2"></i>Munozara
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Qidiruv va profil -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="Qidirish..." 
+                               class="border border-slate-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs bg-white">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    </div>
+                    
+                    <button class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
+                        <i class="fas fa-crown mr-2"></i>Premium
+                    </button>
+                    
+                    <div class="flex items-center space-x-2 ml-2">
+                        <button class="text-slate-500 hover:text-indigo-600 p-1">
+                            <i class="far fa-bell text-lg"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
+                                <i class="fas fa-caret-down ml-1 text-slate-500 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profil sarlavhasi -->
+    <div class="gradient-bg py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="mb-6 md:mb-0 md:mr-8">
+                    <div class="relative">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-lg">
+                        <div class="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md">
+                            <i class="fas fa-camera text-indigo-500 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-white flex-1">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-start">
+                        <div class="mb-4 md:mb-0">
+                            <h1 class="text-2xl md:text-3xl font-bold mb-1">Ali Valiyev</h1>
+                            <p class="text-base md:text-lg opacity-90 mb-2">@alivaliyev</p>
+                            <p class="mb-4 max-w-lg text-sm md:text-base">Full-stack dasturchi | Open source ishqiboz | Raqobatbardosh dasturchi</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs md:text-sm">JavaScript</span>
+                                <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs md:text-sm">Python</span>
+                                <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs md:text-sm">React</span>
+                                <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs md:text-sm">Node.js</span>
+                            </div>
+                        </div>
+                        <button id="edit-profile-btn" class="bg-white text-indigo-600 hover:bg-gray-100 px-3 py-1.5 md:px-4 md:py-2 rounded-md text-sm font-medium self-start md:self-auto">
+                            Profilni Tahrirlash
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap justify-between md:justify-start md:space-x-6 pt-4 border-t border-white border-opacity-20">
+                        <div class="text-center mb-4 md:mb-0">
+                            <div class="text-xl md:text-2xl font-bold">1.2K</div>
+                            <div class="text-xs md:text-sm opacity-80">Obunachilar</div>
+                        </div>
+                        <div class="text-center mb-4 md:mb-0">
+                            <div class="text-xl md:text-2xl font-bold">245</div>
+                            <div class="text-xs md:text-sm opacity-80">Kuzatuvchilar</div>
+                        </div>
+                        <div class="text-center mb-4 md:mb-0">
+                            <div class="text-xl md:text-2xl font-bold">127</div>
+                            <div class="text-xs md:text-sm opacity-80">Yechilgan</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl md:text-2xl font-bold">42</div>
+                            <div class="text-xs md:text-sm opacity-80">Tanlovlar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hissalar grafigi -->
+    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 mt-2 mx-4 md:mx-auto max-w-4xl">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
+            <h3 class="text-base md:text-lg font-bold" id="hissalar-soni">Yuklanmoqda...</h3>
+            <div class="flex items-center space-x-4">
+                <button id="info-btn" class="text-gray-400 hover:text-indigo-600">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+                <select id="year-selector" class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <!-- Yillar JavaScript orqali to'ldiriladi -->
+                </select>
+            </div>
+        </div>
+        
+        <div class="hissa-grafik mb-4">
+            <div class="flex">
+                <!-- Hafta kunlari -->
+                <div class="w-6 md:w-8 flex flex-col items-center text-xs text-gray-500 mr-1">
+                    <div class="h-4"></div>
+                    <div class="h-4 py-1">Du</div>
+                    <div class="h-4 py-1">Se</div>
+                    <div class="h-4 py-1">Ch</div>
+                    <div class="h-4 py-1">Pa</div>
+                    <div class="h-4 py-1">Ju</div>
+                    <div class="h-4 py-1">Sh</div>
+                    <div class="h-4 py-1">Ya</div>
+                </div>
+                
+                <!-- Asosiy grafik maydoni -->
+                <div class="flex-1 overflow-x-auto">
+                    <!-- Oylar qatori -->
+                    <div id="oylar" class="flex mb-1 text-xs text-gray-500 h-4">
+                        <!-- Oylar JavaScript orqali to'ldiriladi -->
+                    </div>
+                    
+                    <!-- Katakchalar -->
+                    <div id="grid" class="grid grid-flow-col grid-rows-7 gap-1">
+                        <!-- Katakchalar JavaScript orqali to'ldiriladi -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between text-xs text-gray-500 gap-2">
+            <div class="flex items-center">
+                <span>Kam</span>
+                <div class="flex ml-2">
+                    <div class="w-2 h-2 md:w-3 md:h-3 bg-gray-100 mx-0.5"></div>
+                    <div class="w-2 h-2 md:w-3 md:h-3 bg-green-100 mx-0.5"></div>
+                    <div class="w-2 h-2 md:w-3 md:h-3 bg-green-300 mx-0.5"></div>
+                    <div class="w-2 h-2 md:w-3 md:h-3 bg-green-500 mx-0.5"></div>
+                    <div class="w-2 h-2 md:w-3 md:h-3 bg-green-700 mx-0.5"></div>
+                </div>
+                <span class="ml-2">Ko'p</span>
+            </div>
+            <button id="learn-more-btn" class="text-indigo-600 hover:underline text-xs md:text-sm">Hisoblash usuli haqida</button>
+        </div>
+    </div>
+
+    <!-- Ma'lumot modali -->
+    <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b border-gray-200 px-6 py-4">
+                <h3 class="text-lg font-bold">Faollik Grafigi</h3>
+                <button class="close-modal-btn text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="mb-4">Bu grafik tanlangan yil davomidagi faolligingizni ko'rsatadi. Har bir katak bir kunni ifodalaydi, rang qoraygani sari ko'proq hissa qo'shganligingizni bildiradi.</p>
+                <div class="flex items-center mb-2">
+                    <div class="w-3 h-3 bg-gray-100 mr-2"></div>
+                    <span>Hissa qo'shilmagan</span>
+                </div>
+                <div class="flex items-center mb-2">
+                    <div class="w-3 h-3 bg-green-100 mr-2"></div>
+                    <span>1-9 ta hissa</span>
+                </div>
+                <div class="flex items-center mb-2">
+                    <div class="w-3 h-3 bg-green-300 mr-2"></div>
+                    <span>10-19 ta hissa</span>
+                </div>
+                <div class="flex items-center mb-2">
+                    <div class="w-3 h-3 bg-green-500 mr-2"></div>
+                    <span>20-29 ta hissa</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-700 mr-2"></div>
+                    <span>30+ ta hissa</span>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 px-6 py-4 flex justify-end">
+                <button class="close-modal-btn gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Tushundim!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asosiy kontent -->
+    <div class="container mx-auto px-4 py-2">
+        <!-- Tab navigatsiyasi -->
+        <div class="bg-white rounded-t-lg shadow-sm">
+            <div class="flex overflow-x-auto">
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="overview">
+                    Umumiy ko'rinish
+                </button>
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="solutions">
+                    Yechimlar
+                </button>
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="discussions">
+                    Munozaralar
+                </button>
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="activity">
+                    Faollik
+                </button>
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="contest">
+                    Tanlovlar
+                </button>
+                <button class="tab-btn px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" data-tab="badges">
+                    Nishonlar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab kontenti -->
+        <div class="bg-white rounded-b-lg shadow-sm p-4 md:p-6">
+            <!-- Umumiy ko'rinish tabi (default) -->
+            <div id="overview-tab" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                    <!-- Progress statistikasi -->
+                    <div class="bg-gray-50 rounded-xl p-4 md:p-6">
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4">Progress Statistikasi</h3>
+                        <div class="space-y-4 md:space-y-6">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs md:text-sm text-gray-600">Jami Yechilgan</span>
+                                    <span class="text-xs md:text-sm font-medium">127/2000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="gradient-btn h-2 rounded-full" style="width: 6.35%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs md:text-sm text-gray-600">Oson</span>
+                                    <span class="text-xs md:text-sm font-medium">85/500</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 17%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs md:text-sm text-gray-600">Oʻrtacha</span>
+                                    <span class="text-xs md:text-sm font-medium">32/1000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 3.2%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs md:text-sm text-gray-600">Qiyin</span>
+                                    <span class="text-xs md:text-sm font-medium">10/500</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 2%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ko'nikmalar diagrammasi -->
+                    <div class="bg-gray-50 rounded-xl p-4 md:p-6">
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4">Ko'nikmalar</h3>
+                        <div class="relative h-48 md:h-64">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                        <div class="mt-3 md:mt-4 grid grid-cols-2 gap-2">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 md:w-3 md:h-3 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-xs">JavaScript</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 md:w-3 md:h-3 bg-green-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Python</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 md:w-3 md:h-3 bg-yellow-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Java</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 md:w-3 md:h-3 bg-purple-500 rounded-full mr-2"></div>
+                                <span class="text-xs">C++</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- So'nggi nishonlar -->
+                    <div class="bg-gray-50 rounded-xl p-4 md:p-6">
+                        <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4">So'nggi Nishonlar</h3>
+                        <div class="grid grid-cols-3 gap-3 md:gap-4">
+                            <div class="flex flex-col items-center">
+                                <div class="relative w-12 h-12 md:w-16 md:h-16 mb-2">
+                                    <div class="nishon-progress rounded-full w-full h-full flex items-center justify-center" style="--progress: 70%">
+                                        <div class="bg-white rounded-full w-8 h-8 md:w-12 md:h-12 flex items-center justify-center">
+                                            <i class="fas fa-code text-indigo-500 text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-center font-medium">100 Kun</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="relative w-12 h-12 md:w-16 md:h-16 mb-2">
+                                    <div class="nishon-progress rounded-full w-full h-full flex items-center justify-center" style="--progress: 30%">
+                                        <div class="bg-white rounded-full w-8 h-8 md:w-12 md:h-12 flex items-center justify-center">
+                                            <i class="fas fa-star text-yellow-400 text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-center font-medium">Ritsar</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="relative w-12 h-12 md:w-16 md:h-16 mb-2">
+                                    <div class="nishon-progress rounded-full w-full h-full flex items-center justify-center" style="--progress: 100%">
+                                        <div class="bg-white rounded-full w-8 h-8 md:w-12 md:h-12 flex items-center justify-center">
+                                            <i class="fas fa-check text-green-500 text-lg"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-center font-medium">50 Yechim</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 md:mt-4 text-xs md:text-sm text-indigo-600 hover:underline">
+                            Barcha nishonlarni ko'rish
+                        </button>
+                    </div>
+                </div>
+
+                <!-- So'nggi faollik -->
+                <div class="mb-6 md:mb-8">
+                    <h3 class="text-base md:text-lg font-bold mb-3 md:mb-4">So'nggi Faollik</h3>
+                    <div class="space-y-3 md:space-y-4">
+                        <div class="flex items-start p-3 md:p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="bg-green-100 p-2 rounded-full mr-3 md:mr-4">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs md:text-sm mb-1"><a href="#" class="font-medium text-indigo-600">Ikki Son Yig'indisi</a> masalasini yechdingiz</p>
+                                <p class="text-xs text-gray-500">2 soat oldin</p>
+                            </div>
+                            <span class="qiyinlik-oson px-2 py-1 text-xs rounded-full">Oson</span>
+                        </div>
+                        <div class="flex items-start p-3 md:p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3 md:mr-4">
+                                <i class="fas fa-trophy text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs md:text-sm mb-1"><a href="#" class="font-medium text-indigo-600">Haftalik Tanlov 345</a>da qatnashdingiz</p>
+                                <p class="text-xs text-gray-500">1 kun oldin</p>
+                            </div>
+                            <span class="text-xs text-gray-500">Oʻrin: 1245</span>
+                        </div>
+                        <div class="flex items-start p-3 md:p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="bg-purple-100 p-2 rounded-full mr-3 md:mr-4">
+                                <i class="fas fa-comment text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs md:text-sm mb-1"><a href="#" class="font-medium text-indigo-600">"DP masalalariga yondashuv"</a>ga izoh qoldirdingiz</p>
+                                <p class="text-xs text-gray-500">3 kun oldin</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yechilgan masalalar -->
+                <div>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4 gap-2">
+                        <h3 class="text-base md:text-lg font-bold">Yaqinda Yechilgan Masalalar</h3>
+                        <a href="#" class="text-xs md:text-sm text-indigo-600 hover:underline">Barchasini ko'rish</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 masala-jadval">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Masala</th>
+                                    <th scope="col" class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qiyinlik</th>
+                                    <th scope="col" class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider tezlik-cell">Tezlik</th>
+                                    <th scope="col" class="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Xotira</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <div class="text-xs md:text-sm font-medium text-gray-900">1. Ikki Son Yig'indisi</div>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <span class="qiyinlik-oson px-2 py-1 text-xs rounded-full">Oson</span>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 tezlik-cell">76 ms</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">42.1 MB</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <div class="text-xs md:text-sm font-medium text-gray-900">20. To'g'ri Qavslar</div>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <span class="qiyinlik-oson px-2 py-1 text-xs rounded-full">Oson</span>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 tezlik-cell">68 ms</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">40.3 MB</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <div class="text-xs md:text-sm font-medium text-gray-900">53. Maksimal Qism Massiv</div>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                        <span class="qiyinlik-o'rta px-2 py-1 text-xs rounded-full">Oʻrtacha</span>
+                                    </td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 tezlik-cell">92 ms</td>
+                                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">50.7 MB</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yechimlar tabi (yashirin) -->
+            <div id="solutions-tab" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-6 gap-2">
+                    <h3 class="text-base md:text-lg font-bold">Mening Yechimlarim</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <select class="border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>Barcha Tillar</option>
+                            <option>JavaScript</option>
+                            <option>Python</option>
+                            <option>Java</option>
+                        </select>
+                        <select class="border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>Yangi birinchi</option>
+                            <option>Eski birinchi</option>
+                            <option>Ko'p ovozlar</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 md:space-y-6">
+                    <div class="border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md transition-all">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-3 md:mb-4 gap-2">
+                            <div>
+                                <h4 class="font-bold text-base md:text-lg mb-1">Ikki Son Yig'indisi Yechimi</h4>
+                                <p class="text-xs md:text-sm text-gray-600 mb-2">Hash Map yondashuvi bilan O(n) vaqt murakkabligi</p>
+                                <div class="flex flex-wrap gap-1 md:gap-2">
+                                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">JavaScript</span>
+                                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Hash Jadvali</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs md:text-sm text-gray-500">Bugun</span>
+                                <div class="flex items-center text-xs md:text-sm text-gray-500">
+                                    <i class="fas fa-thumbs-up mr-1"></i> 24
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 text-green-400 p-3 md:p-4 rounded-lg overflow-x-auto mb-3 md:mb-4">
+                            <pre><code class="text-xs md:text-sm">
+function twoSum(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
+        }
+        map.set(nums[i], i);
+    }
+    return [];
+}
+                            </code></pre>
+                        </div>
+                        <div class="flex flex-col md:flex-row md:justify-between items-center gap-2">
+                            <div class="flex space-x-2 md:space-x-4">
+                                <button class="text-gray-500 hover:text-indigo-600 text-xs md:text-sm">
+                                    <i class="far fa-comment mr-1"></i> 5 Izoh
+                                </button>
+                                <button class="text-gray-500 hover:text-indigo-600 text-xs md:text-sm">
+                                    <i class="fas fa-share-alt mr-1"></i> Ulashish
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-500 hover:text-green-500 text-xs md:text-sm">
+                                    <i class="far fa-edit"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-red-500 text-xs md:text-sm">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md transition-all">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-3 md:mb-4 gap-2">
+                            <div>
+                                <h4 class="font-bold text-base md:text-lg mb-1">To'g'ri Qavslar Yechimi</h4>
+                                <p class="text-xs md:text-sm text-gray-600 mb-2">Stek yondashuvi bilan O(n) vaqt murakkabligi</p>
+                                <div class="flex flex-wrap gap-1 md:gap-2">
+                                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Python</span>
+                                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Stek</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs md:text-sm text-gray-500">Kecha</span>
+                                <div class="flex items-center text-xs md:text-sm text-gray-500">
+                                    <i class="fas fa-thumbs-up mr-1"></i> 12
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 text-green-400 p-3 md:p-4 rounded-lg overflow-x-auto mb-3 md:mb-4">
+                            <pre><code class="text-xs md:text-sm">
+def isValid(self, s: str) -> bool:
+    stack = []
+    mapping = {")": "(", "}": "{", "]": "["}
+    for char in s:
+        if char in mapping:
+            top_element = stack.pop() if stack else '#'
+            if mapping[char] != top_element:
+                return False
+        else:
+            stack.append(char)
+    return not stack
+                            </code></pre>
+                        </div>
+                        <div class="flex flex-col md:flex-row md:justify-between items-center gap-2">
+                            <div class="flex space-x-2 md:space-x-4">
+                                <button class="text-gray-500 hover:text-indigo-600 text-xs md:text-sm">
+                                    <i class="far fa-comment mr-1"></i> 3 Izoh
+                                </button>
+                                <button class="text-gray-500 hover:text-indigo-600 text-xs md:text-sm">
+                                    <i class="fas fa-share-alt mr-1"></i> Ulashish
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-500 hover:text-green-500 text-xs md:text-sm">
+                                    <i class="far fa-edit"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-red-500 text-xs md:text-sm">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 md:mt-6 flex justify-center">
+                    <button class="border border-gray-300 text-gray-700 px-3 py-1.5 md:px-4 md:py-2 rounded-md text-xs md:text-sm font-medium hover:bg-gray-50">
+                        Ko'proq Yuklash
+                    </button>
+                </div>
+            </div>
+
+            <!-- Boshqa tablar shu yerda bo'ladi -->
+            <div id="discussions-tab" class="tab-content hidden">
+                <!-- Munozaralar kontenti -->
+            </div>
+            <div id="activity-tab" class="tab-content hidden">
+                <!-- Faollik kontenti -->
+            </div>
+            <div id="contest-tab" class="tab-content hidden">
+                <!-- Tanlovlar kontenti -->
+            </div>
+            <div id="badges-tab" class="tab-content hidden">
+                <!-- Nishonlar kontenti -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-6 md:py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Mahsulot</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Xususiyatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Narxlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Premium</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biznes</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Resurslar</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Hujjatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Darsliklar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Jamiyat</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Kompaniya</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biz haqimizda</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Karera</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Matbuot</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Aloqa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Huquqiy</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Maxfiylik</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Shartlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Cookie Siyosati</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 md:pt-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-3 md:mb-0">
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>LeetCode
+                    </a>
+                </div>
+                <div class="text-xs md:text-sm text-gray-600">
+                    © 2023 LeetCode Kloni. Barcha huquqlar himoyalangan.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Profilni tahrirlash modali (yashirin) -->
+    <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b border-gray-200 px-6 py-4">
+                <h3 class="text-lg font-bold">Profilni Tahrirlash</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 md:p-6">
+                <form>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-medium mb-1 md:mb-2" for="name">Ism</label>
+                        <input id="name" type="text" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs md:text-sm" value="Ali Valiyev">
+                    </div>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-medium mb-1 md:mb-2" for="username">Foydalanuvchi nomi</label>
+                        <input id="username" type="text" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs md:text-sm" value="@alivaliyev">
+                    </div>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-medium mb-1 md:mb-2" for="bio">Bio</label>
+                        <textarea id="bio" rows="3" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs md:text-sm">Full-stack dasturchi | Open source ishqiboz | Raqobatbardosh dasturchi</textarea>
+                    </div>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-medium mb-1 md:mb-2">Ko'nikmalar</label>
+                        <div class="flex flex-wrap gap-1 md:gap-2">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
+                                JavaScript <button class="ml-1 text-blue-500 hover:text-blue-700"><i class="fas fa-times text-xs"></i></button>
+                            </span>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
+                                Python <button class="ml-1 text-green-500 hover:text-green-700"><i class="fas fa-times text-xs"></i></button>
+                            </span>
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full flex items-center">
+                                React <button class="ml-1 text-purple-500 hover:text-purple-700"><i class="fas fa-times text-xs"></i></button>
+                            </span>
+                            <button class="text-indigo-600 hover:text-indigo-700 text-xs flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Ko'nikma qo'shish
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3 md:mb-4">
+                        <label class="block text-gray-700 text-xs md:text-sm font-medium mb-1 md:mb-2">Profil rasmi</label>
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-12 h-12 md:w-16 md:h-16 border-2 border-indigo-200 mr-3 md:mr-4">
+                            <button class="border border-gray-300 text-gray-700 px-2 py-1 md:px-3 md:py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-gray-50">
+                                O'zgartirish
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="border-t border-gray-200 px-6 py-4 flex justify-end">
+                <button class="border border-gray-300 text-gray-700 px-3 py-1.5 md:px-4 md:py-2 rounded-md text-xs md:text-sm font-medium hover:bg-gray-50 mr-2">
+                    Bekor qilish
+                </button>
+                <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-md text-xs md:text-sm font-medium">
+                    O'zgarishlarni Saqlash
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Tab funksionalligi
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Barcha tablardan faol klassini olib tashlash
+                    tabs.forEach(t => t.classList.remove('tab-faol'));
+                    // Bosilgan tabga faol klassini qo'shish
+                    this.classList.add('tab-faol');
+                    
+                    // Barcha tab kontentlarini yashirish
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    // Tanlangan tab kontentini ko'rsatish
+                    const tabId = this.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.remove('hidden');
+                });
+            });
+            
+            // Birinchi tabni default faol qilish
+            if (tabs.length > 0) {
+                tabs[0].classList.add('tab-faol');
+                const firstTabId = tabs[0].getAttribute('data-tab') + '-tab';
+                document.getElementById(firstTabId).classList.remove('hidden');
+            }
+            
+            // Modal funksionalligi
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const modal = document.getElementById('edit-profile-modal');
+            
+            editProfileBtn.addEventListener('click', function() {
+                modal.classList.remove('hidden');
+            });
+            
+            closeModalBtn.addEventListener('click', function() {
+                modal.classList.add('hidden');
+            });
+            
+            // Modal tashqarisiga bosilganda yopish
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            // Ko'nikmalar diagrammasi
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['JavaScript', 'Python', 'Java', 'C++', 'Boshqa'],
+                    datasets: [{
+                        data: [45, 30, 15, 7, 3],
+                        backgroundColor: [
+                            '#3B82F6',
+                            '#10B981',
+                            '#F59E0B',
+                            '#8B5CF6',
+                            '#E5E7EB'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+            
+            // Progress halqa animatsiyasi
+            const progressRing = document.querySelector('.progress-ring__circle');
+            if (progressRing) {
+                setTimeout(() => {
+                    progressRing.style.strokeDashoffset = '25';
+                }, 500);
+            }
+
+            // Mobil menyu boshqaruvi
+            const mobilMenyuTugmasi = document.getElementById('mobilMenyuTugmasi');
+            const yopishMobilMenyu = document.getElementById('yopishMobilMenyu');
+            const mobilMenyu = document.getElementById('mobilMenyu');
+            const overlay = document.getElementById('overlay');
+            const body = document.body;
+            
+            // Menyuni ochish
+            mobilMenyuTugmasi.addEventListener('click', function() {
+                mobilMenyu.classList.add('ochiq');
+                overlay.classList.add('faol');
+                body.classList.add('overflow-hidden');
+            });
+            
+            // Menyuni yopish
+            function yopishMenyu() {
+                mobilMenyu.classList.remove('ochiq');
+                overlay.classList.remove('faol');
+                body.classList.remove('overflow-hidden');
+            }
+            
+            yopishMobilMenyu.addEventListener('click', yopishMenyu);
+            overlay.addEventListener('click', yopishMenyu);
+            
+            // Responsive o'lchovlar
+            function handleResize() {
+                if (window.innerWidth >= 1024) {
+                    yopishMenyu();
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+        });
+
+        // Hissalar grafigi uchun JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sozlamalar
+            const currentYear = new Date().getFullYear();
+            const years = [currentYear - 2, currentYear - 1, currentYear];
+            let selectedYear = currentYear;
+            
+            // DOM elementlari
+            const yearSelector = document.getElementById('year-selector');
+            const hissalarSoni = document.getElementById('hissalar-soni');
+            const oylar = document.getElementById('oylar');
+            const grid = document.getElementById('grid');
+            const infoBtn = document.getElementById('info-btn');
+            const learnMoreBtn = document.getElementById('learn-more-btn');
+            const infoModal = document.getElementById('info-modal');
+            const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+            
+            // Yil tanlovini to'ldirish
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                option.selected = year === currentYear;
+                yearSelector.appendChild(option);
+            });
+            
+            // Hodisalar
+            yearSelector.addEventListener('change', function() {
+                selectedYear = parseInt(this.value);
+                renderContributionGraph();
+            });
+            
+            infoBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
+            learnMoreBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
+            
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => infoModal.classList.add('hidden'));
+            });
+            
+            infoModal.addEventListener('click', (e) => {
+                if (e.target === infoModal) {
+                    infoModal.classList.add('hidden');
+                }
+            });
+            
+            // Asosiy chizish funktsiyasi
+            function renderContributionGraph() {
+                // Avvalgi kontentni tozalash
+                oylar.innerHTML = '';
+                grid.innerHTML = '';
+                
+                // Tanlangan yil uchun ma'lumot yaratish
+                const contributionData = generateYearlyContributionData(selectedYear);
+                const totalContributions = calculateTotalContributions(contributionData);
+                
+                // Hissalar sonini yangilash
+                hissalarSoni.textContent = `${selectedYear} yilda ${totalContributions} ta hissa`;
+                
+                // Oylar nomlari
+                renderMonthLabels(contributionData);
+                
+                // Katakchalarni chizish
+                renderGridCells(contributionData);
+            }
+            
+            // Tasodifiy hissa ma'lumotlari
+            function generateYearlyContributionData(year) {
+                const weeks = [];
+                const firstDayOfYear = new Date(year, 0, 1);
+                const lastDayOfYear = new Date(year, 11, 31);
+                
+                // Yil boshlanishidan oldingi yakshanbani topish
+                let currentDate = new Date(firstDayOfYear);
+                currentDate.setDate(currentDate.getDate() - currentDate.getDay());
+                
+                // Yil oxirigacha haftalarni yaratish
+                while (currentDate <= lastDayOfYear) {
+                    const week = [];
+                    let weekHasDaysInYear = false;
+                    
+                    // Har hafta uchun 7 kun
+                    for (let i = 0; i < 7; i++) {
+                        const dayDate = new Date(currentDate);
+                        dayDate.setDate(dayDate.getDate() + i);
+                        
+                        // Faqat tanlangan yildagi kunlarni qo'shish
+                        if (dayDate.getFullYear() === year) {
+                            weekHasDaysInYear = true;
+                            let count;
+                            const rand = Math.random();
+                            if (rand < 0.6) count = 0;
+                            else if (rand < 0.8) count = Math.floor(Math.random() * 9) + 1;
+                            else if (rand < 0.9) count = Math.floor(Math.random() * 10) + 10;
+                            else if (rand < 0.95) count = Math.floor(Math.random() * 10) + 20;
+                            else count = Math.floor(Math.random() * 20) + 30;
+                            
+                            week.push({
+                                date: dayDate,
+                                count: count,
+                                month: dayDate.getMonth()
+                            });
+                        } else {
+                            // Yil chegarasidan tashqaridagi kunlar uchun bo'sh katak
+                            week.push(null);
+                        }
+                    }
+                    
+                    // Faqat yil ichida kamida 1 kuni bo'lgan haftalarni qo'shish
+                    if (weekHasDaysInYear) {
+                        weeks.push(week);
+                    }
+                    
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+                
+                return weeks;
+            }
+            
+            // Jami hissalarni hisoblash
+            function calculateTotalContributions(contributionData) {
+                return contributionData.reduce((total, week) => {
+                    return total + week.reduce((weekTotal, day) => {
+                        return weekTotal + (day ? day.count : 0);
+                    }, 0);
+                }, 0);
+            }
+            
+            // Oylar nomlarini chizish
+            function renderMonthLabels(contributionData) {
+                const monthNames = ["Yan", "Fev", "Mar", "Apr", "May", "Iyn", 
+                                  "Iyl", "Avg", "Sen", "Okt", "Noy", "Dek"];
+                let currentMonth = -1;
+                let monthStartIndex = 0;
+                let lastDayProcessed = false;
+                
+                // Har oyning 1-kuni bo'lgan haftalarni topish
+                contributionData.forEach((week, weekIndex) => {
+                    week.forEach(day => {
+                        if (day && day.date.getDate() === 1 && !lastDayProcessed) {
+                            const month = day.date.getMonth();
+                            if (month !== currentMonth) {
+                                // Oy nomi uchun joy hisoblash
+                                const monthWidth = weekIndex - monthStartIndex;
+                                if (monthWidth > 0 && currentMonth >= 0) {
+                                    const monthLabel = document.createElement('div');
+                                    monthLabel.textContent = monthNames[currentMonth];
+                                    monthLabel.style.marginRight = '47px'; // Oylar orasida 8px bo'shliq
+                                    monthLabel.style.minWidth = `${monthWidth * 14}px`;
+                                    oylar.appendChild(monthLabel);
+                                }
+                                
+                                currentMonth = month;
+                                monthStartIndex = weekIndex;
+                            }
+                        }
+                        
+                        // Yil oxiriga yetib borilganligini tekshirish
+                        if (day && day.date.getMonth() === 11 && day.date.getDate() === 31) {
+                            lastDayProcessed = true;
+                        }
+                    });
+                });
+                
+                // Oxirgi oyni qo'shish
+                if (currentMonth >= 0) {
+                    const monthLabel = document.createElement('div');
+                    monthLabel.textContent = monthNames[currentMonth];
+                    monthLabel.style.marginRight = '8px';
+                    oylar.appendChild(monthLabel);
+                }
+            }
+            
+            // Katakchalarni chizish (oylarni ajratib)
+            function renderGridCells(contributionData) {
+                // Oylar o'rtasidagi o'tishlarni aniqlash
+                const monthTransitions = [];
+                let currentMonth = -1;
+                
+                contributionData.forEach((week, weekIndex) => {
+                    week.forEach(day => {
+                        if (day && day.month !== currentMonth) {
+                            monthTransitions.push(weekIndex);
+                            currentMonth = day.month;
+                        }
+                    });
+                });
+                
+                // Ma'lumotlarni aylantirib, hafta kunlarini qatorlarga aylantirish
+                for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                    contributionData.forEach((week, weekIndex) => {
+                        const day = week[dayOfWeek];
+                        const cell = document.createElement('div');
+                        
+                        // Oylar o'rtasiga bo'shliq qo'shish
+                        if (monthTransitions.includes(weekIndex)) {
+                            cell.style.marginRight = '8px'; // Oylar orasida 8px bo'shliq
+                        }
+                        
+                        if (day) {
+                            cell.className = `w-2 h-2 md:w-3 md:h-3 rounded-sm cursor-pointer ${getColorClass(day.count)}`;
+                            cell.title = `${formatDate(day.date)}: ${day.count} ta hissa`;
+                        } else {
+                            cell.className = 'w-2 h-2 md:w-3 md:h-3 opacity-0'; // Ko'rinmas katak (padding uchun)
+                        }
+                        
+                        grid.appendChild(cell);
+                    });
+                }
+            }
+            
+            // Yordamchi funktsiyalar
+            function getColorClass(count) {
+                if (count === 0) return 'bg-gray-100';
+                if (count < 10) return 'bg-green-100';
+                if (count < 20) return 'bg-green-300';
+                if (count < 30) return 'bg-green-500';
+                return 'bg-green-700';
+            }
+            
+            function formatDate(date) {
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                return date.toLocaleDateString('uz-UZ', options);
+            }
+            
+            // Dastlabki chizish
+            renderContributionGraph();
+        });
+    </script>
+</body>
+</html>

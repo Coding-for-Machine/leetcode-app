@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Contest Page Content -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Main Content -->
+            <div class="w-full lg:w-2/3">
+                <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+                        <h1 class="text-2xl font-bold gradient-text flex items-center mb-4 md:mb-0">
+                            <i class="fas fa-trophy text-indigo-500 mr-2"></i>
+                            Kodlash Tanlovlari
+                        </h1>
+                        <div class="flex space-x-2">
+                            <button class="border border-indigo-500 text-indigo-500 hover:bg-indigo-50 px-3 py-1 rounded-lg text-sm font-medium">
+                                <i class="fas fa-history mr-1"></i> O'tgan tanlovlar
+                            </button>
+                            <button class="gradient-btn text-white px-3 py-1 rounded-lg text-sm font-medium shadow-sm">
+                                <i class="fas fa-plus mr-1"></i> Yangi tanlov
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Contests -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>
+                            Kelgusi Tanlovlar
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Contest Card 1 -->
+                            <div class="contest-card card-hover bg-white rounded-lg p-5">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                    <div class="mb-3 md:mb-0">
+                                        <h3 class="font-bold text-lg mb-1">Haftalik Tanlov #345</h3>
+                                        <div class="flex items-center text-sm text-slate-600">
+                                            <i class="fas fa-clock mr-2"></i>
+                                            <span>15 Iyun, 2023 | 18:30 (Toshkent vaqti)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                            90 daqiqa
+                                        </span>
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                                            4 masala
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between contest-card-content">
+                                    <div class="flex items-center mb-2 md:mb-0">
+                                        <div class="relative w-16 h-16 mr-3">
+                                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                                <circle cx="18" cy="18" r="16" fill="none" stroke="#e2e8f0" stroke-width="2"></circle>
+                                                <circle cx="18" cy="18" r="16" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="40" class="progress-ring__circle"></circle>
+                                                <text x="18" y="20.5" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="bold">60%</text>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-slate-600">Ro'yxatdan o'tganlar</p>
+                                            <p class="text-sm font-medium">1,245 ishtirokchi</p>
+                                        </div>
+                                    </div>
+                                    <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm contest-register-btn">
+                                        Ro'yxatdan o'tish
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Contest Card 2 -->
+                            <div class="contest-card card-hover bg-white rounded-lg p-5">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                    <div class="mb-3 md:mb-0">
+                                        <h3 class="font-bold text-lg mb-1">2-Haftalik Tanlov #106</h3>
+                                        <div class="flex items-center text-sm text-slate-600">
+                                            <i class="fas fa-clock mr-2"></i>
+                                            <span>24 Iyun, 2023 | 16:30 (Toshkent vaqti)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                            90 daqiqa
+                                        </span>
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                                            4 masala
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between contest-card-content">
+                                    <div class="flex items-center mb-2 md:mb-0">
+                                        <div class="relative w-16 h-16 mr-3">
+                                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                                <circle cx="18" cy="18" r="16" fill="none" stroke="#e2e8f0" stroke-width="2"></circle>
+                                                <circle cx="18" cy="18" r="16" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="70" class="progress-ring__circle"></circle>
+                                                <text x="18" y="20.5" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="bold">30%</text>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-slate-600">Ro'yxatdan o'tganlar</p>
+                                            <p class="text-sm font-medium">845 ishtirokchi</p>
+                                        </div>
+                                    </div>
+                                    <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm contest-register-btn">
+                                        Ro'yxatdan o'tish
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Contests -->
+                    <div>
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-history text-indigo-500 mr-2"></i>
+                            O'tgan Tanlovlar
+                        </h2>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanlov</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Sana</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Masalalar</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">O'rin</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ball</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-slate-200">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="font-medium">Haftalik Tanlov #344</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                            8 Iyun, 2023
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">4</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            #1,245
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                                            2,150
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-800">Natijalar</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="font-medium">2-Haftalik Tanlov #105</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                            10 Iyun, 2023
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">4</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            #2,341
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                                            1,850
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-800">Natijalar</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="font-medium">Haftalik Tanlov #343</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                            1 Iyun, 2023
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">4</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            #3,142
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                                            1,650
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-800">Natijalar</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-4 flex justify-center">
+                            <button class="border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50">
+                                Barchasini ko'rish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="w-full lg:w-1/3">
+                <!-- Contest Stats -->
+                <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-indigo-500 mr-2"></i>
+                        Tanlov Statistikasi
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-600">Ishtirok etgan tanlovlar</span>
+                                <span class="font-medium">42</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div class="bg-indigo-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-600">Eng yaxshi o'rin</span>
+                                <span class="font-medium">#245</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-600">O'rtacha o'rin</span>
+                                <span class="font-medium">#1,842</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-600">Yig'ilgan ball</span>
+                                <span class="font-medium">24,150</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contest Rules -->
+                <div class="card-hover bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-info-circle text-indigo-500 mr-2"></i>
+                        Tanlov Qoidalari
+                    </h2>
+                    
+                    <div class="space-y-3 text-sm text-slate-700">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-1 rounded-full mr-3 mt-1">
+                                <i class="fas fa-clock text-indigo-500 text-xs"></i>
+                            </div>
+                            <p>Har bir tanlov 90 daqiqa davom etadi</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-1 rounded-full mr-3 mt-1">
+                                <i class="fas fa-list-ol text-indigo-500 text-xs"></i>
+                            </div>
+                            <p>Har bir tanlovda 4 ta algoritmik masala bo'ladi</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-1 rounded-full mr-3 mt-1">
+                                <i class="fas fa-star text-indigo-500 text-xs"></i>
+                            </div>
+                            <p>Masalalar qiyinlik darajasi: 1-oson, 4-eng qiyin</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-1 rounded-full mr-3 mt-1">
+                                <i class="fas fa-trophy text-indigo-500 text-xs"></i>
+                            </div>
+                            <p>Eng ko'p ball to'plagan ishtirokchilar g'olib hisoblanadi</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-1 rounded-full mr-3 mt-1">
+                                <i class="fas fa-medal text-indigo-500 text-xs"></i>
+                            </div>
+                            <p>Yaxshi natijalar reytingingizni oshiradi</p>
+                        </div>
+                    </div>
+                    
+                    <button class="mt-4 w-full text-sm text-indigo-600 hover:underline">
+                        Batafsil qoidalar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

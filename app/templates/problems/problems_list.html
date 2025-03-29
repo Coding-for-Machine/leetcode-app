@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masalalar | LeetCode Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Asosiy stil qoidalari */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+            color: #1e293b;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        body.menu-open {
+            overflow: hidden;
+        }
+        
+        /* Navbar uchun shaffof fon effekti */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        /* Gradient tekst */
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Kartalar uchun hover effekti */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Qiyinlik darajalari uchun stil */
+        .difficulty-easy {
+            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .difficulty-medium {
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+        
+        .difficulty-hard {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        /* Takvim kunlari */
+        .calendar-day {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e0e7ff;
+        }
+        
+        .calendar-day.has-problem {
+            background-color: #c7d2fe;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #6366f1;
+        }
+        
+        .calendar-day.selected {
+            background-color: #6366f1;
+            color: white;
+        }
+        
+        /* Qidiruv konteyneri */
+        .search-container {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container.focused {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Qidiruv natijalari */
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .search-container.active .search-results {
+            display: block;
+        }
+        
+        /* Checkbox uchun maxsus stil */
+        .custom-checkbox {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.25rem;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .custom-checkbox:checked {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+        
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            width: 0.625rem;
+            height: 0.625rem;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: center;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Gradient tugmalar */
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-btn:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Jadval satrlari uchun hover effekti */
+        .problem-row:hover {
+            background-color: #f8fafc;
+        }
+        
+        /* Mobil menyu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            left: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Responsive tuzilish */
+        @media (max-width: 1024px) {
+            .calendar-day {
+                font-size: 0.75rem;
+                padding: 0.25rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .problem-table th, 
+            .problem-table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .problem-table .difficulty-cell {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .search-container {
+                width: 100%;
+            }
+            
+            .problem-table .topic-cell {
+                display: none;
+            }
+            
+            .pagination-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "navbar.html" %}
+
+    <!-- Problems Page Content -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold gradient-text mb-2">Masalalar</h1>
+                <p class="text-slate-600 text-sm md:text-base">Algoritmik masalalarni hal qilish orqali dasturlash mahoratingizni oshiring</p>
+            </div>
+            <div class="mt-3 md:mt-0">
+                <button class="gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm flex items-center text-sm md:text-base">
+                    <i class="fas fa-random mr-2"></i> Tasodifiy Masala
+                </button>
+            </div>
+        </div>
+        
+        <!-- Calendar and Filters -->
+        <div class="flex flex-col lg:flex-row gap-5 mb-6">
+            <!-- Calendar Panel -->
+            <div class="w-full lg:w-1/4">
+                <div class="card-hover bg-white rounded-xl shadow-sm p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold gradient-text">Masalalar Takvimi</h2>
+                        <div class="flex space-x-1">
+                            <button id="prevMonth" class="p-1 text-slate-500 hover:text-indigo-600">
+                                <i class="fas fa-chevron-left text-sm"></i>
+                            </button>
+                            <button id="nextMonth" class="p-1 text-slate-500 hover:text-indigo-600">
+                                <i class="fas fa-chevron-right text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-3">
+                        <h3 id="currentMonth" class="font-semibold">Iyun 2023</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-1 mb-1 text-xs">
+                        <div class="text-center text-slate-500">D</div>
+                        <div class="text-center text-slate-500">S</div>
+                        <div class="text-center text-slate-500">C</div>
+                        <div class="text-center text-slate-500">P</div>
+                        <div class="text-center text-slate-500">J</div>
+                        <div class="text-center text-slate-500">S</div>
+                        <div class="text-center text-slate-500">Y</div>
+                    </div>
+                    
+                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-sm">
+                        <!-- JavaScript orqali to'ldiriladi -->
+                    </div>
+                    
+                    <div class="mt-3 pt-3 border-t border-slate-200 text-xs">
+                        <div class="flex items-center mb-1">
+                            <div class="w-2 h-2 rounded-full bg-indigo-100 border border-indigo-300 mr-2"></div>
+                            <span class="text-slate-600">Bugun</span>
+                        </div>
+                        <div class="flex items-center mb-1">
+                            <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
+                            <span class="text-slate-600">Tanlangan</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full bg-indigo-200 mr-2"></div>
+                            <span class="text-slate-600">Masala bor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filters Panel -->
+            <div class="w-full lg:w-3/4">
+                <div class="card-hover bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <h2 class="text-lg font-bold gradient-text mb-3">Filtrlar</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">Mavzu</label>
+                            <select class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Barchasi</option>
+                                <option>Daraxtlar</option>
+                                <option>Grafiklar</option>
+                                <option>Dinamik dasturlash</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">Qiyinlik</label>
+                            <select class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Barchasi</option>
+                                <option>Oson</option>
+                                <option>Oʻrtacha</option>
+                                <option>Qiyin</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs md:text-sm font-medium text-slate-700 mb-1">Holat</label>
+                            <select class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Barchasi</option>
+                                <option>Hal qilingan</option>
+                                <option>Hal qilinmagan</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="premiumOnly" class="custom-checkbox h-3 w-3 md:h-4 md:w-4">
+                            <label for="premiumOnly" class="ml-1.5 text-xs md:text-sm text-slate-600">Premium</label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="hasSolution" class="custom-checkbox h-3 w-3 md:h-4 md:w-4">
+                            <label for="hasSolution" class="ml-1.5 text-xs md:text-sm text-slate-600">Yechim</label>
+                        </div>
+                        
+                        <button class="ml-auto gradient-btn text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium shadow-sm">
+                            Filtrlash
+                        </button>
+                    </div>
+                </div>
+                <!-- Problems Table -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 problem-table">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-3 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider">ID</th>
+                                    <th scope="col" class="px-3 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider">Sarlavha</th>
+                                    <th scope="col" class="px-3 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider topic-cell">Mavzu</th>
+                                    <th scope="col" class="px-3 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider difficulty-cell">Qiyinlik</th>
+                                    <th scope="col" class="px-3 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-slate-500 uppercase tracking-wider">Muvaffaqiyat</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <!-- Problem 1 -->
+                                <tr class="problem-row">
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900">1</td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4">
+                                        <div class="flex items-center">
+                                            <a href="#" class="text-xs md:text-sm font-medium text-indigo-600 hover:text-indigo-800">Ikki sonning yig'indisi</a>
+                                            <span class="ml-1 text-xs text-slate-500"><i class="fas fa-lock"></i></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500 topic-cell">Massiv, Hash jadvali</td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm difficulty-cell">
+                                        <span class="difficulty-easy px-2 py-0.5 rounded-full text-xs font-medium">Oson</span>
+                                    </td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500">
+                                        <div class="flex items-center">
+                                            <div class="w-10 md:w-16 h-1.5 bg-slate-200 rounded-full mr-1 md:mr-2">
+                                                <div class="h-full bg-green-500 rounded-full" style="width: 78%"></div>
+                                            </div>
+                                            <span>78%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Problem 2 -->
+                                <tr class="problem-row">
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900">2</td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4">
+                                        <div class="flex items-center">
+                                            <a href="#" class="text-xs md:text-sm font-medium text-indigo-600 hover:text-indigo-800">Ikki qo'shilma son</a>
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500 topic-cell">Bog'langan ro'yxat</td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm difficulty-cell">
+                                        <span class="difficulty-medium px-2 py-0.5 rounded-full text-xs font-medium">Oʻrtacha</span>
+                                    </td>
+                                    <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500">
+                                        <div class="flex items-center">
+                                            <div class="w-10 md:w-16 h-1.5 bg-slate-200 rounded-full mr-1 md:mr-2">
+                                                <div class="h-full bg-yellow-500 rounded-full" style="width: 56%"></div>
+                                            </div>
+                                            <span>56%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- More problems... -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="bg-white px-4 py-2 md:px-6 md:py-3 flex items-center justify-between border-t border-slate-200">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <a href="#" class="relative inline-flex items-center px-3 py-1.5 border border-slate-300 text-xs font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">
+                                Oldingi
+                            </a>
+                            <a href="#" class="ml-2 relative inline-flex items-center px-3 py-1.5 border border-slate-300 text-xs font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">
+                                Keyingi
+                            </a>
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div class="pagination-info">
+                                <p class="text-xs md:text-sm text-slate-700">
+                                    Ko'rsatilmoqda <span class="font-medium">1</span> dan <span class="font-medium">10</span> gacha <span class="font-medium">1,245</span> ta masaladan
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-1.5 rounded-l-md border border-slate-300 bg-white text-xs md:text-sm font-medium text-slate-500 hover:bg-slate-50">
+                                        <span class="sr-only">Oldingi</span>
+                                        <i class="fas fa-chevron-left text-xs"></i>
+                                    </a>
+                                    <a href="#" aria-current="page" class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-3 py-1.5 border text-xs md:text-sm font-medium">
+                                        1
+                                    </a>
+                                    <a href="#" class="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-3 py-1.5 border text-xs md:text-sm font-medium">
+                                        2
+                                    </a>
+                                    <a href="#" class="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-3 py-1.5 border text-xs md:text-sm font-medium">
+                                        3
+                                    </a>
+                                    <span class="relative inline-flex items-center px-3 py-1.5 border border-slate-300 bg-white text-xs md:text-sm font-medium text-slate-700">
+                                        ...
+                                    </span>
+                                    <a href="#" class="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-3 py-1.5 border text-xs md:text-sm font-medium">
+                                        8
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-1.5 rounded-r-md border border-slate-300 bg-white text-xs md:text-sm font-medium text-slate-500 hover:bg-slate-50">
+                                        <span class="sr-only">Keyingi</span>
+                                        <i class="fas fa-chevron-right text-xs"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-8 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                <div>
+                    <h4 class="font-bold mb-3 text-sm md:text-base">Mahsulot</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Xususiyatlar</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Narxlar</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Premium</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 text-sm md:text-base">Resurslar</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Hujjatlar</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Darsliklar</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 text-sm md:text-base">Kompaniya</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Biz haqimizda</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Karera</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Aloqa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 text-sm md:text-base">Huquqiy</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Maxfiylik</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Shartlar</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white text-xs md:text-sm">Cookie</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-3 md:mb-0">
+                    <a href="#" class="text-lg font-bold text-white flex items-center">
+                        <i class="fas fa-code mr-2"></i>LeetCode
+                    </a>
+                </div>
+                <div class="text-xs md:text-sm text-slate-400">
+                    © 2023 LeetCode Clone. Barcha huquqlar himoyalangan.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobil menyuni boshqarish
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            const body = document.body;
+            
+            // Menyuni ochish
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('active');
+                body.classList.add('menu-open');
+            });
+            
+            // Menyuni yopish
+            function closeMenu() {
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('active');
+                body.classList.remove('menu-open');
+            }
+            
+            closeMobileMenu.addEventListener('click', closeMenu);
+            overlay.addEventListener('click', closeMenu);
+            
+            // Takvimni yaratish
+            let currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            
+            function renderCalendar(month, year) {
+                const calendarDays = document.getElementById('calendarDays');
+                const monthNames = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", 
+                                  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"];
+                
+                document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+                
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date();
+                
+                let html = '';
+                
+                // Bo'sh kataklar
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<div class="calendar-day"></div>`;
+                }
+                
+                // Kunlar
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayDate = new Date(year, month, i);
+                    const isToday = dayDate.getDate() === today.getDate() && 
+                                    dayDate.getMonth() === today.getMonth() && 
+                                    dayDate.getFullYear() === today.getFullYear();
+                    const hasProblem = Math.random() > 0.7; // Tasodifiy masala mavjudligi
+                    
+                    let dayClass = 'calendar-day';
+                    if (isToday) dayClass += ' today';
+                    if (hasProblem) dayClass += ' has-problem';
+                    
+                    html += `
+                        <div class="${dayClass}" data-date="${year}-${month+1}-${i}">
+                            ${i}
+                        </div>
+                    `;
+                }
+                
+                calendarDays.innerHTML = html;
+                
+                // Kunlarni tanlash
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    day.addEventListener('click', function() {
+                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        const selectedDate = this.getAttribute('data-date');
+                        console.log(`Tanlangan sana: ${selectedDate}`);
+                    });
+                });
+            }
+            
+            // Oylarni almashtirish
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar(currentMonth, currentYear);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar(currentMonth, currentYear);
+            });
+            
+            // Takvimni boshlang'ich holatda yuklash
+            renderCalendar(currentMonth, currentYear);
+            
+            // Qidiruv funksionalligi
+            const searchContainer = document.querySelector('.search-container');
+            const searchInput = document.getElementById('searchInput');
+            
+            if (searchContainer && searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    searchContainer.classList.add('active', 'focused');
+                });
+                
+                searchInput.addEventListener('blur', function() {
+                    searchContainer.classList.remove('focused');
+                    setTimeout(() => {
+                        if (!searchInput.value) {
+                            searchContainer.classList.remove('active');
+                        }
+                    }, 200);
+                });
+                
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase();
+                    
+                    if (query.length > 2) {
+                        // Demo uchun: API so'rovini simulyatsiya qilamiz
+                        setTimeout(() => {
+                            const mockResults = [
+                                {id: 1, title: "Ikki sonning yig'indisi", type: "problem"},
+                                {id: 2, title: "2023-06-15 masalalari", type: "date"},
+                                {id: 3, title: "Daraxtlar mavzusidagi masalalar", type: "topic"}
+                            ];
+                            
+                            const filtered = mockResults.filter(item => 
+                                item.title.toLowerCase().includes(query)
+                            );
+                            
+                            const resultsList = document.querySelector('.search-results-list');
+                            if (resultsList) {
+                                resultsList.innerHTML = '';
+                                
+                                if (filtered.length > 0) {
+                                    filtered.forEach(item => {
+                                        const icon = item.type === 'problem' ? 'fa-code' : 
+                                                    item.type === 'date' ? 'fa-calendar-day' : 'fa-tag';
+                                        
+                                        const resultItem = document.createElement('a');
+                                        resultItem.href = '#';
+                                        resultItem.className = 'flex items-center p-2 hover:bg-slate-100 rounded';
+                                        resultItem.innerHTML = `
+                                            <i class="fas ${icon} text-indigo-500 mr-2"></i>
+                                            <span>${item.title}</span>
+                                        `;
+                                        
+                                        resultItem.addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            searchInput.value = item.title;
+                                            searchContainer.classList.remove('active');
+                                        });
+                                        
+                                        resultsList.appendChild(resultItem);
+                                    });
+                                } else {
+                                    resultsList.innerHTML = '<div class="p-2 text-sm text-slate-500">Natija topilmadi</div>';
+                                }
+                            }
+                        }, 300);
+                    }
+                });
+            }
+            
+            // Checkboxlarni ishlatish
+            document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        this.classList.add('custom-checkbox-checked');
+                    } else {
+                        this.classList.remove('custom-checkbox-checked');
+                    }
+                });
+            });
+            
+            // Responsive moslashuvchanlik uchun qo'shimcha sozlamalar
+            function handleResize() {
+                if (window.innerWidth >= 1024) {
+                    closeMenu();
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+</html>

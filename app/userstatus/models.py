@@ -1,14 +1,16 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.conf import settings
 from problems.models import Problem
 from django.db.models import Sum
 from typing import TYPE_CHECKING
 from problems.models import TimeMixsin
 
 if TYPE_CHECKING:
-    from solution.models import Solution, UserQuizResult
+    from solution.models import Solution
 
+User = settings.AUTH_USER_MODEL
 
 
 
@@ -80,12 +82,11 @@ class UserLeaderboard(TimeMixsin):
 
     @classmethod
     def update_leaderboard(cls, user):
-        quiz_score = UserQuizResult.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
         activity_score = UserActivityDaily.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
         problem_score = UserProblemStatus.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0
         solution_score = Solution.objects.filter(user=user).aggregate(Sum('score'))['score__sum'] or 0  # ✅ Solution ballari qo'shildi
 
-        total_score = quiz_score + activity_score + problem_score + solution_score
+        total_score = activity_score + problem_score + solution_score
         leaderboard, created = cls.objects.get_or_create(user=user)
         leaderboard.total_score = total_score
         leaderboard.save()

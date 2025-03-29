@@ -1,10 +1,12 @@
+from django.conf import settings
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.text import slugify
 from .gnerate_slug import generate_slug_with_case
-from django.contrib.auth.models import User
 
+User = settings.AUTH_USER_MODEL
 
 #  base timemixis
 class TimeMixsin(models.Model):
@@ -58,6 +60,9 @@ class Problem(TimeMixsin):
         if self.title:
             return self.title
         return self.difficulty
+    @property
+    def get_url(self):
+        return reverse("problem_page", kwargs={"slug": self.slug})
     
 class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)

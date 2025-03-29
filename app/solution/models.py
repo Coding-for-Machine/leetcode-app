@@ -1,10 +1,11 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from problems.models import Language, Problem
 from userstatus.models import UserProblemStatus
-from django.contrib.auth.models import User
 from problems.models import TimeMixsin
 
+User = settings.AUTH_USER_MODEL
 
 class Solution(TimeMixsin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
