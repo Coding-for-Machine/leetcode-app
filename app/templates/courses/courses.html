@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurslar | LeetCode Kloni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .shisha-effekt {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-btn:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        
+        .karta-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .karta-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background-color: #e5e7eb;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+        
+        /* Mobil menyu */
+        .mobil-menyu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .mobil-menyu.ochiq {
+            left: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.faol {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            .masala-jadval th, 
+            .masala-jadval td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+    
+    <!-- Mobil menyu -->
+    <div id="mobilMenyu" class="mobil-menyu">
+        <div class="p-4 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                    <i class="fas fa-code mr-2"></i>LeetCode
+                </a>
+                <button id="yopishMobilMenyu" class="text-slate-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto">
+                <div class="space-y-2 mb-6">
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-compass mr-2"></i>Kashfiyot
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-list-ol mr-2"></i>Masalalar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-comments mr-2"></i>Munozara
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg bg-indigo-50 text-indigo-600">
+                        <i class="fas fa-graduation-cap mr-2"></i>Kurslar
+                    </a>
+                </div>
+                
+                <div class="px-3 py-4 border-t border-slate-200">
+                    <h3 class="font-medium text-slate-700 mb-3">Profil</h3>
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
+                        <div>
+                            <p class="font-medium">Ali Valiyev</p>
+                            <p class="text-xs text-slate-500">@alivaliyev</p>
+                        </div>
+                    </div>
+                    <button class="w-full gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2">
+                        <i class="fas fa-crown mr-2"></i>Premiumga o'tish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigatsiya paneli -->
+    <nav class="shisha-effekt shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo va desktop menyu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Mobil menyu tugmasi -->
+                    <button id="mobilMenyuTugmasi" class="lg:hidden text-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>
+                        <span class="hidden sm:inline">LeetCode</span>
+                    </a>
+                    
+                    <div class="hidden lg:flex space-x-6">
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-compass mr-2"></i>Kashfiyot
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-list-ol mr-2"></i>Masalalar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-comments mr-2"></i>Munozara
+                        </a>
+                        <a href="#" class="text-indigo-600 px-1 py-2 text-sm font-medium flex items-center border-b-2 border-indigo-600">
+                            <i class="fas fa-graduation-cap mr-2"></i>Kurslar
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Qidiruv va profil -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="Qidirish..." 
+                               class="border border-slate-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs bg-white">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    </div>
+                    
+                    <button class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
+                        <i class="fas fa-crown mr-2"></i>Premium
+                    </button>
+                    
+                    <div class="flex items-center space-x-2 ml-2">
+                        <button class="text-slate-500 hover:text-indigo-600 p-1">
+                            <i class="far fa-bell text-lg"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
+                                <i class="fas fa-caret-down ml-1 text-slate-500 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Asosiy kontent -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Sarlavha va filtrlar -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Kurslar</h1>
+                <p class="text-gray-600">Algoritmlar, ma'lumot tuzilmalari va intervyu tayyorgarligi bo'yicha kurslar</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <select id="category-filter" class="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white w-full md:w-auto">
+                    <option value="all">Barcha kategoriyalar</option>
+                    <option value="algorithms">Algoritmlar</option>
+                    <option value="data-structures">Ma'lumot tuzilmalari</option>
+                    <option value="interview-prep">Intervyu tayyorgarligi</option>
+                    <option value="language">Dasturlash tillari</option>
+                </select>
+                
+                <select id="difficulty-filter" class="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white w-full md:w-auto">
+                    <option value="all">Barcha darajalar</option>
+                    <option value="beginner">Boshlang'ich</option>
+                    <option value="intermediate">O'rta</option>
+                    <option value="advanced">Qiyin</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Kurslar ro'yxati -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 1-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Algoritmlar kursi" class="w-full h-40 object-cover">
+                    <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                        <i class="fas fa-crown mr-1"></i> Premium
+                    </div>
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">Algoritmlarga Kirish</h2>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">Boshlang'ich</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Algoritmlarning asosiy tushunchalari va ularni amaliyotda qo'llash usullari</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 25%</span>
+                            <span>5/20 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.8</span>
+                            <span class="text-gray-400 text-sm mx-1">(124)</span>
+                        </div>
+                        <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium">
+                            Davom etish
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Ma'lumot tuzilmalari kursi" class="w-full h-40 object-cover">
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">Ma'lumot Tuzilmalari</h2>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">O'rta</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Massivlar, ro'yxatlar, steklar, navbatlar va boshqa asosiy ma'lumot tuzilmalari</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 0%</span>
+                            <span>0/15 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.6</span>
+                            <span class="text-gray-400 text-sm mx-1">(89)</span>
+                        </div>
+                        <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium">
+                            Boshlash
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80" 
+                         alt="FAANG intervyusi kursi" class="w-full h-40 object-cover">
+                    <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                        <i class="fas fa-crown mr-1"></i> Premium
+                    </div>
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">FAANG Intervyusi</h2>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Qiyin</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">FAANG kompaniyalariga intervyuga tayyorgarlik bo'yicha to'liq qo'llanma</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 65%</span>
+                            <span>13/20 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.9</span>
+                            <span class="text-gray-400 text-sm mx-1">(215)</span>
+                        </div>
+                        <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium">
+                            Davom etish
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1528&q=80" 
+                         alt="Python kursi" class="w-full h-40 object-cover">
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">Python Dasturlash</h2>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">Boshlang'ich</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Pythonda dasturlash asoslari va algoritmik masalalarni yechish</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 100%</span>
+                            <span>10/10 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.7</span>
+                            <span class="text-gray-400 text-sm mx-1">(156)</span>
+                        </div>
+                        <button class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium">
+                            Yakunlandi
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1624953587687-daf255b6b80a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" 
+                         alt="Daraxtlar kursi" class="w-full h-40 object-cover">
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">Daraxtlar va Graf Algoritmlari</h2>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">O'rta</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Daraxtlar, graflar va ular ustida ishlaydigan algoritmlar</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 40%</span>
+                            <span>6/15 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.5</span>
+                            <span class="text-gray-400 text-sm mx-1">(72)</span>
+                        </div>
+                        <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium">
+                            Davom etish
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 6-kurs -->
+            <div class="karta-hover bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80" 
+                         alt="JavaScript kursi" class="w-full h-40 object-cover">
+                    <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                        <i class="fas fa-crown mr-1"></i> Premium
+                    </div>
+                </div>
+                <div class="p-4 md:p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-800">JavaScript Algoritmlari</h2>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">O'rta</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">JavaScriptda algoritmik masalalarni yechish va optimal kod yozish</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                            <span>Progress: 0%</span>
+                            <span>0/12 dars</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm font-medium">4.4</span>
+                            <span class="text-gray-400 text-sm mx-1">(63)</span>
+                        </div>
+                        <button class="gradient-btn hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium">
+                            Boshlash
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="mt-6 flex justify-center">
+            <nav class="inline-flex rounded-md shadow">
+                <a href="#" class="px-3 py-1.5 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <a href="#" class="px-3 py-1.5 border-t border-b border-gray-300 bg-white text-sm font-medium text-indigo-600 hover:bg-gray-50">
+                    1
+                </a>
+                <a href="#" class="px-3 py-1.5 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    2
+                </a>
+                <a href="#" class="px-3 py-1.5 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    3
+                </a>
+                <span class="px-3 py-1.5 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-500">
+                    ...
+                </span>
+                <a href="#" class="px-3 py-1.5 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    8
+                </a>
+                <a href="#" class="px-3 py-1.5 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-6 md:py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Mahsulot</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Xususiyatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Narxlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Premium</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biznes</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Resurslar</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Hujjatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Darsliklar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Jamiyat</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Kompaniya</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biz haqimizda</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Karera</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Matbuot</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Aloqa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Huquqiy</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Maxfiylik</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Shartlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Cookie Siyosati</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 md:pt-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-3 md:mb-0">
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>LeetCode
+                    </a>
+                </div>
+                <div class="text-xs md:text-sm text-gray-600">
+                    © 2023 LeetCode Kloni. Barcha huquqlar himoyalangan.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Kurs haqida modali -->
+    <div id="course-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                     alt="Kurs rasmi" class="w-full h-48 object-cover rounded-t-lg">
+                <button id="close-course-modal" class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-100">
+                    <i class="fas fa-times text-gray-700"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Algoritmlarga Kirish</h2>
+                        <p class="text-gray-600">Algoritmlarning asosiy tushunchalari va ularni amaliyotda qo'llash usullari</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">Boshlang'ich</span>
+                        <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm flex items-center">
+                            <i class="fas fa-crown mr-1"></i> Premium
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <span class="font-medium">4.8</span>
+                        <span class="text-gray-400 mx-1">(124 baho)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-user-graduate text-indigo-500 mr-1"></i>
+                        <span>1,245 o'quvchi</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-indigo-500 mr-1"></i>
+                        <span>8 soat</span>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Kurs haqida</h3>
+                    <p class="text-gray-700 mb-4">
+                        Bu kursda siz algoritmlarning asosiy tushunchalari, ularning turlari va qo'llanilishi haqida bilib olasiz. 
+                        Kurs davomida siz turli algoritmlarni amaliyotda qo'llashni, ularning samaradorligini tahlil qilishni 
+                        va muammolarni yechishda qanday qo'llashni o'rganasiz.
+                    </p>
+                    <p class="text-gray-700">
+                        Kurs yakunida siz algoritmlarni tahlil qila olasiz, ularning murakkablik darajasini hisoblashni bilasiz 
+                        va turli dasturlash tillarida algoritmlarni amalga oshira olasiz.
+                    </p>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Nimalarni o'rganasiz?</h3>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Algoritmlarning asosiy tushunchalari</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Vaqt va joy murakkabligi</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Qidiruv va tartiblash algoritmlari</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Rekursiya va dinamik dasturlash</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Oqim algoritmlari</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Greedy algoritmlari</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Kurs dasturi</h3>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <!-- 1-modul -->
+                        <div class="border-b border-gray-200 last:border-b-0">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 cursor-pointer">
+                                <div class="flex items-center">
+                                    <i class="fas fa-folder-open text-indigo-500 mr-3"></i>
+                                    <h4 class="font-medium">1. Algoritmlarga kirish</h4>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                            </div>
+                            <div class="hidden px-4 pb-4 bg-white">
+                                <div class="pl-9 space-y-3">
+                                    <div class="flex items-center justify-between py-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                                            <span>Algoritm nima?</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500">12:45</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                                            <span>Algoritmlarning xususiyatlari</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500">15:20</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-question-circle text-indigo-500 mr-3"></i>
+                                            <span>Vazifa: Oddiy algoritm yozish</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500">Vazifa</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 2-modul -->
+                        <div class="border-b border-gray-200 last:border-b-0">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 cursor-pointer">
+                                <div class="flex items-center">
+                                    <i class="fas fa-folder-open text-indigo-500 mr-3"></i>
+                                    <h4 class="font-medium">2. Vaqt murakkabligi</h4>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                            </div>
+                            <div class="hidden px-4 pb-4 bg-white">
+                                <div class="pl-9 space-y-3">
+                                    <div class="flex items-center justify-between py-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                                            <span>Big O notatsiyasi</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500">18:30</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                                            <span>Doimiy vaqt murakkabligi</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500">14:15</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row justify-between gap-4">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold mb-3">Ustoz</h3>
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Ustoz" class="w-12 h-12 rounded-full mr-3">
+                            <div>
+                                <h4 class="font-medium">John Doe</h4>
+                                <p class="text-sm text-gray-600">Senior Software Engineer, Google</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold mb-3">Kurs narxi</h3>
+                        <div class="bg-indigo-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium">To'liq kurs</span>
+                                <span class="text-2xl font-bold">$49.99</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Bir martalik to'lov bilan cheksiz foydalanish</p>
+                            <button class="w-full gradient-btn hover:bg-indigo-600 text-white py-2 rounded-lg font-medium">
+                                Kursga yozilish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Mobil menyu boshqaruvi
+            $('#mobilMenyuTugmasi').click(function() {
+                $('#mobilMenyu').addClass('ochiq');
+                $('#overlay').addClass('faol');
+                $('body').addClass('overflow-hidden');
+            });
+            
+            $('#yopishMobilMenyu, #overlay').click(function() {
+                $('#mobilMenyu').removeClass('ochiq');
+                $('#overlay').removeClass('faol');
+                $('body').removeClass('overflow-hidden');
+            });
+            
+            // Kurs modali
+            $('.karta-hover').click(function() {
+                $('#course-modal').removeClass('hidden');
+            });
+            
+            $('#close-course-modal, #course-modal').click(function(e) {
+                if (e.target === this || $(e.target).is('#close-course-modal')) {
+                    $('#course-modal').addClass('hidden');
+                }
+            });
+            
+            // Kurs dasturi accordion
+            $('.bg-gray-50').click(function() {
+                $(this).find('i.fa-chevron-down').toggleClass('rotate-180');
+                $(this).next().slideToggle();
+            });
+            
+            // Filtrlash funksiyalari
+            $('#category-filter, #difficulty-filter').change(function() {
+                const category = $('#category-filter').val();
+                const difficulty = $('#difficulty-filter').val();
+                
+                // Bu yerda haqiqiy loyihada API so'rovi yoki filtratsiya amalga oshiriladi
+                console.log(`Tanlangan kategoriya: ${category}, Daraja: ${difficulty}`);
+            });
+            
+            // Kurs kartalariga hover effekti
+            $('.karta-hover').hover(
+                function() {
+                    $(this).css('transform', 'translateY(-2px)');
+                    $(this).css('box-shadow', '0 10px 25px -5px rgba(99, 102, 241, 0.2)');
+                },
+                function() {
+                    $(this).css('transform', 'translateY(0)');
+                    $(this).css('box-shadow', '0 1px 3px rgba(0, 0, 0, 0.1)');
+                }
+            );
+            
+            // Oynani o'lchamini o'zgartirganda mobil menyuni yopish
+            $(window).resize(function() {
+                if ($(window).width() >= 1024) {
+                    $('#mobilMenyu').removeClass('ochiq');
+                    $('#overlay').removeClass('faol');
+                    $('body').removeClass('overflow-hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

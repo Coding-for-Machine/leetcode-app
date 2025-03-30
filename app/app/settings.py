@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     # installed package
+    "corsheaders",
     'ckeditor',
     'ninja',
     'ninja_extra',
@@ -49,6 +50,9 @@ INSTALLED_APPS = [
     'userstatus.apps.UserstatusConfig',
     'contest.apps.ContestConfig',
     'commits.apps.CommitsConfig',
+    'courses',
+    'quizs.apps.QuizsConfig',
+    'lessons',
 ]
 AUTH_USER_MODEL = "users.MyUser"
 if DEBUG:
@@ -57,11 +61,18 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware", # add
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:8000",
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -96,22 +107,22 @@ DATABASES = {
     }
 }
 
-DATABASE_URL = config("DATABASE_URL", default=None)
+# DATABASE_URL = config("DATABASE_URL", default=None)
 
 
 
 
 # Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
-if DATABASE_URL:
-    tmpPostgres = urlparse(DATABASE_URL)
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": tmpPostgres.path.lstrip("/"),
-        "USER": tmpPostgres.username,
-        "PASSWORD": tmpPostgres.password,
-        "HOST": tmpPostgres.hostname,
-        "PORT": tmpPostgres.port or 5432,
-    }
+# if DATABASE_URL:
+#     tmpPostgres = urlparse(DATABASE_URL)
+#     DATABASES["default"] = {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": tmpPostgres.path.lstrip("/"),
+#         "USER": tmpPostgres.username,
+#         "PASSWORD": tmpPostgres.password,
+#         "HOST": tmpPostgres.hostname,
+#         "PORT": tmpPostgres.port or 5432,
+#     }
 
 
 # DATABASES = {
@@ -182,7 +193,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfile')
 STATICFILES_DIRS = [
-    BASE_DIR / "statuc"
+    os.path.join(BASE_DIR, 'static')
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

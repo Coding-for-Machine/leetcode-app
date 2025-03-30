@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express.js Backend Kursi | LeetCode Kloni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .shisha-effekt {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-btn:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        
+        .lesson-completed {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+        
+        .lesson-active {
+            background-color: #eef2ff;
+            border-left: 4px solid #6366f1;
+        }
+        
+        .tab-active {
+            border-bottom: 2px solid #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+        }
+        
+        /* Mobil menyu */
+        .mobil-menyu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .mobil-menyu.ochiq {
+            left: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.faol {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+    
+    <!-- Mobil menyu -->
+    <div id="mobilMenyu" class="mobil-menyu">
+        <div class="p-4 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                    <i class="fas fa-code mr-2"></i>LeetCode
+                </a>
+                <button id="yopishMobilMenyu" class="text-slate-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto">
+                <div class="space-y-2 mb-6">
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-compass mr-2"></i>Kashfiyot
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-list-ol mr-2"></i>Masalalar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
+                        <i class="fas fa-comments mr-2"></i>Munozara
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-lg bg-indigo-50 text-indigo-600">
+                        <i class="fas fa-graduation-cap mr-2"></i>Kurslar
+                    </a>
+                </div>
+                
+                <div class="px-3 py-4 border-t border-slate-200">
+                    <h3 class="font-medium text-slate-700 mb-3">Profil</h3>
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
+                        <div>
+                            <p class="font-medium">Ali Valiyev</p>
+                            <p class="text-xs text-slate-500">@alivaliyev</p>
+                        </div>
+                    </div>
+                    <button class="w-full gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2">
+                        <i class="fas fa-crown mr-2"></i>Premiumga o'tish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigatsiya paneli -->
+    <nav class="shisha-effekt shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo va desktop menyu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Mobil menyu tugmasi -->
+                    <button id="mobilMenyuTugmasi" class="lg:hidden text-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>
+                        <span class="hidden sm:inline">LeetCode</span>
+                    </a>
+                    
+                    <div class="hidden lg:flex space-x-6">
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-compass mr-2"></i>Kashfiyot
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-list-ol mr-2"></i>Masalalar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-trophy mr-2"></i>Tanlovlar
+                        </a>
+                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-comments mr-2"></i>Munozara
+                        </a>
+                        <a href="#" class="text-indigo-600 px-1 py-2 text-sm font-medium flex items-center border-b-2 border-indigo-600">
+                            <i class="fas fa-graduation-cap mr-2"></i>Kurslar
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Qidiruv va profil -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="Qidirish..." 
+                               class="border border-slate-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs bg-white">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    </div>
+                    
+                    <button class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
+                        <i class="fas fa-crown mr-2"></i>Premium
+                    </button>
+                    
+                    <div class="flex items-center space-x-2 ml-2">
+                        <button class="text-slate-500 hover:text-indigo-600 p-1">
+                            <i class="far fa-bell text-lg"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
+                                <i class="fas fa-caret-down ml-1 text-slate-500 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Asosiy kontent -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Kurs sarlavhasi va navigatsiya -->
+        <div class="mb-6">
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
+                            <i class="fas fa-home mr-2"></i>
+                            Bosh sahifa
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                            <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2">Kurslar</a>
+                        </div>
+                    </li>
+                    <li aria-current="page">
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Express.js Backend</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Express.js bilan Backend Dasturlash</h1>
+                    <p class="text-gray-600">Node.js va Express.js yordamida professional backend ilovalar yaratish</p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center">
+                        <i class="far fa-share-square mr-2"></i> Ulashish
+                    </button>
+                    <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-crown mr-2"></i> Premiumga o'tish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kurs asosiy qismi -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Chap panel - Darslar ro'yxati -->
+            <div class="lg:w-1/4">
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden sticky top-20">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-800">Kurs dasturi</h3>
+                        <div class="flex justify-between text-sm text-gray-500 mt-1">
+                            <span>25% tugallandi</span>
+                            <span>3/12 dars</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                            <div class="bg-indigo-600 h-1.5 rounded-full" style="width: 25%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-y-auto max-h-[calc(100vh-200px)]">
+                        <!-- 1-modul -->
+                        <div class="border-b border-gray-200">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 cursor-pointer">
+                                <div class="flex items-center">
+                                    <i class="fas fa-folder-open text-indigo-500 mr-3"></i>
+                                    <h4 class="font-medium">1. Express.js ga kirish</h4>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                            </div>
+                            <div class="px-4 pb-2 bg-white">
+                                <div class="pl-9 space-y-1">
+                                    <a href="#" class="block py-2 px-2 rounded lesson-completed">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                                <span>Express.js nima?</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">12:45</span>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="block py-2 px-2 rounded lesson-completed">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                                <span>Dastlabki sozlamalar</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">15:20</span>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="block py-2 px-2 rounded lesson-active">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                                                <span>Routing asoslari</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">18:30</span>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="block py-2 px-2 rounded hover:bg-gray-50">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="far fa-circle text-gray-400 mr-3"></i>
+                                                <span>Middleware tushunchasi</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">14:15</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 2-modul -->
+                        <div class="border-b border-gray-200">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 cursor-pointer">
+                                <div class="flex items-center">
+                                    <i class="fas fa-folder-open text-indigo-500 mr-3"></i>
+                                    <h4 class="font-medium">2. CRUD amallari</h4>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                            </div>
+                            <div class="hidden px-4 pb-2 bg-white">
+                                <div class="pl-9 space-y-1">
+                                    <a href="#" class="block py-2 px-2 rounded hover:bg-gray-50">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="far fa-circle text-gray-400 mr-3"></i>
+                                                <span>GET so'rovlari</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">10:25</span>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="block py-2 px-2 rounded hover:bg-gray-50">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="far fa-circle text-gray-400 mr-3"></i>
+                                                <span>POST so'rovlari</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">12:40</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 3-modul -->
+                        <div class="border-b border-gray-200">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 cursor-pointer">
+                                <div class="flex items-center">
+                                    <i class="fas fa-folder text-indigo-300 mr-3"></i>
+                                    <h4 class="font-medium">3. Ma'lumotlar bazasi</h4>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                            </div>
+                            <div class="hidden px-4 pb-2 bg-white">
+                                <div class="pl-9 space-y-1">
+                                    <a href="#" class="block py-2 px-2 rounded hover:bg-gray-50">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="far fa-circle text-gray-400 mr-3"></i>
+                                                <span>MongoDB ulash</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">16:15</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- O'ng panel - Dars kontenti -->
+            <div class="lg:w-3/4">
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <!-- Video player -->
+                    <div class="bg-black aspect-video flex items-center justify-center">
+                        <div class="text-white text-center">
+                            <i class="fas fa-lock text-4xl mb-3"></i>
+                            <p>Ushbu darsni ko'rish uchun premiumga a'zo bo'ling</p>
+                            <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium mt-3">
+                                Premiumga o'tish
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dars sarlavhasi va navigatsiya -->
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-gray-800">Routing asoslari</h2>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-500 hover:text-indigo-600 p-2">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-indigo-600 p-2">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 mt-1">
+                            <span>3-dars • 18:30</span>
+                            <span class="mx-2">|</span>
+                            <span>1-modul: Express.js ga kirish</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dars kontenti -->
+                    <div class="p-4 md:p-6">
+                        <div class="flex border-b border-gray-200 mb-6">
+                            <button class="tab-active pb-3 px-4 text-sm font-medium">Dars materiali</button>
+                            <button class="text-gray-500 hover:text-gray-700 pb-3 px-4 text-sm font-medium">Izohlar (5)</button>
+                            <button class="text-gray-500 hover:text-gray-700 pb-3 px-4 text-sm font-medium">Qo'llanma</button>
+                        </div>
+                        
+                        <div class="prose max-w-none">
+                            <h3 class="text-lg font-semibold mb-3">Express.js Routing</h3>
+                            <p class="mb-4">
+                                Routing - bu ilova qanday javob berishini aniqlash usuli, bu mijoz so'rovlari 
+                                va ilova yo'llari (endpointlar) orasidagi bog'lanishdir. Express.js da routing 
+                                juda oddiy va tushunarli usulda amalga oshiriladi.
+                            </p>
+                            
+                            <h4 class="font-medium mb-2">Asosiy routing misoli:</h4>
+                            <div class="code-block p-4 mb-4 rounded-md">
+                                <pre><code class="text-sm">
+const express = require('express');
+const app = express();
+
+// Asosiy yo'l
+app.get('/', (req, res) => {
+  res.send('Salom dunyo!');
+});
+
+// Boshqa yo'l
+app.get('/about', (req, res) => {
+  res.send('Biz haqimizda sahifasi');
+});
+
+app.listen(3000, () => {
+  console.log('Server 3000-portda ishlamoqda');
+});
+                                </code></pre>
+                            </div>
+                            
+                            <h3 class="text-lg font-semibold mb-3">Route Parameters</h3>
+                            <p class="mb-4">
+                                Route parametrlari URL manzilidagi o'zgaruvchan qismlardir. Ular dinamik 
+                                yo'llar yaratish uchun ishlatiladi. Parametrlar <code class="bg-gray-100 px-1 py-0.5 rounded">req.params</code> 
+                                orqali olinadi.
+                            </p>
+                            
+                            <div class="code-block p-4 mb-4 rounded-md">
+                                <pre><code class="text-sm">
+app.get('/users/:userId', (req, res) => {
+  res.send(`Foydalanuvchi ID: ${req.params.userId}`);
+});
+
+app.get('/posts/:postId/comments/:commentId', (req, res) => {
+  res.send(`
+    Post ID: ${req.params.postId}
+    Comment ID: ${req.params.commentId}
+  `);
+});
+                                </code></pre>
+                            </div>
+                            
+                            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle text-blue-400 mt-1"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-blue-800">Eslatma</h4>
+                                        <div class="mt-1 text-sm text-blue-700">
+                                            <p>
+                                                Route parametrlari faqat URL qismida bo'lishi mumkin. 
+                                                So'rov tanasi (body) yoki so'rov parametrlari (query) 
+                                                uchun <code class="bg-blue-100 px-1 py-0.5 rounded">req.body</code> 
+                                                va <code class="bg-blue-100 px-1 py-0.5 rounded">req.query</code> 
+                                                dan foydalaning.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-lg font-semibold mb-3">Vazifa</h3>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                                <p class="mb-3">Quyidagi vazifani bajaring:</p>
+                                <ol class="list-decimal pl-5 space-y-2">
+                                    <li>Yangi Express.js loyihasi yarating</li>
+                                    <li>3 ta route qo'shing: bosh sahifa, kontakt sahifasi va foydalanuvchi profili</li>
+                                    <li>Foydalanuvchi profili uchun route parametridan foydalaning</li>
+                                    <li>Serverni ishga tushiring va yo'llarni brauzerda tekshiring</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="flex justify-between pt-4 border-t border-gray-200">
+                                <button class="flex items-center text-indigo-600 hover:text-indigo-800">
+                                    <i class="fas fa-chevron-left mr-2"></i> Oldingi dars
+                                </button>
+                                <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center">
+                                    Keyingi dars <i class="fas fa-chevron-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- O'qituvchi haqida -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
+                    <div class="p-4 md:p-6">
+                        <h3 class="text-lg font-semibold mb-4">O'qituvchi haqida</h3>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="O'qituvchi" class="w-24 h-24 rounded-full border-2 border-white shadow-sm">
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-gray-800">John Doe</h4>
+                                <p class="text-indigo-600 mb-2">Senior Backend Engineer, Google</p>
+                                <p class="text-gray-600 mb-4">
+                                    10 yillik tajribaga ega backend dasturchi. Node.js, Express.js, Django va 
+                                    boshqa backend texnologiyalari bo'yicha mutaxassis. 50 dan ortiq 
+                                    professional loyihalarda ishtirok etgan.
+                                </p>
+                                <div class="flex space-x-4">
+                                    <a href="#" class="text-gray-500 hover:text-indigo-600">
+                                        <i class="fab fa-github text-lg"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-500 hover:text-indigo-600">
+                                        <i class="fab fa-linkedin text-lg"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-500 hover:text-indigo-600">
+                                        <i class="fab fa-twitter text-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-6 md:py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Mahsulot</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Xususiyatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Narxlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Premium</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biznes</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Resurslar</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Hujjatlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Darsliklar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Jamiyat</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Kompaniya</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biz haqimizda</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Karera</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Matbuot</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Aloqa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-3 md:mb-4">Huquqiy</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Maxfiylik</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Shartlar</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Cookie Siyosati</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 md:pt-6 flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-3 md:mb-0">
+                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
+                        <i class="fas fa-code mr-2"></i>LeetCode
+                    </a>
+                </div>
+                <div class="text-xs md:text-sm text-gray-600">
+                    © 2023 LeetCode Kloni. Barcha huquqlar himoyalangan.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobil menyu boshqaruvi
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobilMenyuTugmasi = document.getElementById('mobilMenyuTugmasi');
+            const yopishMobilMenyu = document.getElementById('yopishMobilMenyu');
+            const mobilMenyu = document.getElementById('mobilMenyu');
+            const overlay = document.getElementById('overlay');
+            const body = document.body;
+            
+            // Menyuni ochish
+            mobilMenyuTugmasi.addEventListener('click', function() {
+                mobilMenyu.classList.add('ochiq');
+                overlay.classList.add('faol');
+                body.classList.add('overflow-hidden');
+            });
+            
+            // Menyuni yopish
+            function yopishMenyu() {
+                mobilMenyu.classList.remove('ochiq');
+                overlay.classList.remove('faol');
+                body.classList.remove('overflow-hidden');
+            }
+            
+            yopishMobilMenyu.addEventListener('click', yopishMenyu);
+            overlay.addEventListener('click', yopishMenyu);
+            
+            // Kurs modullari accordioni
+            const moduleHeaders = document.querySelectorAll('.bg-gray-50');
+            moduleHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const icon = this.querySelector('i.fa-chevron-down');
+                    const content = this.nextElementSibling;
+                    
+                    icon.classList.toggle('rotate-180');
+                    
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        content.style.display = 'block';
+                    } else {
+                        content.classList.add('hidden');
+                        content.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Tab boshqaruvi
+            const tabs = document.querySelectorAll('.border-b button');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('tab-active'));
+                    this.classList.add('tab-active');
+                });
+            });
+            
+            // Oynani o'lchamini o'zgartirganda mobil menyuni yopish
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1024) {
+                    yopishMenyu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

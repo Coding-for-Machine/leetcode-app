@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import get_object_or_404
 from ninja_jwt.tokens import RefreshToken
 from typing import Dict
-
+from ninja.errors import HttpError
 from .models import MyUser
 from .schemas import UserRegisterSchema, UserSchema, UserLoginSchema, ProfileUpdateSchema
 
@@ -31,11 +31,12 @@ def register(request, data: UserRegisterSchema):
     
     if MyUser.objects.filter(email=data.email).exists():
         return 400, {"error": "Email already exists"}
+    if MyUser.objects.filter(username=data.username).exists():
+        return 400, {"error": "Username already exists"}
     
     user = MyUser.objects.create(
         email=data.email,
-        first_name=data.first_name,
-        last_name=data.last_name,
+        username=data.username,
         password=make_password(data.password)
     )
 
@@ -44,19 +45,23 @@ def register(request, data: UserRegisterSchema):
 # Login qilish
 @user_router.post("/login", response={200: Dict[str, str], 401: Dict[str, str]})
 def login(request, data: UserLoginSchema):
-    user = MyUser.objects.filter(email=data.email).first()
-    
-    if not user:
-        return 401, {"error": "Email not found"}
-    
-    if not check_password(data.password, user.password):
-        return 401, {"error": "Incorrect password"}
-    
-    refresh = RefreshToken.for_user(user)
-    return {
-        "refresh": str(refresh),
-        "access": str(refresh.access_token)
-    }
+    try:
+
+        user = MyUser.objects.filter(email=data.email).first()
+        
+        if not user:
+            return 401, {"error": "Email not found"}
+        
+        if not check_password(data.password, user.password):
+            return 401, {"error": "Incorrect password"}
+        
+        refresh = RefreshToken.for_user(user)
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+        }
+    except MyUser.DoesNotExist:
+        return HttpError(404, "Foydalanovchi Topilmadi!")
 
 # Profilni olish (faqat login qilgan foydalanuvchilar)
 @user_router.get("/profile", response={200: UserSchema, 401: Dict[str, str]}, auth=JWTAuth())

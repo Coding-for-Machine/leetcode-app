@@ -100,9 +100,7 @@ class TestCase(TimeMixsin):
         return f"Test for {self.problem.title} [{self.language.name}]"
 
     def is_valid_test_case(self):
-        """Test holati to‘g‘ri formatda ekanligini tekshiradi"""
         return bool(self.input_txt and self.output_txt)
 
     def get_summary(self):
-        """Test ma'lumotlarini qisqacha formatda chiqarish"""
         return f"Test [{self.language.name}] - Input: {self.input_txt[:30]}..."

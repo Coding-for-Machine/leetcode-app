@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+     <!-- Axios -->
+     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         /* Advanced particle system */
         .particle {
@@ -225,18 +227,22 @@
             <h1 class="text-2xl font-bold text-center text-gray-800 mb-2 animate__animated animate__fadeIn">Sign in to LeetCode</h1>
             <p class="text-center text-gray-600 mb-6 animate__animated animate__fadeIn animate__delay-1s">Solve problems. Prepare for interviews. Level up.</p>
             
-            <form id="login-form" class="space-y-4 animate__animated animate__fadeIn animate__delay-1s">
+            <form id="register-form" class="space-y-4 animate__animated animate__fadeIn animate__delay-1s">
                 <div class="space-y-2">
-                    <label for="username" class="block text-sm font-medium text-gray-700 transition-colors">Username or email address</label>
-                    <input type="text" id="username" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required autofocus>
+                    <label for="register-username" class="block text-sm font-medium text-gray-700 transition-colors">Username</label>
+                    <input type="text" id="register-username" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required autofocus>
+                </div>
+                <div class="space-y-2">
+                    <label for="register-email" class="block text-sm font-medium text-gray-700 transition-colors">Email address</label>
+                    <input type="text" id="register-email" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
                 </div>
                 
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="block text-sm font-medium text-gray-700 transition-colors">Password</label>
+                        <label for="register-password" class="block text-sm font-medium text-gray-700 transition-colors">Password</label>
                         <a href="#" class="text-sm text-orange-500 hover:underline transition-colors">Forgot password?</a>
                     </div>
-                    <input type="password" id="password" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
+                    <input type="password" id="register-password" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
                 </div>
                 
                 <button type="submit" class="github-btn text-white w-full py-2.5 px-4 rounded-md font-medium">
@@ -278,6 +284,59 @@
     <div id="floating-code" class="absolute inset-0 overflow-hidden z-0"></div>
 
     <script>
+        // API functions
+        const API_URL = "http://127.0.0.1:8000/api/auth";
+
+        async function apiRequest(endpoint, method, data = null, auth = false) {
+            const headers = { "Content-Type": "application/json" };
+            if (auth) {
+                let token = localStorage.getItem("access_token");
+                if (token) headers["Authorization"] = `Bearer ${token}`;
+            }
+
+            try {
+                const response = await axios({
+                    url: `${API_URL}/${endpoint}`,
+                    method,
+                    headers,
+                    data
+                });
+                return response.data;
+            } catch (error) {
+                console.error(`Error in ${endpoint}:`, error.response?.data || error.message);
+                return null;
+            }
+        }
+
+        async function registerUser(username, email, password) {
+            const response = await apiRequest("register", "POST", { email, username, password });
+            if (response) {
+                alert("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
+                window.location.href = "/users/login/";
+            }
+        }
+
+        async function loginUser(email, password) {
+            const response = await apiRequest("login", "POST", { email, password });
+            if (response) {
+                localStorage.setItem("access_token", response.access);
+                localStorage.setItem("refresh_token", response.refresh);
+                alert("Tizimga muvaffaqiyatli kirdingiz!");
+                window.location.href = "/users/profile/";
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            window.location.href = "/users/login/";
+        }
+
+        async function getCurrentUser() {
+            return await apiRequest("me", "GET", null, true);
+        }
+
+        // DOM Content Loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Advanced particle system
             function createParticles() {
@@ -373,85 +432,51 @@
                 });
             }
             
-            // Form submission with advanced animations
-            document.getElementById('login-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                // Button loading animation
-                submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Authenticating...
-                `;
-                submitBtn.disabled = true;
-                
-                // Simulate API call
-                setTimeout(() => {
-                    // Success animation
+            // Form submission handler
+            const registerForm = document.getElementById("register-form");
+            if (registerForm) {
+                registerForm.addEventListener("submit", async function(event) {
+                    event.preventDefault();
+                    
+                    const submitBtn = event.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    
+                    // Show loading state
                     submitBtn.innerHTML = `
-                        <svg class="animate__animated animate__bounceIn -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Success!
+                        Processing...
                     `;
+                    submitBtn.disabled = true;
                     
-                    // Create a ripple effect
-                    const ripple = document.createElement('div');
-                    ripple.className = 'absolute inset-0 rounded-md bg-orange-400 opacity-0 animate__animated animate__pulse';
-                    submitBtn.appendChild(ripple);
+                    const register_username = document.getElementById("register-username").value;
+                    const register_email = document.getElementById("register-email").value;
+                    const register_password = document.getElementById("register-password").value;
                     
-                    setTimeout(() => {
-                        ripple.remove();
-                        
-                        // Create confetti particles
-                        createConfetti();
-                        
-                        // Redirect after animation completes
-                        setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, 1000);
-                    }, 500);
-                }, 2000);
-            });
-            
-            // Create confetti effect
-            function createConfetti() {
-                const container = document.getElementById('floating-code');
-                const count = 50;
-                const colors = ['#f97316', '#fb923c', '#fdba74', '#fed7aa'];
-                
-                for (let i = 0; i < count; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'absolute rounded-sm';
+                    if (register_password.length < 8) {
+                        alert("Parol kamida 8 ta belgidan iborat bo'lishi kerak!");
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
                     
-                    // Random properties
-                    const size = Math.random() * 10 + 5;
-                    const posX = Math.random() * window.innerWidth;
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    const delay = Math.random() * 0.5;
-                    const duration = Math.random() * 3 + 1;
-                    const rotation = Math.random() * 360;
+                    if (register_email.length < 8 || !register_email.endsWith("@gmail.com")) {
+                        alert("Email noto'g'ri kiritilgan!");
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
                     
-                    confetti.style.width = `${size}px`;
-                    confetti.style.height = `${size/2}px`;
-                    confetti.style.left = `${posX}px`;
-                    confetti.style.bottom = '0';
-                    confetti.style.backgroundColor = color;
-                    confetti.style.transform = `rotate(${rotation}deg)`;
-                    confetti.style.animation = `animate__fadeOutUp ${duration}s ease-out ${delay}s forwards`;
-                    
-                    container.appendChild(confetti);
-                    
-                    // Remove after animation
-                    setTimeout(() => {
-                        confetti.remove();
-                    }, (duration + delay) * 1000);
-                }
+                    try {
+                        await registerUser(register_username, register_email, register_password);
+                    } catch (error) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        alert("Xatolik yuz berdi: " + error.message);
+                    }
+                });
             }
             
             // Input focus animations

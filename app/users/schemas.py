@@ -4,8 +4,7 @@ from datetime import datetime
 
 class UserRegisterSchema(BaseModel):
     email: EmailStr
-    first_name: Annotated[str, StringConstraints(min_length=2, max_length=30)]
-    last_name: Annotated[str, StringConstraints(min_length=2, max_length=30)]
+    username: Annotated[str, StringConstraints(min_length=2, max_length=30)]
     password: Annotated[str, StringConstraints(min_length=6, max_length=128)]
 
 # Login uchun schema

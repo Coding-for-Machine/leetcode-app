@@ -1,176 +1,88 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        {% block title %}
-        CfM |
-        {% endblock title %}
-    </title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}CfM{% endblock %}</title>
+    
+    
+    <!-- Optimized Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#8b5cf6'
+                    }
+                }
+            }
+        }
+    </script>
+     <!-- Axios -->
+     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- HTMX for AJAX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+
+    
     <style>
-        /* Custom styles */
+        [x-cloak] { display: none !important; }
+        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
+        .htmx-request .htmx-indicator { opacity: 1; }
+        
+        /* Simplified custom styles */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
-            color: #1e293b;
-            min-height: 100vh;
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            @apply bg-gray-50 text-gray-800 min-h-full;
         }
         
         .gradient-text {
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
         }
         
         .gradient-btn {
-            background: linear-gradient(to right, #6366f1, #8b5cf6);
-            transition: all 0.3s ease;
-        }
-        
-        .gradient-btn:hover {
-            background: linear-gradient(to right, #4f46e5, #7c3aed);
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+            @apply bg-gradient-to-r from-primary to-secondary transition-all hover:from-indigo-700 hover:to-purple-700;
         }
         
         .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            @apply transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5;
         }
         
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
-        }
-        
-        .difficulty-easy {
-            color: #10b981;
-            background-color: rgba(16, 185, 129, 0.1);
-        }
-        
-        .difficulty-medium {
-            color: #f59e0b;
-            background-color: rgba(245, 158, 11, 0.1);
-        }
-        
-        .difficulty-hard {
-            color: #ef4444;
-            background-color: rgba(239, 68, 68, 0.1);
-        }
-        
-        /* Mobil menyu */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 280px;
-            height: 100vh;
-            background: white;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu.open {
-            left: 0;
-        }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        /* Responsive tuzilish */
-        @media (max-width: 768px) {
-            .problem-table th, 
-            .problem-table td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.875rem;
-            }
-            
-            .problem-table .solution-cell {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .problem-table .frequency-cell {
-                display: none;
-            }
-        }
+        /* Difficulty badges */
+        .difficulty-easy { @apply text-green-600 bg-green-50; }
+        .difficulty-medium { @apply text-yellow-500 bg-yellow-50; }
+        .difficulty-hard { @apply text-red-500 bg-red-50; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-{% include "navbar.html" %}
-{% block content %}
-
-{% endblock content %}
-    <!-- Footer -->
+<body class="flex flex-col min-h-screen" hx-boost="true">
+    {% if request.path != "/users/login/"  or request.path == "/users/register/"%}
+    {% include "navbar.html" %}
+    {% endif %}
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% block content %}
+        <!-- Main content will be loaded here -->
+        {% endblock %}
+    </main>
+    
+    {% if request.path == '/' %}
     {% include "footer.html" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.3/cdn.js"></script>
-    <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Mobil menyuni boshqarish
-                const mobileMenuButton = document.getElementById('mobileMenuButton');
-                const closeMobileMenu = document.getElementById('closeMobileMenu');
-                const mobileMenu = document.getElementById('mobileMenu');
-                const overlay = document.getElementById('overlay');
-                const body = document.body;
-                
-                // Menyuni ochish
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.add('open');
-                    overlay.classList.add('active');
-                    body.classList.add('menu-open');
-                });
-                
-                // Menyuni yopish
-                function closeMenu() {
-                    mobileMenu.classList.remove('open');
-                    overlay.classList.remove('active');
-                    body.classList.remove('menu-open');
-                }
-                
-                closeMobileMenu.addEventListener('click', closeMenu);
-                overlay.addEventListener('click', closeMenu);
-                
-                // Responsive moslashuvchanlik uchun qo'shimcha sozlamalar
-                function handleResize() {
-                    if (window.innerWidth >= 1024) {
-                        closeMenu();
-                    }
-                }
-                
-                window.addEventListener('resize', handleResize);
-            });
-    </script>
-    {% block extra_js %}{% endblock extra_js %}
-
+    {% endif %}
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    
+    <!-- HTMX indicators -->
+    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 h-1 bg-primary z-50"></div>
+    <div class="htmx-indicator fixed inset-0 bg-white bg-opacity-70 z-40 flex items-center justify-center">
+        <i class="fas fa-spinner fa-spin text-4xl text-primary"></i>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
