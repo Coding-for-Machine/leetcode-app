@@ -1,76 +1,52 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.utils.text import slugify
-from django.urls import reverse
 
 User = get_user_model()
 
-class Topic(models.Model):
-    DIFFICULTY_CHOICES = [
-        ('easy', 'Oson'),
-        ('medium', 'Oʻrtacha'),
-        ('hard', 'Qiyin'),
+class Contest(models.Model):
+    CONTEST_TYPE_CHOICES = [
+        ('weekly', 'Haftalik Tanlov'),
+        ('biweekly', '2-Haftalik Tanlov'),
     ]
     
-    title = models.CharField(max_length=200, verbose_name="Mavzu nomi")
-    slug = models.SlugField(max_length=200, unique=True, blank=True)
-    description = models.TextField(verbose_name="Tavsif")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='topics')
-    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium')
-    views = models.PositiveIntegerField(default=0)
+    title = models.CharField(max_length=100)
+    contest_type = models.CharField(max_length=20, choices=CONTEST_TYPE_CHOICES)
+    contest_number = models.PositiveIntegerField(help_text="M: Bu hafta 345-chi haftalik tanlov")
+    start_time = models.DateTimeField()
+    duration = models.PositiveIntegerField(help_text="Daqiqalarda m: 90 daqiqa")  # 90 daqiqa
+    problem_count = models.PositiveIntegerField(default=4)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        ordering = ['-created_at']
-        verbose_name = "Mavzu"
-        verbose_name_plural = "Mavzular"
+        ordering = ['-start_time']
     
     def __str__(self):
-        return self.title
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-    
-    def get_absolute_url(self):
-        return reverse('topic_detail', kwargs={'slug': self.slug})
-    
-    def get_difficulty_class(self):
-        return {
-            'easy': 'qiyinlik-oson',
-            'medium': 'qiyinlik-o\'rta',
-            'hard': 'qiyinlik-qiyin'
-        }.get(self.difficulty, '')
+        return f"{self.get_contest_type_display()} #{self.contest_number}"
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+class ContestRegistration(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+    registered_at = models.DateTimeField(auto_now_add=True)
+    is_participated = models.BooleanField(default=False)
     
     class Meta:
-        verbose_name = "Teg"
-        verbose_name_plural = "Teglar"
+        unique_together = ('user', 'contest')
     
     def __str__(self):
-        return self.name
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+        return f"{self.user.username} - {self.contest.title}"
 
 
-class TopicTag(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='topic_tags')
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    
-    class Meta:
-        unique_together = ('topic', 'tag')
-        verbose_name = "Mavzu Tegi"
-        verbose_name_plural = "Mavzu Teglari"
+
+class UserContestStats(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    total_contests = models.PositiveIntegerField(default=0)
+    best_rank = models.PositiveIntegerField(null=True, blank=True)
+    average_rank = models.FloatField(null=True, blank=True)
+    total_points = models.PositiveIntegerField(default=0)
+    last_contest = models.ForeignKey(Contest, null=True, blank=True, on_delete=models.SET_NULL)
     
     def __str__(self):
-        return f"{self.topic.title} - {self.tag.name}"
-
+        return f"{self.user.username} stats"

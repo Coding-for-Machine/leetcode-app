@@ -62,9 +62,12 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-screen" hx-boost="true">
-    {% if request.path != "/users/login/"  or request.path == "/users/register/"%}
+    {% if request.path != "/users/login/"%}
+    {% if request.path != "/users/register/" %}
     {% include "navbar.html" %}
     {% endif %}
+    {% endif %}
+
     <main class="flex-grow container mx-auto px-4 py-6">
         {% block content %}
         <!-- Main content will be loaded here -->
@@ -83,6 +86,8 @@
         <i class="fas fa-spinner fa-spin text-4xl text-primary"></i>
     </div>
     
+    <script src="{% static "js/auth.js" %}" ></script>
     {% block extra_js %}{% endblock %}
+    
 </body>
 </html>

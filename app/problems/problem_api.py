@@ -52,6 +52,7 @@ class ProblemsAPiList(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+
 @api_problem_router.get("/", response=List[ProblemsAPiList])
 def problem_get_api(request):
     problems = Problem.objects.all()

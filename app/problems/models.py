@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.text import slugify
 from .gnerate_slug import generate_slug_with_case
+from contest.models import Contest
 
 User = settings.AUTH_USER_MODEL
 
@@ -17,7 +18,7 @@ class TimeMixsin(models.Model):
         abstract=True
         # model yaratmaydi abstract=True
 
-class Categorys(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=500)
 
@@ -43,27 +44,49 @@ class Language(TimeMixsin):
     
 
 class Problem(TimeMixsin):
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, null=True, blank=True)
     language = models.ManyToManyField(Language, related_name='problems_in_language')
-    category = models.ManyToManyField(Categorys, related_name='problems_in_category')
-    title = models.CharField(max_length=200, blank=True, null=True)
-    slug = models.SlugField(max_length=250, blank=True, null=True)
+    category = models.ManyToManyField(Category, related_name='problems_in_category')
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, blank=True, unique=True)
     description = RichTextUploadingField()
+    
     difficulty_choices = [
-        ('easy', 'Easy'),
-        ('medium', 'Medium'),
-        ('hard', 'Hard'),
+        (1, '1 - Oson'),
+        (2, '2 - O\'rtacha'),
+        (3, '3 - Qiyin'),
+        (4, '4 - Juda qiyin'),
     ]
-    difficulty = models.CharField(choices=difficulty_choices, max_length=6)
+    difficulty = models.PositiveIntegerField(choices=difficulty_choices, default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    points = models.PositiveIntegerField(blank=True)
+    order = models.PositiveIntegerField(default=1)
+    
     def __str__(self):
-        if self.title:
-            return self.title
-        return self.difficulty
-    @property
-    def get_url(self):
+        return f"{self.title} ({self.get_difficulty_display()})"
+    
+    def get_absolute_url(self):
         return reverse("problem_page", kwargs={"slug": self.slug})
     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        
+        if not self.points:
+            self.points = {
+                1: 100,
+                2: 250,
+                3: 450,
+                4: 700
+            }.get(self.difficulty, 100)
+            
+        super().save(*args, **kwargs)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Masala"
+        verbose_name_plural = "Masalalar"
+        
 class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="functions", on_delete=models.CASCADE)
@@ -86,7 +109,6 @@ class ExecutionTestCase(TimeMixsin):
 
 class TestCase(TimeMixsin):
     problem = models.ForeignKey(Problem, related_name="test_problem", on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, related_name="test_language", on_delete=models.CASCADE)
     input_txt = models.CharField(max_length=250, help_text="Test Input")
     output_txt = models.CharField(max_length=250, help_text="Chiqish Output")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -94,7 +116,7 @@ class TestCase(TimeMixsin):
         return f"Test for {self.problem.title}"
     
     class Meta:
-        unique_together = ("problem", "language", "input_txt")
+        unique_together = ("problem", "input_txt", "output_txt")
 
     def __str__(self):
         return f"Test for {self.problem.title} [{self.language.name}]"

@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from contest.models import Topic
+from problems.models import Problem
 User = get_user_model()
 
 class Comment(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='comments')
+    problems = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -16,32 +16,32 @@ class Comment(models.Model):
         verbose_name_plural = "Izohlar"
     
     def __str__(self):
-        return f"Comment by {self.author.username} on {self.topic.title}"
+        return f"Comment by {self.author.username} on {self.problems.title}"
 
 
 class Like(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='likes')
+    problems = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ('topic', 'user')
+        unique_together = ('problems', 'user')
         verbose_name = "Yoqtirish"
         verbose_name_plural = "Yoqtirishlar"
     
     def __str__(self):
-        return f"{self.user.username} likes {self.topic.title}"
+        return f"{self.user.username} likes {self.problems.title}"
 
 
 class Bookmark(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='bookmarks')
+    problems = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='bookmarks')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ('topic', 'user')
+        unique_together = ('problems', 'user')
         verbose_name = "Xatchoʻp"
         verbose_name_plural = "Xatchoʻplar"
     
     def __str__(self):
-        return f"{self.user.username} bookmarked {self.topic.title}"
+        return f"{self.user.username} bookmarked {self.problems.title}"

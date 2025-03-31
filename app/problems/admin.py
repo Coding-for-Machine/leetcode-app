@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Problem, Categorys, TestCase, ExecutionTestCase, Function, Language
+from .models import Problem, Category, TestCase, ExecutionTestCase, Function, Language
 
 class ExecutionTestCaseInlineAdmin(admin.StackedInline):
     model = ExecutionTestCase
@@ -20,7 +20,7 @@ class LanguageAdmin(admin.ModelAdmin):
     list_display_links = ["name"]
     list_per_page = 5
 
-@admin.register(Categorys)
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "slug"]
 
