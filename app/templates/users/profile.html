@@ -1,304 +1,201 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil | LeetCode Kloni</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .shisha-effekt {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        }
-        
-        .gradient-btn {
-            background: linear-gradient(to right, #6366f1, #8b5cf6);
-            transition: all 0.3s ease;
-        }
-        
-        .gradient-btn:hover {
-            background: linear-gradient(to right, #4f46e5, #7c3aed);
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
-        }
-        
-        .karta-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .karta-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
-        }
-        
-        .qiyinlik-oson {
-            color: #10b981;
-            background-color: rgba(16, 185, 129, 0.1);
-        }
-        
-        .qiyinlik-o'rta {
-            color: #f59e0b;
-            background-color: rgba(245, 158, 11, 0.1);
-        }
-        
-        .qiyinlik-qiyin {
-            color: #ef4444;
-            background-color: rgba(239, 68, 68, 0.1);
-        }
-        
-        .tab-faol { 
-            border-bottom: 2px solid #6366f1;
-            color: #6366f1;
-            font-weight: 600;
-        }
-        
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.5s;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-        
-        .hissa-grafik {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        }
-        
-        [title] {
-            position: relative;
-        }
-        
-        [title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            margin-bottom: 5px;
-            z-index: 10;
-        }
-        
-        [title]:hover::before {
-            content: '';
-            position: absolute;
-            bottom: calc(100% - 5px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid rgba(0,0,0,0.8);
-            z-index: 11;
-        }
-        
-        #oylar {
-            display: flex;
-            align-items: center;
-        }
-        
-        #oylar div {
-            flex-shrink: 0;
-        }
-        
-        #grid > div[style*="margin-right"] {
-            position: relative;
-        }
-        
-        #grid > div[style*="margin-right"]::after {
-            content: '';
-            position: absolute;
-            right: -10px;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background-color: rgba(0,0,0,0.05);
-        }
-        
-        .nishon-progress {
-            background: conic-gradient(#6366f1 var(--progress), #f0f0f0 0deg);
-        }
-
-        /* Mobil menyu */
-        .mobil-menyu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 280px;
-            height: 100vh;
-            background: white;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-        
-        .mobil-menyu.ochiq {
-            left: 0;
-        }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .overlay.faol {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        @media (max-width: 768px) {
-            .masala-jadval th, 
-            .masala-jadval td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.875rem;
-            }
-            
-            .masala-jadval .yechim-cell {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .masala-jadval .tezlik-cell {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-    <!-- Overlay -->
-    <div id="overlay" class="overlay"></div>
+{% comment %} {% extends "base.html" %}  <!-- HAR DOIM BIRINCHI --> {% endcomment %}
+    {% load static %}  <!-- Keyin load taglari -->
+    {% block title %}
+    CfM | Profile
+    {% endblock title %}
     
-    <!-- Mobil menyu -->
-    <div id="mobilMenyu" class="mobil-menyu">
-        <div class="p-4 h-full flex flex-col">
-            <div class="flex justify-between items-center mb-6">
-                <a href="#" class="text-xl font-bold gradient-text flex items-center">
-                    <i class="fas fa-code mr-2"></i>LeetCode
-                </a>
-                <button id="yopishMobilMenyu" class="text-slate-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto">
-                <div class="space-y-2 mb-6">
-                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
-                        <i class="fas fa-compass mr-2"></i>Kashfiyot
-                    </a>
-                    <a href="#" class="block px-3 py-2 rounded-lg bg-indigo-50 text-indigo-600">
-                        <i class="fas fa-list-ol mr-2"></i>Masalalar
-                    </a>
-                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
-                        <i class="fas fa-trophy mr-2"></i>Tanlovlar
-                    </a>
-                    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-slate-100">
-                        <i class="fas fa-comments mr-2"></i>Munozara
-                    </a>
-                </div>
-                
-                <div class="px-3 py-4 border-t border-slate-200">
-                    <h3 class="font-medium text-slate-700 mb-3">Profil</h3>
-                    <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
-                        <div>
-                            <p class="font-medium">Foydalanuvchi</p>
-                            <p class="text-xs text-slate-500">Premium a'zo emas</p>
-                        </div>
-                    </div>
-                    <button class="w-full gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2">
-                        <i class="fas fa-crown mr-2"></i>Premiumga o'tish
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% block extra_css %}
+<style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    .shisha-effekt {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .gradient-text {
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .gradient-bg {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .gradient-btn {
+        background: linear-gradient(to right, #6366f1, #8b5cf6);
+        transition: all 0.3s ease;
+    }
+    
+    .gradient-btn:hover {
+        background: linear-gradient(to right, #4f46e5, #7c3aed);
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    }
+    
+    .karta-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .karta-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+    }
+    
+    .qiyinlik-oson {
+        color: #10b981;
+        background-color: rgba(16, 185, 129, 0.1);
+    }
+    
+    .qiyinlik-o'rta {
+        color: #f59e0b;
+        background-color: rgba(245, 158, 11, 0.1);
+    }
+    
+    .qiyinlik-qiyin {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    .tab-faol { 
+        border-bottom: 2px solid #6366f1;
+        color: #6366f1;
+        font-weight: 600;
+    }
+    
+    .progress-ring__circle {
+        transition: stroke-dashoffset 0.5s;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    .hissa-grafik {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    
+    [title] {
+        position: relative;
+    }
+    
+    [title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        margin-bottom: 5px;
+        z-index: 10;
+    }
+    
+    [title]:hover::before {
+        content: '';
+        position: absolute;
+        bottom: calc(100% - 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid rgba(0,0,0,0.8);
+        z-index: 11;
+    }
+    
+    #oylar {
+        display: flex;
+        align-items: center;
+    }
+    
+    #oylar div {
+        flex-shrink: 0;
+    }
+    
+    #grid > div[style*="margin-right"] {
+        position: relative;
+    }
+    
+    #grid > div[style*="margin-right"]::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: rgba(0,0,0,0.05);
+    }
+    
+    .nishon-progress {
+        background: conic-gradient(#6366f1 var(--progress), #f0f0f0 0deg);
+    }
 
-    <!-- Navigatsiya paneli -->
-    <nav class="shisha-effekt shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between h-16 items-center">
-                <!-- Logo va desktop menyu -->
-                <div class="flex items-center space-x-4">
-                    <!-- Mobil menyu tugmasi -->
-                    <button id="mobilMenyuTugmasi" class="lg:hidden text-slate-700">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                    
-                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
-                        <i class="fas fa-code mr-2"></i>
-                        <span class="hidden sm:inline">LeetCode</span>
-                    </a>
-                    
-                    <div class="hidden lg:flex space-x-6">
-                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
-                            <i class="fas fa-compass mr-2"></i>Kashfiyot
-                        </a>
-                        <a href="#" class="text-indigo-600 px-1 py-2 text-sm font-medium flex items-center border-b-2 border-indigo-600">
-                            <i class="fas fa-list-ol mr-2"></i>Masalalar
-                        </a>
-                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
-                            <i class="fas fa-trophy mr-2"></i>Tanlovlar
-                        </a>
-                        <a href="#" class="text-slate-700 hover:text-indigo-600 px-1 py-2 text-sm font-medium flex items-center">
-                            <i class="fas fa-comments mr-2"></i>Munozara
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Qidiruv va profil -->
-                <div class="flex items-center space-x-3">
-                    <div class="relative hidden sm:block">
-                        <input type="text" placeholder="Qidirish..." 
-                               class="border border-slate-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs bg-white">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
-                    </div>
-                    
-                    <button class="gradient-btn text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
-                        <i class="fas fa-crown mr-2"></i>Premium
-                    </button>
-                    
-                    <div class="flex items-center space-x-2 ml-2">
-                        <button class="text-slate-500 hover:text-indigo-600 p-1">
-                            <i class="far fa-bell text-lg"></i>
-                        </button>
-                        <div class="relative">
-                            <button class="flex items-center">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profil" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
-                                <i class="fas fa-caret-down ml-1 text-slate-500 text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    /* Mobil menyu */
+    .mobil-menyu {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        transition: all 0.3s ease;
+    }
+    
+    .mobil-menyu.ochiq {
+        left: 0;
+    }
+    
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .overlay.faol {
+        opacity: 1;
+        visibility: visible;
+    }
 
+    @media (max-width: 768px) {
+        .masala-jadval th, 
+        .masala-jadval td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .masala-jadval .yechim-cell {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .masala-jadval .tezlik-cell {
+            display: none;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+
+{% block content %}
+<div id="router-view" class="page">
+    <!-- Sahifa kontenti shu yerga yuklanadi -->
+</div>
     <!-- Profil sarlavhasi -->
     <div class="gradient-bg py-12">
         <div class="container mx-auto px-4">
@@ -828,59 +725,7 @@ def isValid(self, s: str) -> bool:
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-gray-100 border-t border-gray-200 py-6 md:py-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
-                <div>
-                    <h4 class="font-bold mb-3 md:mb-4">Mahsulot</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Xususiyatlar</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Narxlar</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Premium</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biznes</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-3 md:mb-4">Resurslar</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Hujjatlar</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Darsliklar</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Blog</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Jamiyat</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-3 md:mb-4">Kompaniya</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Biz haqimizda</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Karera</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Matbuot</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Aloqa</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-3 md:mb-4">Huquqiy</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Maxfiylik</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Shartlar</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">Cookie Siyosati</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-indigo-600 text-xs md:text-sm">GDPR</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-200 pt-4 md:pt-6 flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-3 md:mb-0">
-                    <a href="#" class="text-xl font-bold gradient-text flex items-center">
-                        <i class="fas fa-code mr-2"></i>LeetCode
-                    </a>
-                </div>
-                <div class="text-xs md:text-sm text-gray-600">
-                    © 2023 LeetCode Kloni. Barcha huquqlar himoyalangan.
-                </div>
-            </div>
-        </div>
-    </footer>
+  
 
     <!-- Profilni tahrirlash modali (yashirin) -->
     <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
@@ -943,363 +788,28 @@ def isValid(self, s: str) -> bool:
             </div>
         </div>
     </div>
+{% endblock content %}
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Tab funksionalligi
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Barcha tablardan faol klassini olib tashlash
-                    tabs.forEach(t => t.classList.remove('tab-faol'));
-                    // Bosilgan tabga faol klassini qo'shish
-                    this.classList.add('tab-faol');
-                    
-                    // Barcha tab kontentlarini yashirish
-                    tabContents.forEach(content => content.classList.add('hidden'));
-                    // Tanlangan tab kontentini ko'rsatish
-                    const tabId = this.getAttribute('data-tab') + '-tab';
-                    document.getElementById(tabId).classList.remove('hidden');
-                });
-            });
-            
-            // Birinchi tabni default faol qilish
-            if (tabs.length > 0) {
-                tabs[0].classList.add('tab-faol');
-                const firstTabId = tabs[0].getAttribute('data-tab') + '-tab';
-                document.getElementById(firstTabId).classList.remove('hidden');
-            }
-            
-            // Modal funksionalligi
-            const editProfileBtn = document.getElementById('edit-profile-btn');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            const modal = document.getElementById('edit-profile-modal');
-            
-            editProfileBtn.addEventListener('click', function() {
-                modal.classList.remove('hidden');
-            });
-            
-            closeModalBtn.addEventListener('click', function() {
-                modal.classList.add('hidden');
-            });
-            
-            // Modal tashqarisiga bosilganda yopish
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-            
-            // Ko'nikmalar diagrammasi
-            const ctx = document.getElementById('skillsChart').getContext('2d');
-            const skillsChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['JavaScript', 'Python', 'Java', 'C++', 'Boshqa'],
-                    datasets: [{
-                        data: [45, 30, 15, 7, 3],
-                        backgroundColor: [
-                            '#3B82F6',
-                            '#10B981',
-                            '#F59E0B',
-                            '#8B5CF6',
-                            '#E5E7EB'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
+
+{% block extra_js %}
+
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
+    {% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
+    
+    {% comment %} <script>
+        // CSRF token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
                     }
                 }
-            });
-            
-            // Progress halqa animatsiyasi
-            const progressRing = document.querySelector('.progress-ring__circle');
-            if (progressRing) {
-                setTimeout(() => {
-                    progressRing.style.strokeDashoffset = '25';
-                }, 500);
             }
-
-            // Mobil menyu boshqaruvi
-            const mobilMenyuTugmasi = document.getElementById('mobilMenyuTugmasi');
-            const yopishMobilMenyu = document.getElementById('yopishMobilMenyu');
-            const mobilMenyu = document.getElementById('mobilMenyu');
-            const overlay = document.getElementById('overlay');
-            const body = document.body;
-            
-            // Menyuni ochish
-            mobilMenyuTugmasi.addEventListener('click', function() {
-                mobilMenyu.classList.add('ochiq');
-                overlay.classList.add('faol');
-                body.classList.add('overflow-hidden');
-            });
-            
-            // Menyuni yopish
-            function yopishMenyu() {
-                mobilMenyu.classList.remove('ochiq');
-                overlay.classList.remove('faol');
-                body.classList.remove('overflow-hidden');
-            }
-            
-            yopishMobilMenyu.addEventListener('click', yopishMenyu);
-            overlay.addEventListener('click', yopishMenyu);
-            
-            // Responsive o'lchovlar
-            function handleResize() {
-                if (window.innerWidth >= 1024) {
-                    yopishMenyu();
-                }
-            }
-            
-            window.addEventListener('resize', handleResize);
-        });
-
-        // Hissalar grafigi uchun JavaScript
-        document.addEventListener('DOMContentLoaded', function() {
-            // Sozlamalar
-            const currentYear = new Date().getFullYear();
-            const years = [currentYear - 2, currentYear - 1, currentYear];
-            let selectedYear = currentYear;
-            
-            // DOM elementlari
-            const yearSelector = document.getElementById('year-selector');
-            const hissalarSoni = document.getElementById('hissalar-soni');
-            const oylar = document.getElementById('oylar');
-            const grid = document.getElementById('grid');
-            const infoBtn = document.getElementById('info-btn');
-            const learnMoreBtn = document.getElementById('learn-more-btn');
-            const infoModal = document.getElementById('info-modal');
-            const closeModalBtns = document.querySelectorAll('.close-modal-btn');
-            
-            // Yil tanlovini to'ldirish
-            years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                option.selected = year === currentYear;
-                yearSelector.appendChild(option);
-            });
-            
-            // Hodisalar
-            yearSelector.addEventListener('change', function() {
-                selectedYear = parseInt(this.value);
-                renderContributionGraph();
-            });
-            
-            infoBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
-            learnMoreBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
-            
-            closeModalBtns.forEach(btn => {
-                btn.addEventListener('click', () => infoModal.classList.add('hidden'));
-            });
-            
-            infoModal.addEventListener('click', (e) => {
-                if (e.target === infoModal) {
-                    infoModal.classList.add('hidden');
-                }
-            });
-            
-            // Asosiy chizish funktsiyasi
-            function renderContributionGraph() {
-                // Avvalgi kontentni tozalash
-                oylar.innerHTML = '';
-                grid.innerHTML = '';
-                
-                // Tanlangan yil uchun ma'lumot yaratish
-                const contributionData = generateYearlyContributionData(selectedYear);
-                const totalContributions = calculateTotalContributions(contributionData);
-                
-                // Hissalar sonini yangilash
-                hissalarSoni.textContent = `${selectedYear} yilda ${totalContributions} ta hissa`;
-                
-                // Oylar nomlari
-                renderMonthLabels(contributionData);
-                
-                // Katakchalarni chizish
-                renderGridCells(contributionData);
-            }
-            
-            // Tasodifiy hissa ma'lumotlari
-            function generateYearlyContributionData(year) {
-                const weeks = [];
-                const firstDayOfYear = new Date(year, 0, 1);
-                const lastDayOfYear = new Date(year, 11, 31);
-                
-                // Yil boshlanishidan oldingi yakshanbani topish
-                let currentDate = new Date(firstDayOfYear);
-                currentDate.setDate(currentDate.getDate() - currentDate.getDay());
-                
-                // Yil oxirigacha haftalarni yaratish
-                while (currentDate <= lastDayOfYear) {
-                    const week = [];
-                    let weekHasDaysInYear = false;
-                    
-                    // Har hafta uchun 7 kun
-                    for (let i = 0; i < 7; i++) {
-                        const dayDate = new Date(currentDate);
-                        dayDate.setDate(dayDate.getDate() + i);
-                        
-                        // Faqat tanlangan yildagi kunlarni qo'shish
-                        if (dayDate.getFullYear() === year) {
-                            weekHasDaysInYear = true;
-                            let count;
-                            const rand = Math.random();
-                            if (rand < 0.6) count = 0;
-                            else if (rand < 0.8) count = Math.floor(Math.random() * 9) + 1;
-                            else if (rand < 0.9) count = Math.floor(Math.random() * 10) + 10;
-                            else if (rand < 0.95) count = Math.floor(Math.random() * 10) + 20;
-                            else count = Math.floor(Math.random() * 20) + 30;
-                            
-                            week.push({
-                                date: dayDate,
-                                count: count,
-                                month: dayDate.getMonth()
-                            });
-                        } else {
-                            // Yil chegarasidan tashqaridagi kunlar uchun bo'sh katak
-                            week.push(null);
-                        }
-                    }
-                    
-                    // Faqat yil ichida kamida 1 kuni bo'lgan haftalarni qo'shish
-                    if (weekHasDaysInYear) {
-                        weeks.push(week);
-                    }
-                    
-                    currentDate.setDate(currentDate.getDate() + 7);
-                }
-                
-                return weeks;
-            }
-            
-            // Jami hissalarni hisoblash
-            function calculateTotalContributions(contributionData) {
-                return contributionData.reduce((total, week) => {
-                    return total + week.reduce((weekTotal, day) => {
-                        return weekTotal + (day ? day.count : 0);
-                    }, 0);
-                }, 0);
-            }
-            
-            // Oylar nomlarini chizish
-            function renderMonthLabels(contributionData) {
-                const monthNames = ["Yan", "Fev", "Mar", "Apr", "May", "Iyn", 
-                                  "Iyl", "Avg", "Sen", "Okt", "Noy", "Dek"];
-                let currentMonth = -1;
-                let monthStartIndex = 0;
-                let lastDayProcessed = false;
-                
-                // Har oyning 1-kuni bo'lgan haftalarni topish
-                contributionData.forEach((week, weekIndex) => {
-                    week.forEach(day => {
-                        if (day && day.date.getDate() === 1 && !lastDayProcessed) {
-                            const month = day.date.getMonth();
-                            if (month !== currentMonth) {
-                                // Oy nomi uchun joy hisoblash
-                                const monthWidth = weekIndex - monthStartIndex;
-                                if (monthWidth > 0 && currentMonth >= 0) {
-                                    const monthLabel = document.createElement('div');
-                                    monthLabel.textContent = monthNames[currentMonth];
-                                    monthLabel.style.marginRight = '47px'; // Oylar orasida 8px bo'shliq
-                                    monthLabel.style.minWidth = `${monthWidth * 14}px`;
-                                    oylar.appendChild(monthLabel);
-                                }
-                                
-                                currentMonth = month;
-                                monthStartIndex = weekIndex;
-                            }
-                        }
-                        
-                        // Yil oxiriga yetib borilganligini tekshirish
-                        if (day && day.date.getMonth() === 11 && day.date.getDate() === 31) {
-                            lastDayProcessed = true;
-                        }
-                    });
-                });
-                
-                // Oxirgi oyni qo'shish
-                if (currentMonth >= 0) {
-                    const monthLabel = document.createElement('div');
-                    monthLabel.textContent = monthNames[currentMonth];
-                    monthLabel.style.marginRight = '8px';
-                    oylar.appendChild(monthLabel);
-                }
-            }
-            
-            // Katakchalarni chizish (oylarni ajratib)
-            function renderGridCells(contributionData) {
-                // Oylar o'rtasidagi o'tishlarni aniqlash
-                const monthTransitions = [];
-                let currentMonth = -1;
-                
-                contributionData.forEach((week, weekIndex) => {
-                    week.forEach(day => {
-                        if (day && day.month !== currentMonth) {
-                            monthTransitions.push(weekIndex);
-                            currentMonth = day.month;
-                        }
-                    });
-                });
-                
-                // Ma'lumotlarni aylantirib, hafta kunlarini qatorlarga aylantirish
-                for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                    contributionData.forEach((week, weekIndex) => {
-                        const day = week[dayOfWeek];
-                        const cell = document.createElement('div');
-                        
-                        // Oylar o'rtasiga bo'shliq qo'shish
-                        if (monthTransitions.includes(weekIndex)) {
-                            cell.style.marginRight = '8px'; // Oylar orasida 8px bo'shliq
-                        }
-                        
-                        if (day) {
-                            cell.className = `w-2 h-2 md:w-3 md:h-3 rounded-sm cursor-pointer ${getColorClass(day.count)}`;
-                            cell.title = `${formatDate(day.date)}: ${day.count} ta hissa`;
-                        } else {
-                            cell.className = 'w-2 h-2 md:w-3 md:h-3 opacity-0'; // Ko'rinmas katak (padding uchun)
-                        }
-                        
-                        grid.appendChild(cell);
-                    });
-                }
-            }
-            
-            // Yordamchi funktsiyalar
-            function getColorClass(count) {
-                if (count === 0) return 'bg-gray-100';
-                if (count < 10) return 'bg-green-100';
-                if (count < 20) return 'bg-green-300';
-                if (count < 30) return 'bg-green-500';
-                return 'bg-green-700';
-            }
-            
-            function formatDate(date) {
-                const options = { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                };
-                return date.toLocaleDateString('uz-UZ', options);
-            }
-            
-            // Dastlabki chizish
-            renderContributionGraph();
-        });
-    </script>
-</body>
-</html>
+            return cookieValue;
+        } {% endcomment %}
+{% endblock extra_js %}

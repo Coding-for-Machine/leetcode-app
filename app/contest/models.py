@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf import settings
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Contest(models.Model):
     CONTEST_TYPE_CHOICES = [
@@ -27,26 +27,39 @@ class Contest(models.Model):
 
 
 class ContestRegistration(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_contest_register")
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name="contest_register")
     registered_at = models.DateTimeField(auto_now_add=True)
     is_participated = models.BooleanField(default=False)
-    
+    rank = models.IntegerField(null=True, blank=True)
+    points = models.PositiveIntegerField(default=0)
     class Meta:
         unique_together = ('user', 'contest')
     
     def __str__(self):
         return f"{self.user.username} - {self.contest.title}"
-
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.user.update_contest_stats()
+    
+    def delete(self, *args, **kwargs):
+        user = self.user
+        super().delete(*args, **kwargs)
+        user.update_contest_stats()
 
 
 class UserContestStats(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='contest_stats')
     total_contests = models.PositiveIntegerField(default=0)
     best_rank = models.PositiveIntegerField(null=True, blank=True)
     average_rank = models.FloatField(null=True, blank=True)
     total_points = models.PositiveIntegerField(default=0)
     last_contest = models.ForeignKey(Contest, null=True, blank=True, on_delete=models.SET_NULL)
+  
+    
+    class Meta:
+        verbose_name = "User Contest Statistics"
+        verbose_name_plural = "Users Contest Statistics"
     
     def __str__(self):
-        return f"{self.user.username} stats"
+        return f"{self.user.username}'s stats"

@@ -1,258 +1,272 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}
-Contest
-{% endblock title %}
+{% block extra_css %}
+{% endblock extra_css %}
+{% block content %}
 
-
-{% block contest %}
-<style>
-    .progress-bar {
-        transition: width 0.5s ease-in-out;
-    }
-</style>
-
-<script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const userId = 1; // Foydalanuvchi ID (real loyihada auth orqali olinadi)
-        
-        // Kelgusi tanlovlarni yuklash
-        loadUpcomingContests();
-        
-        // O'tgan tanlovlarni yuklash
-        loadPastContests();
-        
-        // Foydalanuvchi statistikasini yuklash
-        loadUserStats(userId);
-        
-        // Ro'yxatdan o'tish tugmalari uchun hodisalar
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('contest-register-btn')) {
-                registerForContest(e.target.dataset.contestId);
-            }
-        });
-    });
-    
-    // Kelgusi tanlovlarni yuklash
-    async function loadUpcomingContests() {
-        try {
-            const response = await fetch('/api/contests/upcoming/');
-            if (!response.ok) throw new Error('Network response was not ok');
-            
-            const contests = await response.json();
-            const container = document.querySelector('.space-y-4');
-            
-            // Avvalgi kartalarni tozalash
-            container.innerHTML = '';
-            
-            // Yangi kartalarni qo'shish
-            contests.forEach(contest => {
-                const card = createContestCard(contest);
-                container.insertAdjacentHTML('beforeend', card);
-            });
-        } catch (error) {
-            console.error('Error loading upcoming contests:', error);
-            showAlert('error', 'Tanlovlarni yuklashda xatolik yuz berdi');
-        }
-    }
-    
-    // O'tgan tanlovlarni yuklash
-    async function loadPastContests() {
-        try {
-            const response = await fetch('/api/contests/past/');
-            if (!response.ok) throw new Error('Network response was not ok');
-            
-            const contests = await response.json();
-            const tbody = document.querySelector('tbody');
-            
-            // Avvalgi jadvalni tozalash
-            tbody.innerHTML = '';
-            
-            // Yangi qatorlarni qo'shish
-            contests.forEach(contest => {
-                const row = createPastContestRow(contest);
-                tbody.insertAdjacentHTML('beforeend', row);
-            });
-        } catch (error) {
-            console.error('Error loading past contests:', error);
-            showAlert('error', 'O\'tgan tanlovlarni yuklashda xatolik');
-        }
-    }
-    
-    // Foydalanuvchi statistikasini yuklash
-    async function loadUserStats(userId) {
-        try {
-            const response = await fetch(`/api/contests/stats/${userId}/`);
-            if (!response.ok) throw new Error('Network response was not ok');
-            
-            const stats = await response.json();
-            
-            // Statistikani yangilash
-            document.querySelectorAll('.stat-value.total-contests').forEach(el => {
-                el.textContent = stats.total_contests;
-            });
-            
-            document.querySelectorAll('.stat-value.best-rank').forEach(el => {
-                el.textContent = stats.best_rank || '-';
-            });
-            
-            document.querySelectorAll('.stat-value.average-rank').forEach(el => {
-                el.textContent = stats.average_rank ? stats.average_rank.toFixed(1) : '-';
-            });
-            
-            document.querySelectorAll('.stat-value.total-points').forEach(el => {
-                el.textContent = stats.total_points;
-            });
-            
-            // Progress barlarni yangilash
-            updateProgressBar('contests-progress', stats.total_contests / 50 * 100);
-            updateProgressBar('rank-progress', stats.best_rank ? (1 / stats.best_rank) * 100 : 0);
-            updateProgressBar('points-progress', stats.total_points / 50000 * 100);
-        } catch (error) {
-            console.error('Error loading user stats:', error);
-        }
-    }
-    
-    // Tanlov kartasini yaratish
-    function createContestCard(contest) {
-        return `
-            <div class="contest-card card-hover bg-white rounded-lg p-5" data-contest-id="${contest.id}">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div class="mb-3 md:mb-0">
-                        <h3 class="font-bold text-lg mb-1">${contest.title}</h3>
-                        <div class="flex items-center text-sm text-slate-600">
-                            <i class="fas fa-clock mr-2"></i>
-                            <span>${formatDate(contest.start_time)} | ${contest.duration} daqiqa</span>
-                        </div>
-                    </div>
-                    <div class="flex space-x-2">
-                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                            ${contest.duration} daqiqa
-                        </span>
-                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                            ${contest.problem_count} masala
+<div class="flex flex-col md:flex-row gap-8">
+    <!-- Asosiy content -->
+    <div class="flex-1 space-y-8">
+        <!-- Kelgusi tanlovlar bo'limi -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-calendar-alt text-indigo-600 mr-3 text-xl"></i>
+                        Kelgusi Tanlovlar
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2.5 py-1 rounded-full font-medium">
+                            <i class="fas fa-sync-alt mr-1"></i> Real-time
                         </span>
                     </div>
-                </div>
-                <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between contest-card-content">
-                    <div class="flex items-center mb-2 md:mb-0">
-                        <div class="relative w-16 h-16 mr-3">
-                            <svg class="w-full h-full" viewBox="0 0 36 36">
-                                <circle cx="18" cy="18" r="16" fill="none" stroke="#e2e8f0" stroke-width="2"></circle>
-                                <circle cx="18" cy="18" r="16" fill="none" stroke="#6366f1" stroke-width="2" 
-                                    stroke-dasharray="100" stroke-dashoffset="${100 - contest.progress}"></circle>
-                                <text x="18" y="20.5" text-anchor="middle" font-size="10" fill="#6366f1" font-weight="bold">
-                                    ${contest.progress}%
-                                </text>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-600">Ro'yxatdan o'tganlar</p>
-                            <p class="text-sm font-medium">${contest.registered_participants} ishtirokchi</p>
-                        </div>
-                    </div>
-                    <button class="gradient-btn hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm contest-register-btn"
-                        data-contest-id="${contest.id}">
-                        Ro'yxatdan o'tish
-                    </button>
                 </div>
             </div>
-        `;
-    }
-    
-    // O'tgan tanlov qatorini yaratish
-    function createPastContestRow(contest) {
-        return `
-            <tr class="hover:bg-slate-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium">${contest.title}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                    ${formatDate(contest.start_time)}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                        ${contest.problem_count}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    #${contest.user_rank || '-'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
-                    ${contest.user_score || '0'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="/contests/${contest.id}/results/" class="text-indigo-600 hover:text-indigo-800">Natijalar</a>
-                </td>
-            </tr>
-        `;
-    }
-    
-    // Ro'yxatdan o'tish funksiyasi
-    async function registerForContest(contestId) {
-        try {
-            const response = await fetch('/api/contests/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({
-                    contest_id: contestId,
-                    user_id: 1 // Foydalanuvchi ID
-                })
-            });
+            <div id="contest" class="divide-y divide-gray-100">
+                <!-- JavaScript orqali to'ldiriladi -->
+                <!-- Namuna yuklash holati -->
+                <div class="p-6 animate-pulse">
+                    <div class="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
+                    <div class="flex justify-between">
+                        <div class="h-10 bg-gray-200 rounded-full w-10"></div>
+                        <div class="h-10 bg-gray-200 rounded w-24"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- O'tgan tanlovlar bo'limi -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-history text-indigo-600 mr-3 text-xl"></i>
+                    O'tgan Tanlovlar
+                </h2>
+            </div>
             
-            if (response.ok) {
-                showAlert('success', 'Muvaffaqiyatli ro\'yxatdan o\'tdingiz!');
-                // Ro'yxatdan o'tish tugmasini yangilash
-                document.querySelector(`.contest-register-btn[data-contest-id="${contestId}"]`)
-                    .textContent = 'Ro\'yxatdan o\'tilgan';
-            } else {
-                const error = await response.json();
-                showAlert('error', error.message || 'Xatolik yuz berdi');
-            }
-        } catch (error) {
-            console.error('Registration error:', error);
-            showAlert('error', 'Tarmoq xatosi. Iltimos, qayta urunib ko\'ring.');
-        }
-    }
-    
-    // Yordamchi funksiyalar
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return date.toLocaleDateString('uz-UZ', options);
-    }
-    
-    function updateProgressBar(elementId, percent) {
-        const bar = document.getElementById(elementId);
-        if (bar) {
-            bar.style.width = `${Math.min(100, percent)}%`;
-        }
-    }
-    
-    function getCookie(name) {
-        // ... cookie olish funksiyasi ...
-    }
-    
-    function showAlert(type, message) {
-        // Xabarnoma ko'rsatish funksiyasi
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
-            type === 'error' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-        }`;
-        alertDiv.textContent = message;
-        document.body.appendChild(alertDiv);
-        
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
-    }
-</script>
-{% endblock contest %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    Tanlov
+                                    <button class="ml-1 text-gray-400 hover:text-indigo-600">
+                                        <i class="fas fa-sort"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Sana
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Natija
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ball
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Harakat
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="utgan-tanlovlar" class="bg-white divide-y divide-gray-200">
+                        <!-- JavaScript orqali to'ldiriladi -->
+                        <!-- Namuna yuklash holati -->
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="h-6 bg-gray-200 rounded-full w-16"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="h-4 bg-gray-200 rounded w-12"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="h-8 bg-gray-200 rounded w-8 inline-block"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <button class="load-more-btn w-full md:w-auto mx-auto flex items-center justify-center px-6 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300">
+                    <i class="fas fa-redo mr-2"></i> Ko'proq yuklash
+                    <span class="ml-2 bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">12+</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Statistika paneli -->
+    <aside id="statistika-user-sidebar" class="md:w-96 space-y-6 sticky top-6">
+        <!-- Foydalanuvchi statistikasi -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-chart-line text-indigo-600 mr-3"></i>
+                    Mening Statistikam
+                </h3>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <i class="fas fa-calendar-check text-indigo-500 mr-2"></i>
+                            Ishtiroklar
+                        </span>
+                        <span class="text-sm font-semibold text-gray-900 bg-indigo-100 px-2 py-0.5 rounded-full">42</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 75%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Oxirgi ishtirok: 3 kun oldin</div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                            Eng yaxshi o'rin
+                        </span>
+                        <span class="text-sm font-semibold text-gray-900 bg-yellow-100 px-2 py-0.5 rounded-full">#245</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 15%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <i class="fas fa-chess-king text-purple-500 mr-2"></i>
+                            O'rtacha o'rin
+                        </span>
+                        <span class="text-sm font-semibold text-gray-900 bg-purple-100 px-2 py-0.5 rounded-full">#1,842</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-purple-600 h-2.5 rounded-full" style="width: 45%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700 flex items-center">
+                            <i class="fas fa-star text-green-500 mr-2"></i>
+                            Yig'ilgan ball
+                        </span>
+                        <span class="text-sm font-semibold text-gray-900 bg-green-100 px-2 py-0.5 rounded-full">24,150</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 60%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Oxirgi 30 kun: +3,450 ball</div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Tezkor kirish tugmalari -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-bolt text-indigo-600 mr-3"></i>
+                    Tezkor Kirish
+                </h3>
+            </div>
+            <div class="grid grid-cols-2 gap-4 p-6">
+                <a href="#" class="flex flex-col items-center justify-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors duration-300">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-2">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 text-center">Yangi tanlov</span>
+                </a>
+                
+                <a href="#" class="flex flex-col items-center justify-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-300">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-2">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 text-center">Reyting</span>
+                </a>
+                
+                <a href="#" class="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-300">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-2">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 text-center">Arxiv</span>
+                </a>
+                
+                <a href="#" class="flex flex-col items-center justify-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-300">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mb-2">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 text-center">Sozlamalar</span>
+                </a>
+            </div>
+        </div>
 
+        <!-- Tanlov qoidalari -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-info-circle text-indigo-600 mr-3"></i>
+                    Tanlov Qoidalari
+                </h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-indigo-600 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-700">90 daqiqalik intensiv tanlov</p>
+                        <p class="text-xs text-gray-500 mt-1">Har bir tanlov aniq vaqt bilan chegaralangan</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-list-ol text-indigo-600 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-700">4 xil darajadagi masalalar</p>
+                        <p class="text-xs text-gray-500 mt-1">Oson, o'rta, qiyin va juda qiyin</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-star text-indigo-600 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-700">Ballar tizimi</p>
+                        <p class="text-xs text-gray-500 mt-1">Masala qiyinligiga qarab 100-500 ball</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-3 bg-gray-50 text-center">
+                <a href="#" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-300">
+                    Batafsil qoidalar
+                    <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'api/contest.js' %}"></script>
+{% endblock %}

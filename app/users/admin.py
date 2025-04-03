@@ -30,10 +30,15 @@ class MyUserAdmin(BaseUserAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     filter_horizontal = ('groups', 'user_permissions')
 
+
+@admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display=['created_at',"updated_at",'bio', 'profile_icon']
-    # icon 
-    def profile_icon(self, obj):
-        return format_html('<i class="fa-regular fa-address-card"></i>')
-    profile_icon.short_description = 'Profile-Icon'
-admin.site.register(Profile, ProfileAdmin)
+    list_display = ('user', 'first_name', 'last_name', 'avatar_preview')
+    readonly_fields = ('avatar_preview',)
+    
+    def avatar_preview(self, obj):
+        from django.utils.html import format_html
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" />', obj.image.url)
+        return "No Image"
+    avatar_preview.short_description = "Avatar Preview"

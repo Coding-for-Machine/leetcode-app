@@ -1,5 +1,7 @@
 from django.db.models.signals import post_save, post_migrate
 from django.dispatch import receiver
+
+from contest.models import ContestRegistration
 from .models import Profile, MyUser
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -58,3 +60,10 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=MyUser)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+@receiver(post_save, sender=ContestRegistration)
+def update_user_stats(sender, instance, created, **kwargs):
+    if created or instance.rank is not None or instance.points is not None:
+        user = instance.user
+        user.update_contest_stats()

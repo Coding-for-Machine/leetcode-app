@@ -2,12 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, FileExtensionValidator
-
-
-# from typing import  TYPE_CHECKING
-
-# if TYPE_CHECKING:
-#     from courses.models import TimeMixsin
+from django.db.models import Avg, Sum, Min, Max
+from contest.models import UserContestStats
 
 class MyUserManager(BaseUserManager):
     def get_queryset(self):
@@ -68,7 +64,30 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
+    
+    def update_contest_stats(self):
+        """
+        Foydalanuvchi statistikasini avtomatik yangilaydi
+        """
+        stats, created = UserContestStats.objects.get_or_create(user=self)
+        
+        registrations = self.user_contest_register.all()
+        
+        if registrations.exists():
+            stats.total_contests = registrations.count()
+            stats.best_rank = registrations.aggregate(Min('rank'))['rank__min']
+            stats.average_rank = registrations.aggregate(Avg('rank'))['rank__avg']
+            stats.total_points = registrations.aggregate(Sum('points'))['points__sum'] or 0
+            stats.last_contest = registrations.latest('contest__start_time').contest
+        else:
+            stats.total_contests = 0
+            stats.best_rank = None
+            stats.average_rank = None
+            stats.total_points = 0
+            stats.last_contest = None
+        
+        stats.save()
+        
     class Meta:
         verbose_name = "Foydalanuvchi"
         verbose_name_plural = "Foydalanuvchilar"
@@ -96,17 +115,35 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, verbose_name="Foydalanuvchi")
     first_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ism")
     last_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Familiya")
-    image = models.ImageField(upload_to='profile/', default='user/user.png', blank=True, 
-                              validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])], verbose_name="Profil rasmi")
+    image = models.ImageField(
+        upload_to='profile/',
+        default="profile/user/user.png",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])],
+        verbose_name="Profil rasmi"
+    )
+    # 
     bio = models.TextField(blank=True, null=True, verbose_name="Bio")
     age = models.IntegerField(default=12, validators=[MinValueValidator(12)], verbose_name="Yosh")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan vaqti")
+    skills =models.JSONField(default=list, blank=True)
+    social_links = models.JSONField(default=dict, blank=True)
+    stats = models.JSONField(default=dict, blank=True)  # {solved: 127, contests: 42, followers: 1200}
+    
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.user.email})"
+        return f"{self.user.username} profile"
+    
+    @property
+    def avatar_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return '/static/images/default_avatar.png'
     @property
     def is_premium(self):
         return self.user.is_superuser
+    
     class Meta:
         verbose_name = "Profil"
         verbose_name_plural = "Profillar"

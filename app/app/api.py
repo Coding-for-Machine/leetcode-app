@@ -8,4 +8,7 @@ api.register_controllers(NinjaJWTDefaultController)
 
 # apps api
 from contest.api import contest_router
+from userstatus.api import activity_router
 api.add_router("contest/", contest_router)
+api.add_router("activaty/", activity_router)
+

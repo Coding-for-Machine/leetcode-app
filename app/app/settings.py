@@ -55,6 +55,18 @@ INSTALLED_APPS = [
     'lessons',
 ]
 AUTH_USER_MODEL = "users.MyUser"
+# JWT Settings
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # JWT token muddati
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token muddati
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "SIGNING_KEY": SECRET_KEY,  # Asosiy kalit
+}
+
 if DEBUG:
     INSTALLED_APPS.append("whitenoise.runserver_nostatic")
 MIDDLEWARE = [
@@ -68,12 +80,41 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:8000",
+
+# Hammaga ruxsat berish (faqat ishlab chiqish uchun)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Yoki aniq manbalarga ruxsat berish (production uchun yaxshiroq)
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+#     "https://sizning-saytingiz.com",
+# ]
+
+# Qo'shimcha CORS sozlamalari (ixtiyoriy)
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Cookie va credentials uchun (agar kerak bo'lsa)
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'app.urls'
 
@@ -190,6 +231,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfile')
 STATICFILES_DIRS = [
@@ -213,9 +255,15 @@ CKEDITOR_CONFIGS = {
 }
 
 STORAGES = {
-    # ...
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": BASE_DIR / "media",  # media fayllar saqlanadigan papka
+            "base_url": "/media/",          # media fayllarga URL
+        },
+    },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 # Default primary key field type

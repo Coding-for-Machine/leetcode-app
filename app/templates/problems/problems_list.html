@@ -528,197 +528,168 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobil menyuni boshqarish
-            const mobileMenuButton = document.getElementById('mobileMenuButton');
-            const closeMobileMenu = document.getElementById('closeMobileMenu');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
-            const body = document.body;
+        // Masalalarni yuklash
+async function loadProblems() {
+    try {
+        const response = await fetch('/api/problems/');
+        const problems = await response.json();
+        
+        const tbody = document.querySelector('.problem-table tbody');
+        tbody.innerHTML = '';
+        
+        problems.forEach(problem => {
+            const row = document.createElement('tr');
+            row.className = 'problem-row';
             
-            // Menyuni ochish
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('active');
-                body.classList.add('menu-open');
-            });
+            // Qiyinlik klassini aniqlash
+            let difficultyClass = 'difficulty-easy';
+            if (problem.difficulty.includes('Oʻrtacha')) difficultyClass = 'difficulty-medium';
+            if (problem.difficulty.includes('Qiyin')) difficultyClass = 'difficulty-hard';
             
-            // Menyuni yopish
-            function closeMenu() {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('active');
-                body.classList.remove('menu-open');
-            }
+            // Muvaffaqiyat rangi
+            let successColor = 'bg-green-500';
+            if (problem.success_rate < 70 && problem.success_rate >= 40) successColor = 'bg-yellow-500';
+            if (problem.success_rate < 40) successColor = 'bg-red-500';
             
-            closeMobileMenu.addEventListener('click', closeMenu);
-            overlay.addEventListener('click', closeMenu);
-            
-            // Takvimni yaratish
-            let currentDate = new Date();
-            let currentMonth = currentDate.getMonth();
-            let currentYear = currentDate.getFullYear();
-            
-            function renderCalendar(month, year) {
-                const calendarDays = document.getElementById('calendarDays');
-                const monthNames = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", 
-                                  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"];
-                
-                document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
-                
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const today = new Date();
-                
-                let html = '';
-                
-                // Bo'sh kataklar
-                for (let i = 0; i < firstDay; i++) {
-                    html += `<div class="calendar-day"></div>`;
-                }
-                
-                // Kunlar
-                for (let i = 1; i <= daysInMonth; i++) {
-                    const dayDate = new Date(year, month, i);
-                    const isToday = dayDate.getDate() === today.getDate() && 
-                                    dayDate.getMonth() === today.getMonth() && 
-                                    dayDate.getFullYear() === today.getFullYear();
-                    const hasProblem = Math.random() > 0.7; // Tasodifiy masala mavjudligi
-                    
-                    let dayClass = 'calendar-day';
-                    if (isToday) dayClass += ' today';
-                    if (hasProblem) dayClass += ' has-problem';
-                    
-                    html += `
-                        <div class="${dayClass}" data-date="${year}-${month+1}-${i}">
-                            ${i}
+            row.innerHTML = `
+                <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-slate-900">${problem.id}</td>
+                <td class="px-3 py-2 md:px-6 md:py-4">
+                    <div class="flex items-center">
+                        <a href="/problems/${problem.slug}/" class="text-xs md:text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                            ${problem.title}
+                        </a>
+                        ${problem.is_premium ? '<span class="ml-1 text-xs text-slate-500"><i class="fas fa-lock"></i></span>' : ''}
+                    </div>
+                </td>
+                <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500 topic-cell">
+                    ${problem.topics}
+                </td>
+                <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm difficulty-cell">
+                    <span class="${difficultyClass} px-2 py-0.5 rounded-full text-xs font-medium">
+                        ${problem.difficulty}
+                    </span>
+                </td>
+                <td class="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-slate-500">
+                    <div class="flex items-center">
+                        <div class="w-10 md:w-16 h-1.5 bg-slate-200 rounded-full mr-1 md:mr-2">
+                            <div class="h-full ${successColor} rounded-full" style="width: ${problem.success_rate}%"></div>
                         </div>
-                    `;
-                }
-                
-                calendarDays.innerHTML = html;
-                
-                // Kunlarni tanlash
-                document.querySelectorAll('.calendar-day').forEach(day => {
-                    day.addEventListener('click', function() {
-                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-                        this.classList.add('selected');
-                        
-                        const selectedDate = this.getAttribute('data-date');
-                        console.log(`Tanlangan sana: ${selectedDate}`);
-                    });
-                });
-            }
+                        <span>${Math.round(problem.success_rate)}%</span>
+                    </div>
+                </td>
+            `;
             
-            // Oylarni almashtirish
-            document.getElementById('prevMonth').addEventListener('click', function() {
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-                renderCalendar(currentMonth, currentYear);
-            });
-            
-            document.getElementById('nextMonth').addEventListener('click', function() {
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-                renderCalendar(currentMonth, currentYear);
-            });
-            
-            // Takvimni boshlang'ich holatda yuklash
-            renderCalendar(currentMonth, currentYear);
-            
-            // Qidiruv funksionalligi
-            const searchContainer = document.querySelector('.search-container');
-            const searchInput = document.getElementById('searchInput');
-            
-            if (searchContainer && searchInput) {
-                searchInput.addEventListener('focus', function() {
-                    searchContainer.classList.add('active', 'focused');
-                });
-                
-                searchInput.addEventListener('blur', function() {
-                    searchContainer.classList.remove('focused');
-                    setTimeout(() => {
-                        if (!searchInput.value) {
-                            searchContainer.classList.remove('active');
-                        }
-                    }, 200);
-                });
-                
-                searchInput.addEventListener('input', function(e) {
-                    const query = e.target.value.toLowerCase();
-                    
-                    if (query.length > 2) {
-                        // Demo uchun: API so'rovini simulyatsiya qilamiz
-                        setTimeout(() => {
-                            const mockResults = [
-                                {id: 1, title: "Ikki sonning yig'indisi", type: "problem"},
-                                {id: 2, title: "2023-06-15 masalalari", type: "date"},
-                                {id: 3, title: "Daraxtlar mavzusidagi masalalar", type: "topic"}
-                            ];
-                            
-                            const filtered = mockResults.filter(item => 
-                                item.title.toLowerCase().includes(query)
-                            );
-                            
-                            const resultsList = document.querySelector('.search-results-list');
-                            if (resultsList) {
-                                resultsList.innerHTML = '';
-                                
-                                if (filtered.length > 0) {
-                                    filtered.forEach(item => {
-                                        const icon = item.type === 'problem' ? 'fa-code' : 
-                                                    item.type === 'date' ? 'fa-calendar-day' : 'fa-tag';
-                                        
-                                        const resultItem = document.createElement('a');
-                                        resultItem.href = '#';
-                                        resultItem.className = 'flex items-center p-2 hover:bg-slate-100 rounded';
-                                        resultItem.innerHTML = `
-                                            <i class="fas ${icon} text-indigo-500 mr-2"></i>
-                                            <span>${item.title}</span>
-                                        `;
-                                        
-                                        resultItem.addEventListener('click', function(e) {
-                                            e.preventDefault();
-                                            searchInput.value = item.title;
-                                            searchContainer.classList.remove('active');
-                                        });
-                                        
-                                        resultsList.appendChild(resultItem);
-                                    });
-                                } else {
-                                    resultsList.innerHTML = '<div class="p-2 text-sm text-slate-500">Natija topilmadi</div>';
-                                }
-                            }
-                        }, 300);
-                    }
-                });
-            }
-            
-            // Checkboxlarni ishlatish
-            document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        this.classList.add('custom-checkbox-checked');
-                    } else {
-                        this.classList.remove('custom-checkbox-checked');
-                    }
-                });
-            });
-            
-            // Responsive moslashuvchanlik uchun qo'shimcha sozlamalar
-            function handleResize() {
-                if (window.innerWidth >= 1024) {
-                    closeMenu();
-                }
-            }
-            
-            window.addEventListener('resize', handleResize);
+            tbody.appendChild(row);
         });
-    </script>
+    } catch (error) {
+        console.error('Xatolik yuz berdi:', error);
+    }
+}
+
+// Tasodifiy masala tanlash
+document.querySelector('.gradient-btn').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/api/problems/random/');
+        const problem = await response.json();
+        window.location.href = `/problems/${problem.slug}/`;
+    } catch (error) {
+        console.error('Tasodifiy masala yuklanmadi:', error);
+    }
+});
+
+// Sahifa yuklanganda masalalarni yuklash
+document.addEventListener('DOMContentLoaded', loadProblems);
+
+// Filtrlash funksiyasi
+async function applyFilters() {
+    const difficultyFilter = document.querySelector('select:nth-of-type(2)').value;
+    const topicFilter = document.querySelector('select:nth-of-type(1)').value;
+    const premiumOnly = document.getElementById('premiumOnly').checked;
+    
+    try {
+        const response = await fetch('/api/problems/');
+        const problems = await response.json();
+        
+        const filteredProblems = problems.filter(problem => {
+            let matches = true;
+            
+            if (difficultyFilter && !problem.difficulty.includes(difficultyFilter)) {
+                matches = false;
+            }
+            
+            if (topicFilter && !problem.topics.includes(topicFilter)) {
+                matches = false;
+            }
+            
+            if (premiumOnly && !problem.is_premium) {
+                matches = false;
+            }
+            
+            return matches;
+        });
+        
+        const tbody = document.querySelector('.problem-table tbody');
+        tbody.innerHTML = '';
+        
+        filteredProblems.forEach(problem => {
+            // Yuqoridagi kabi qator yaratish logikasi
+            // ...
+        });
+        
+    } catch (error) {
+        console.error('Filtrlashda xatolik:', error);
+    }
+}
+
+// Filtrlash tugmasini ulash
+document.querySelector('.gradient-btn').addEventListener('click', applyFilters);
+    
+// Qidiruv funksiyasi
+async function searchProblems(query) {
+    if (query.length < 3) return;
+    
+    try {
+        const response = await fetch('/api/problems/');
+        const problems = await response.json();
+        
+        const results = problems.filter(problem => 
+            problem.title.toLowerCase().includes(query.toLowerCase()) ||
+            problem.topics.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        const resultsList = document.querySelector('.search-results-list');
+        resultsList.innerHTML = '';
+        
+        if (results.length > 0) {
+            results.forEach(problem => {
+                const resultItem = document.createElement('a');
+                resultItem.href = `/problems/${problem.slug}/`;
+                resultItem.className = 'flex items-center p-2 hover:bg-slate-100 rounded';
+                resultItem.innerHTML = `
+                    <i class="fas fa-code text-indigo-500 mr-2"></i>
+                    <span>${problem.title}</span>
+                    <span class="ml-auto text-xs text-slate-500">${problem.difficulty}</span>
+                `;
+                resultsList.appendChild(resultItem);
+            });
+        } else {
+            resultsList.innerHTML = '<div class="p-2 text-sm text-slate-500">Natija topilmadi</div>';
+        }
+        
+    } catch (error) {
+        console.error('Qidiruvda xatolik:', error);
+    }
+}
+
+// Qidiruv inputiga event listener qo'shish
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        searchProblems(e.target.value);
+    });
+}
+</script>
+
+
 </body>
 </html>

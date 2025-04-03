@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.text import slugify
+
+from lessons.models import Lesson
 from .gnerate_slug import generate_slug_with_case
 from contest.models import Contest
 
@@ -44,6 +46,7 @@ class Language(TimeMixsin):
     
 
 class Problem(TimeMixsin):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True, blank=True)
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, null=True, blank=True)
     language = models.ManyToManyField(Language, related_name='problems_in_language')
     category = models.ManyToManyField(Category, related_name='problems_in_category')
@@ -107,22 +110,18 @@ class ExecutionTestCase(TimeMixsin):
         unique_together = ("problem", "language")
 
 
+# TestCase modelida faqat bitta __str__ metodini qoldirdim
 class TestCase(TimeMixsin):
     problem = models.ForeignKey(Problem, related_name="test_problem", on_delete=models.CASCADE)
     input_txt = models.CharField(max_length=250, help_text="Test Input")
     output_txt = models.CharField(max_length=250, help_text="Chiqish Output")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
     def __str__(self):
         return f"Test for {self.problem.title}"
-    
-    class Meta:
-        unique_together = ("problem", "input_txt", "output_txt")
-
-    def __str__(self):
-        return f"Test for {self.problem.title} [{self.language.name}]"
 
     def is_valid_test_case(self):
         return bool(self.input_txt and self.output_txt)
 
     def get_summary(self):
-        return f"Test [{self.language.name}] - Input: {self.input_txt[:30]}..."
+        return f"Test - Input: {self.input_txt[:30]}..."

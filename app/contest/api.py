@@ -27,6 +27,7 @@ class ContestStats(BaseModel):
     best_rank: Optional[int]
     average_rank: Optional[float]
     total_points: int
+    last_contest: Optional[str]
 
 # --------- API ---------
 contest_router = Router(tags=["Contests"])
@@ -39,16 +40,17 @@ def upcoming_contests(request):
     ).order_by('start_time')
     
     return [{
-        "title": f"{c.get_contest_type_display()} #{c.contest_number}",
+        "title": c.title,
         "contest_type": c.contest_type,
         "contest_number": c.contest_number,
         "start_time": c.start_time,
         "duration": c.duration,
+        "is_active": c.is_active,
         "problem_count": c.problem_count,
         "description": c.description,
         "created_at": c.created_at,
-        "registered_participants": c.registrations.count(),  # registration modeli bo'lishi kerak
-        "progress_percentage": min(100, int(c.registrations.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
+        "registered_participants": c.contest_register.count(),  # registration modeli bo'lishi kerak
+        "progress_percentage": min(100, int(c.contest_register.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
     } for c in contests]
 
 @contest_router.get("/past/", response=List[ContestBase])
@@ -59,29 +61,32 @@ def past_contests(request, limit: int = 10):
     ).order_by('-start_time')[:limit]
     
     return [{
-        "title": f"{c.get_contest_type_display()} #{c.contest_number}",
+        "title": c.title,
         "contest_type": c.contest_type,
         "contest_number": c.contest_number,
         "start_time": c.start_time,
         "duration": c.duration,
+        "is_active": c.is_active,
         "problem_count": c.problem_count,
         "description": c.description,
         "created_at": c.created_at,
-        "registered_participants": c.registrations.count(),  # registration modeli bo'lishi kerak
-        "progress_percentage": min(100, int(c.registrations.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
+        "registered_participants": c.contest_register.count(),  # registration modeli bo'lishi kerak
+        "progress_percentage": min(100, int(c.contest_register.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
     } for c in contests]
 
 @contest_router.get("/stats/{user_id}/", response=ContestStats)
 def user_stats(request, user_id: int):
     user = get_object_or_404(MyUser, pk=user_id)
-    stats = {
-        "total_contests": user.contests.count(),
-        "best_rank": user.best_rank(),  # Bu metodni User modeliga qo'shishingiz kerak
-        "average_rank": user.average_rank(),
-        "total_points": user.total_points
+    user.update_contest_stats()
+    stats = user.contest_stats  # Avtomatik yaratiladi/yangilanadi
+    
+    return {
+        "total_contests": stats.total_contests,
+        "best_rank": stats.best_rank,
+        "average_rank": stats.average_rank,
+        "total_points": stats.total_points,
+        "last_contest": stats.last_contest.title if stats.last_contest else None
     }
-    return stats
-
 # @contest_router.post("/register/")
 # def register_for_contest(request, data: ContestRegistrationSchema):
 #     try:

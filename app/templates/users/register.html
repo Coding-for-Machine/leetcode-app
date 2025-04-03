@@ -1,510 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeetCode - Animated Login</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-     <!-- Axios -->
-     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        /* Advanced particle system */
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(251,146,60,0.8) 100%);
-            filter: blur(1px);
-            transform-origin: center;
-        }
-        
-        /* Floating code elements */
-        .code-element {
-            position: absolute;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: rgba(249, 115, 22, 0.7);
-            pointer-events: none;
-            user-select: none;
-        }
-        
-        /* Glowing form effect */
-        .github-form {
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 
-                        0 0 0 1px rgba(0, 0, 0, 0.04),
-                        0 0 40px -10px rgba(249, 115, 22, 0.15);
-            transition: all 0.4s ease;
-        }
-        
-        .github-form:hover {
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 
-                        0 0 0 1px rgba(0, 0, 0, 0.04),
-                        0 0 60px -8px rgba(249, 115, 22, 0.25);
-            transform: translateY(-2px);
-        }
-        
-        /* Input field animations */
-        .github-input {
-            background-color: rgba(246, 248, 250, 0.8);
-            border: 1px solid rgba(27, 31, 35, 0.15);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .github-input:hover {
-            background-color: rgba(246, 248, 250, 0.9);
-            border-color: rgba(249, 115, 22, 0.4);
-        }
-        
-        .github-input:focus {
-            background-color: white;
-            border-color: rgba(249, 115, 22, 0.8);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        /* Button animations */
-        .github-btn {
-            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .github-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(249, 115, 22, 0.25);
-        }
-        
-        .github-btn:active {
-            transform: translateY(0);
-        }
-        
-        .github-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(30deg);
-            transition: all 0.3s;
-        }
-        
-        .github-btn:hover::after {
-            left: 100%;
-        }
-        
-        /* Complex floating animations */
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-15px) rotate(3deg);
-            }
-        }
-        
-        @keyframes floatReverse {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(-5deg);
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-        }
-        
-        .floating {
-            animation: float 8s ease-in-out infinite;
-        }
-        
-        .floating-reverse {
-            animation: floatReverse 9s ease-in-out infinite;
-        }
-        
-        .pulse {
-            animation: pulse 4s ease infinite;
-        }
-        
-        /* Octocat animations */
-        .octocat {
-            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
-        }
-        
-        .octocat-arm {
-            transform-origin: 130px 106px;
-        }
-        
-        @keyframes wave {
-            0%, 100% {
-                transform: rotate(0);
-            }
-            20%, 60% {
-                transform: rotate(-25deg);
-            }
-            40%, 80% {
-                transform: rotate(10deg);
-            }
-        }
-        
-        @keyframes octocatFloat {
-            0%, 100% {
-                transform: translateY(0) rotate(-5deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(5deg);
-            }
-        }
-        
-        /* Background grid animation */
-        .grid-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(249, 115, 22, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(249, 115, 22, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: gridMove 120s linear infinite;
-            z-index: -2;
-        }
-        
-        @keyframes gridMove {
-            0% {
-                background-position: 0 0;
-            }
-            100% {
-                background-position: 1000px 1000px;
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 overflow-hidden">
-    <!-- Animated background elements -->
-    <div class="grid-bg"></div>
-    <div id="particles-js" class="absolute inset-0 overflow-hidden z-0"></div>
-    <div id="code-elements" class="absolute inset-0 overflow-hidden z-0"></div>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Ro'yxatdan o'tish</h2>
     
-    <!-- Animated corner logo -->
-    <a href="#" class="absolute top-6 left-6 text-2xl font-bold text-orange-500 flex items-center z-10 hover:text-orange-600 transition-colors animate__animated animate__fadeInDown">
-        <i class="fas fa-code mr-2"></i>LeetCode
-    </a>
+    <form id="register-form" class="space-y-4">
+        <div>
+            <label for="username" class="block text-sm font-medium text-gray-700">Foydalanuvchi nomi</label>
+            <input type="text" id="username" name="username" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div id="username-error" class="invalid-feedback"></div>
+        </div>
+        
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email manzil</label>
+            <input type="email" id="email" name="email" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div id="email-error" class="invalid-feedback"></div>
+        </div>
+        
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Parol</label>
+            <input type="password" id="password" name="password" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div id="password-error" class="invalid-feedback"></div>
+            <p class="mt-1 text-sm text-gray-500">
+                Parol kamida 8 belgidan iborat bo'lishi, bitta katta harf, kichik harf va raqamdan iborat bo'lishi kerak
+            </p>
+        </div>
+        
+        <div>
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Ro'yxatdan o'tish
+            </button>
+        </div>
+    </form>
     
-    <!-- Main container -->
-    <div class="relative w-full max-w-md mx-auto z-10 animate__animated animate__fadeIn">
-        <!-- Animated octocat -->
-        <div class="absolute -top-28 left-1/2 transform -translate-x-1/2 w-32 h-32 octocat floating-reverse hidden sm:block">
-            <svg height="128" width="128" viewBox="0 0 250 250">
-                <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" fill="currentColor" class="text-orange-500"></path>
-                <path class="octocat-arm" d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="#ffffff"></path>
-                <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="#ffffff"></path>
-            </svg>
-        </div>
-        
-        <!-- Animated form -->
-        <div class="github-form rounded-xl p-8">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-2 animate__animated animate__fadeIn">Sign in to LeetCode</h1>
-            <p class="text-center text-gray-600 mb-6 animate__animated animate__fadeIn animate__delay-1s">Solve problems. Prepare for interviews. Level up.</p>
-            
-            <form id="register-form" class="space-y-4 animate__animated animate__fadeIn animate__delay-1s">
-                <div class="space-y-2">
-                    <label for="register-username" class="block text-sm font-medium text-gray-700 transition-colors">Username</label>
-                    <input type="text" id="register-username" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required autofocus>
-                </div>
-                <div class="space-y-2">
-                    <label for="register-email" class="block text-sm font-medium text-gray-700 transition-colors">Email address</label>
-                    <input type="text" id="register-email" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
-                </div>
-                
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label for="register-password" class="block text-sm font-medium text-gray-700 transition-colors">Password</label>
-                        <a href="#" class="text-sm text-orange-500 hover:underline transition-colors">Forgot password?</a>
-                    </div>
-                    <input type="password" id="register-password" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
-                </div>
-                
-                <button type="submit" class="github-btn text-white w-full py-2.5 px-4 rounded-md font-medium">
-                    Sign in
-                </button>
-            </form>
-            
-            <div class="mt-6 text-center text-sm animate__animated animate__fadeIn animate__delay-2s">
-                <p class="text-gray-600">New to LeetCode? <a href="#" class="text-orange-500 font-medium hover:underline transition-colors">Create an account</a>.</p>
-            </div>
-            
-            <div class="mt-8 border-t border-gray-200 pt-6 animate__animated animate__fadeIn animate__delay-2s">
-                <div class="grid grid-cols-3 gap-3">
-                    <button class="github-input py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-100 flex items-center justify-center transition-colors">
-                        <i class="fab fa-google text-red-500 mr-2"></i> Google
-                    </button>
-                    <button class="github-input py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-100 flex items-center justify-center transition-colors">
-                        <i class="fab fa-github text-gray-800 mr-2"></i> GitHub
-                    </button>
-                    <button class="github-input py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-100 flex items-center justify-center transition-colors">
-                        <i class="fab fa-linkedin text-blue-600 mr-2"></i> LinkedIn
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Animated footer -->
-        <div class="mt-8 text-center text-xs text-gray-500 animate__animated animate__fadeIn animate__delay-3s">
-            <ul class="flex flex-wrap justify-center space-x-4">
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Terms</a></li>
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Privacy</a></li>
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Security</a></li>
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Contact</a></li>
-            </ul>
-        </div>
+    <div class="mt-4 text-center text-sm text-gray-600">
+        Akauntingiz bormi? <a href="/login/" class="font-medium text-indigo-600 hover:text-indigo-500">Tizimga kiring</a>
     </div>
+</div>
 
-    <!-- Floating code elements -->
-    <div id="floating-code" class="absolute inset-0 overflow-hidden z-0"></div>
-
-    <script>
-        // API functions
-        const API_URL = "http://127.0.0.1:8000/api/auth";
-
-        async function apiRequest(endpoint, method, data = null, auth = false) {
-            const headers = { "Content-Type": "application/json" };
-            if (auth) {
-                let token = localStorage.getItem("access_token");
-                if (token) headers["Authorization"] = `Bearer ${token}`;
-            }
-
-            try {
-                const response = await axios({
-                    url: `${API_URL}/${endpoint}`,
-                    method,
-                    headers,
-                    data
-                });
-                return response.data;
-            } catch (error) {
-                console.error(`Error in ${endpoint}:`, error.response?.data || error.message);
-                return null;
-            }
-        }
-
-        async function registerUser(username, email, password) {
-            const response = await apiRequest("register", "POST", { email, username, password });
-            if (response) {
-                alert("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
-                window.location.href = "/users/login/";
-            }
-        }
-
-        async function loginUser(email, password) {
-            const response = await apiRequest("login", "POST", { email, password });
-            if (response) {
-                localStorage.setItem("access_token", response.access);
-                localStorage.setItem("refresh_token", response.refresh);
-                alert("Tizimga muvaffaqiyatli kirdingiz!");
-                window.location.href = "/users/profile/";
-            }
-        }
-
-        function logoutUser() {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            window.location.href = "/users/login/";
-        }
-
-        async function getCurrentUser() {
-            return await apiRequest("me", "GET", null, true);
-        }
-
-        // DOM Content Loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Advanced particle system
-            function createParticles() {
-                const container = document.getElementById('particles-js');
-                const particleCount = Math.min(Math.floor(window.innerWidth / 5), 200);
-                
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = document.createElement('div');
-                    particle.classList.add('particle');
-                    
-                    // Random properties
-                    const size = Math.random() * 8 + 2;
-                    const posX = Math.random() * window.innerWidth;
-                    const posY = Math.random() * window.innerHeight;
-                    const opacity = Math.random() * 0.5 + 0.1;
-                    const delay = Math.random() * 10;
-                    const duration = Math.random() * 20 + 10;
-                    const blur = Math.random() * 2 + 0.5;
-                    const animationType = Math.random() > 0.5 ? 'float' : 'floatReverse';
-                    
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.left = `${posX}px`;
-                    particle.style.top = `${posY}px`;
-                    particle.style.opacity = opacity;
-                    particle.style.filter = `blur(${blur}px)`;
-                    particle.style.animation = `${animationType} ${duration}s ease-in-out ${delay}s infinite`;
-                    
-                    // Random rotation
-                    particle.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    
-                    container.appendChild(particle);
-                }
-            }
-            
-            // Create floating code elements
-            function createCodeElements() {
-                const container = document.getElementById('code-elements');
-                const codeSnippets = [
-                    "function()", "const x = 5", "return true", "import React", 
-                    "class Solution", "public static", "def hello():", 
-                    "console.log", "<?php echo", "<div>", "for(let i=0)", 
-                    "while(true)", "try {", "interface", "type User", 
-                    "db.query", "async await", "git commit", "docker run"
-                ];
-                
-                const count = Math.min(Math.floor(window.innerWidth / 20), 50);
-                
-                for (let i = 0; i < count; i++) {
-                    const element = document.createElement('div');
-                    element.classList.add('code-element');
-                    element.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-                    
-                    // Random properties
-                    const size = Math.random() * 14 + 10;
-                    const posX = Math.random() * window.innerWidth;
-                    const posY = Math.random() * window.innerHeight;
-                    const opacity = Math.random() * 0.3 + 0.1;
-                    const delay = Math.random() * 15;
-                    const duration = Math.random() * 25 + 15;
-                    const rotation = Math.random() * 15 - 7.5;
-                    const animationType = Math.random() > 0.5 ? 'float' : 'floatReverse';
-                    
-                    element.style.fontSize = `${size}px`;
-                    element.style.left = `${posX}px`;
-                    element.style.top = `${posY}px`;
-                    element.style.opacity = opacity;
-                    element.style.transform = `rotate(${rotation}deg)`;
-                    element.style.animation = `${animationType} ${duration}s ease-in-out ${delay}s infinite`;
-                    
-                    container.appendChild(element);
-                }
-            }
-            
-            // Initialize animations
-            createParticles();
-            createCodeElements();
-            
-            // Octocat wave animation
-            const octocatArm = document.querySelector('.octocat-arm');
-            if (octocatArm) {
-                octocatArm.style.animation = 'none';
-                
-                const octocat = document.querySelector('.octocat');
-                octocat.addEventListener('mouseenter', function() {
-                    octocatArm.style.animation = 'wave 560ms ease-in-out infinite';
-                    octocat.style.animation = 'octocatFloat 3s ease-in-out infinite';
-                });
-                
-                octocat.addEventListener('mouseleave', function() {
-                    octocatArm.style.animation = 'none';
-                    octocat.style.animation = 'floatReverse 9s ease-in-out infinite';
-                });
-            }
-            
-            // Form submission handler
-            const registerForm = document.getElementById("register-form");
-            if (registerForm) {
-                registerForm.addEventListener("submit", async function(event) {
-                    event.preventDefault();
-                    
-                    const submitBtn = event.target.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.innerHTML;
-                    
-                    // Show loading state
-                    submitBtn.innerHTML = `
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Processing...
-                    `;
-                    submitBtn.disabled = true;
-                    
-                    const register_username = document.getElementById("register-username").value;
-                    const register_email = document.getElementById("register-email").value;
-                    const register_password = document.getElementById("register-password").value;
-                    
-                    if (register_password.length < 8) {
-                        alert("Parol kamida 8 ta belgidan iborat bo'lishi kerak!");
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        return;
-                    }
-                    
-                    if (register_email.length < 8 || !register_email.endsWith("@gmail.com")) {
-                        alert("Email noto'g'ri kiritilgan!");
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        return;
-                    }
-                    
-                    try {
-                        await registerUser(register_username, register_email, register_password);
-                    } catch (error) {
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                        alert("Xatolik yuz berdi: " + error.message);
-                    }
-                });
-            }
-            
-            // Input focus animations
-            const inputs = document.querySelectorAll('.github-input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentNode.querySelector('label').classList.add('text-orange-500', 'font-semibold');
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.parentNode.querySelector('label').classList.remove('text-orange-500', 'font-semibold');
-                });
-            });
-            
-            // Social button hover effects
-            const socialButtons = document.querySelectorAll('.github-input');
-            socialButtons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = '';
-                    this.style.boxShadow = '';
-                });
-            });
+<script>
+document.getElementById('register-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Jo'natilmoqda...
+    `;
+    
+    // Xatolarni tozalash
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('input').forEach(input => input.classList.remove('input-error'));
+    
+    try {
+        const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
         });
-    </script>
-</body>
-</html>
+        
+        showSuccess("Ro'yxatdan muvaffaqiyatli o'tdingiz!");
+        setTimeout(() => window.location.href = '/login/', 1500);
+    } catch (error) {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        if (error.response && error.response.status === 400) {
+            const errors = error.response.data;
+            
+            if (typeof errors === 'object') {
+                for (const [field, message] of Object.entries(errors)) {
+                    const errorEl = document.getElementById(`${field}-error`);
+                    const inputEl = document.getElementById(field);
+                    
+                    if (errorEl && inputEl) {
+                        errorEl.textContent = Array.isArray(message) ? message.join(', ') : message;
+                        inputEl.classList.add('input-error');
+                    } else {
+                        showError(`${field}: ${message}`);
+                    }
+                }
+            } else {
+                showError(errors);
+            }
+        } else {
+            showError(error.response?.data?.message || error.message || "Ro'yxatdan o'tishda xatolik yuz berdi");
+        }
+    }
+});
+</script>
+{% endblock %}

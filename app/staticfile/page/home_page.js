@@ -1,0 +1,270 @@
+
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-6">
+    <!-- Hero Section -->
+    <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-6 md:mb-0">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Kodlash Mahoratingizni Oshiring</h1>
+                <p class="text-slate-600 mb-6">2000+ masalalar, tanlovlar va intervyu tayyorlash resurslari bilan kodlash ko'nikmalaringizni takomillashtiring.</p>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                    <button class="gradient-btn text-white px-6 py-2 rounded-lg font-medium shadow-sm">
+                        Boshlash
+                    </button>
+                    <button class="border border-indigo-500 text-indigo-500 hover:bg-indigo-50 px-6 py-2 rounded-lg font-medium">
+                        Masalalarni Ko'rish
+                    </button>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/001/458/126/datas/gallery.jpg" alt="Coding Illustration" class="w-64 h-64 rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card-hover bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-slate-500 text-sm">Yechilgan</p>
+                    <p class="text-2xl font-bold">127</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-hover bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                    <i class="fas fa-medal text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-slate-500 text-sm">Oson</p>
+                    <p class="text-2xl font-bold">85</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-hover bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                    <i class="fas fa-star text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-slate-500 text-sm">Oʻrtacha</p>
+                    <p class="text-2xl font-bold">32</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-hover bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                    <i class="fas fa-fire text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-slate-500 text-sm">Qiyin</p>
+                    <p class="text-2xl font-bold">10</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge -->
+    <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-800">Kunlik Masala</h2>
+            <a href="#" class="text-sm text-indigo-600 hover:underline">Barchasini ko'rish</a>
+        </div>
+        
+        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-all duration-200">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-bold mb-1">Ikki Son Yig'indisi</h3>
+                    <p class="text-sm text-slate-600 mb-2">Butun sonlar massivi va maqsadli qiymat berilganda, ikkita sonning indekslarini qaytaring, shunda ular maqsadga qo'shiladi.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-slate-100 text-slate-800 text-xs px-2 py-1 rounded">Massiv</span>
+                        <span class="bg-slate-100 text-slate-800 text-xs px-2 py-1 rounded">Hash Jadvali</span>
+                    </div>
+                </div>
+                <span class="difficulty-easy text-sm font-medium px-2 py-1 rounded-full border border-green-200 bg-green-50">Oson</span>
+            </div>
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                <div class="text-sm text-slate-500">
+                    <span>1,234,567 ta yechim</span>
+                </div>
+                <button class="gradient-btn text-white px-4 py-2 rounded-lg font-medium shadow-sm">
+                    Masalani Yechish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problems List -->
+    <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
+            <h2 class="text-xl font-bold text-slate-800">Tavsiya Etilgan Masalalar</h2>
+            <div class="flex flex-wrap gap-2">
+                <button class="border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium hover:bg-slate-50">Barchasi</button>
+                <button class="border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium hover:bg-slate-50">Oson</button>
+                <button class="border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium hover:bg-slate-50">Oʻrtacha</button>
+                <button class="border border-slate-300 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium hover:bg-slate-50">Qiyin</button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 problem-table">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Holat</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Sarlavha</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider solution-cell">Yechim</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Qiyinlik</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider frequency-cell">Ko'p Ishlatilishi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">
+                    <tr class="hover:bg-slate-50 cursor-pointer">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <i class="fas fa-check text-green-500"></i>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-slate-900">1. Ikki Son Yig'indisi</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap solution-cell">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm">Ko'rish</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="difficulty-easy px-2 py-1 text-xs font-medium rounded-full">Oson</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap frequency-cell">
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-green-500 h-1.5 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <i class="far fa-circle text-slate-300"></i>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-slate-900">2. Ikki Raqam Qo'shish</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap solution-cell">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm">Ko'rish</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="difficulty-medium px-2 py-1 text-xs font-medium rounded-full">Oʻrtacha</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap frequency-cell">
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <i class="fas fa-check text-green-500"></i>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-slate-900">3. Takrorlanmas Belgilar</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap solution-cell">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm">Ko'rish</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="difficulty-medium px-2 py-1 text-xs font-medium rounded-full">Oʻrtacha</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap frequency-cell">
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 72%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <i class="far fa-circle text-slate-300"></i>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-slate-900">4. Ikkita Saralangan Massiv Medianasi</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap solution-cell">
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm">Ko'rish</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="difficulty-hard px-2 py-1 text-xs font-medium rounded-full">Qiyin</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap frequency-cell">
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-red-500 h-1.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+            <button class="border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50">
+                Ko'proq Yuklash
+            </button>
+        </div>
+    </div>
+
+    <!-- Study Plans -->
+    <div class="card-hover bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-800">O'qish Rejalari</h2>
+            <a href="#" class="text-sm text-indigo-600 hover:underline">Barchasini ko'rish</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="card-hover border border-slate-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-laptop-code text-blue-500"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Algoritmlar I</h3>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">Algoritmlar asoslarini o'rganish uchun 14 kunlik o'qish rejasi.</p>
+                <div class="flex justify-between items-center">
+                    <div class="text-sm text-slate-500">14 ta masala</div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium">
+                        Boshlash
+                    </button>
+                </div>
+            </div>
+            <div class="card-hover border border-slate-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-database text-green-500"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Ma'lumot Tuzilmalari</h3>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">Massivlar, bog'langan ro'yxatlar, daraxtlar va graflarni 21 kunda o'zlashtiring.</p>
+                <div class="flex justify-between items-center">
+                    <div class="text-sm text-slate-500">21 ta masala</div>
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-medium">
+                        Boshlash
+                    </button>
+                </div>
+            </div>
+            <div class="card-hover border border-slate-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-briefcase text-purple-500"></i>
+                    </div>
+                    <h3 class="text-lg font-bold">Intervyu Tayyorgarligi</h3>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">Yetakchi kompaniyalarda kodlash intervyulariga tayyorlanish uchun 8 haftalik reja.</p>
+                <div class="flex justify-between items-center">
+                    <div class="text-sm text-slate-500">56 ta masala</div>
+                    <button class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-medium">
+                        Boshlash
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

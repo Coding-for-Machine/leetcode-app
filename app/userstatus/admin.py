@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
     UserActivityDaily, Badge, UserBadge, 
-    UserActivitySummary, UserLeaderboard, 
      UserProblemStatus
     )
 @admin.register(UserActivityDaily)
@@ -32,18 +31,18 @@ class UserBadgeAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'badge__name')
 
 
-@admin.register(UserActivitySummary)
-class UserActivitySummaryAdmin(admin.ModelAdmin):
-    list_display = ('user', 'period_type', 'period_start', 'period_end', 'total_score', 'total_activity')
-    list_filter = ('period_type', 'period_start')
-    search_fields = ('user__email',)
+# @admin.register(UserActivitySummary)
+# class UserActivitySummaryAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'period_type', 'period_start', 'period_end', 'total_score', 'total_activity')
+#     list_filter = ('period_type', 'period_start')
+#     search_fields = ('user__email',)
 
 
-@admin.register(UserLeaderboard)
-class UserLeaderboardAdmin(admin.ModelAdmin):
-    list_display = ('user', 'total_score', 'last_updated')
-    search_fields = ('user__email',)
-    ordering = ('-total_score',)
+# @admin.register(UserLeaderboard)
+# class UserLeaderboardAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'total_score', 'last_updated')
+#     search_fields = ('user__email',)
+#     ordering = ('-total_score',)
 
 
 @admin.register(UserProblemStatus)

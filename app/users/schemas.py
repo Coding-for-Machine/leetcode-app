@@ -16,6 +16,8 @@ class UserLoginSchema(BaseModel):
 class UserSchema(BaseModel):
     id: int
     email: EmailStr
+    username: str
+    image: Optional[str]
     first_name: Optional[str]
     last_name: Optional[str]
     created_at: datetime
@@ -40,6 +42,6 @@ class ProfileUpdateSchema(BaseModel):
     last_name: Optional[str]
     image: Optional[str]
     bio: Optional[str]
-    age: int
+    age: Optional[int]
     class Config:
         from_attributes = True

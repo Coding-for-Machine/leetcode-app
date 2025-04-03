@@ -1,4 +1,29 @@
 {% load static %}
+
+<style>
+    /* User menu uchun maxsus stil */
+    #user-menu {
+        display: none; /* Boshlang'ich holatda yashirilgan */
+        align-items: center;
+    }
+    
+    /* Auth buttons uchun maxsus stil */
+    #auth-buttons {
+        display: flex; /* Boshlang'ich holatda ko'rinadi */
+        align-items: center;
+    }
+    
+    /* Mobil versiya uchun */
+    #mobile-user-menu {
+        display: none; /* Boshlang'ich holatda yashirilgan */
+    }
+    
+    #mobile-auth-buttons {
+        display: block; /* Boshlang'ich holatda ko'rinadi */
+    }
+</style>
+
+{% load static %}
 <!-- Navbar Component -->
 <nav class="bg-white shadow-sm sticky top-0 z-50"
      x-data="{ mobileMenuOpen: false, userMenuOpen: false }"
@@ -15,42 +40,30 @@
                 </button>
                 
                 <!-- Logo -->
-                <a href="{% url 'home' %}" class="text-xl font-bold text-indigo-600 flex items-center">
+                <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
+                    <span class="hidden sm:inline p-2">CfM</span>
                     <i class="fas fa-code mr-2"></i>
-                    <span class="hidden sm:inline">CfM</span>
                 </a>
                 
                 <!-- Desktop Menu -->
-                <div class="hidden lg:flex space-x-6">
-                    <a href="{% url 'home' %}" 
+                <div class="hidden lg:flex space-x-6 mx-10">
+                    <a href="/" 
                        class="px-1 py-2 text-sm font-medium flex items-center
                               {% if request.path == '/' %}text-indigo-600 border-b-2 border-indigo-600
                               {% else %}text-gray-700 hover:text-indigo-600{% endif %}">
-                        <i class="fas fa-compass mr-2"></i>Explore
+                        <i class="fas fa-compass mr-2"></i>Bosh sahifa
                     </a>
-                    <a href="{% url 'problems' %}" 
+                    <a href="/problems/" 
                        class="px-1 py-2 text-sm font-medium flex items-center
                               {% if 'problems' in request.path %}text-indigo-600 border-b-2 border-indigo-600
                               {% else %}text-gray-700 hover:text-indigo-600{% endif %}">
                         <i class="fas fa-list-ol mr-2"></i>Masalalar
                     </a>
-                    <a href="{% url 'contest' %}" 
+                    <a href="/contest/" 
                        class="px-1 py-2 text-sm font-medium flex items-center
                               {% if 'contest' in request.path %}text-indigo-600 border-b-2 border-indigo-600
                               {% else %}text-gray-700 hover:text-indigo-600{% endif %}">
                         <i class="fas fa-trophy mr-2"></i>Tanlovlar
-                    </a>
-                    <a href="{% url 'comments' %}" 
-                       class="px-1 py-2 text-sm font-medium flex items-center
-                              {% if 'comments' in request.path %}text-indigo-600 border-b-2 border-indigo-600
-                              {% else %}text-gray-700 hover:text-indigo-600{% endif %}">
-                        <i class="fas fa-comments mr-2"></i>Munozara
-                    </a>
-                    <a href="{% url 'quiz' %}" 
-                       class="px-1 py-2 text-sm font-medium flex items-center
-                              {% if 'quiz' in request.path %}text-indigo-600 border-b-2 border-indigo-600
-                              {% else %}text-gray-700 hover:text-indigo-600{% endif %}">
-                        <i class="fas fa-question-circle mr-2"></i>Testlar
                     </a>
                 </div>
             </div>
@@ -59,62 +72,56 @@
             <div class="flex items-center space-x-3">
                 <!-- Search -->
                 <div class="relative hidden sm:block">
-                    <form action="{% url 'search' %}" method="get">
+                    <form action="/search/" method="get">
                         <input type="text" name="q" placeholder="Qidirish..." 
                                class="border border-gray-300 rounded-full py-1.5 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full max-w-xs bg-white">
                         <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
                     </form>
                 </div>
                 
-                {% if user.is_authenticated %}
-                    <!-- Premium Button -->
-                    <a href="#" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hidden sm:flex items-center">
-                        <i class="fas fa-crown mr-2"></i>Premium
+                <!-- Auth Buttons (for non-authenticated u) -->
+                <div class="hidden sm:flex space-x-2" id="auth-buttons">
+                    <a href="/u/login/" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:text-indigo-600">
+                        Kirish
                     </a>
+                    <a href="/u/register/" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                        Ro'yxatdan o'tish
+                    </a>
+                </div>
+                
+                <!-- User Menu (for authenticated u) -->
+                <div class="hidden items-center space-x-2 ml-2" id="user-menu">
+                    <!-- Notification -->
+                    <button class="text-gray-500 hover:text-indigo-600 p-1">
+                        <i class="far fa-bell text-lg"></i>
+                    </button>
                     
-                    <!-- User Menu -->
-                    <div class="flex items-center space-x-2 ml-2">
-                        <!-- Notification -->
-                        <button class="text-gray-500 hover:text-indigo-600 p-1">
-                            <i class="far fa-bell text-lg"></i>
+                    <!-- Profile Dropdown -->
+                    <div class="relative">
+                        <button @click="userMenuOpen = !userMenuOpen" class="flex items-center">
+                            <img id="profile-image" src="{% static 'images/default-profile.png' %}" 
+                                 alt="Profile" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
+                            <span id="username-display" class="ml-2 text-sm font-medium"></span>
+                            <i class="fas fa-caret-down ml-1 text-gray-500 text-xs"></i>
                         </button>
                         
-                        <!-- Profile Dropdown -->
-                        <div class="relative">
-                            <button @click="userMenuOpen = !userMenuOpen" class="flex items-center">
-                                <img src="{% if user_profile.image and user_profile.image.url %}{{ user_profile.image.url }}{% else %}{% static 'user/user.png' %}{% endif %}" 
-                                     alt="Profile" class="rounded-full w-8 h-8 border-2 border-white shadow-sm">
-                                <i class="fas fa-caret-down ml-1 text-gray-500 text-xs"></i>
-                            </button>
-                            
-                            <!-- Dropdown Menu -->
-                            <div x-show="userMenuOpen" 
-                                 @click.outside="userMenuOpen = false"
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                                <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i>Profil
-                                </a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i>Sozlamalar
-                                </a>
-                                <div class="border-t border-gray-200"></div>
-                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Chiqish
-                                </a>
-                            </div>
+                        <!-- Dropdown Menu -->
+                        <div x-show="userMenuOpen" 
+                             @click.outside="userMenuOpen = false"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="/u/profile/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profil
+                            </a>
+                            <a href="/settings/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Sozlamalar
+                            </a>
+                            <div class="border-t border-gray-200"></div>
+                            <a href="#" onclick="logoutUser()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Chiqish
+                            </a>
                         </div>
                     </div>
-                {% else %}
-                    <!-- Auth Buttons -->
-                    <div class="hidden sm:flex space-x-2">
-                        <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:text-indigo-600">
-                            Kirish
-                        </a>
-                        <a href="{% url 'register' %}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                            Ro'yxatdan o'tish
-                        </a>
-                    </div>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -135,8 +142,8 @@
         <!-- Menu Content -->
         <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-lg">
             <div class="flex justify-between items-center p-4 border-b">
-                <a href="{% url 'home' %}" class="text-xl font-bold text-indigo-600 flex items-center">
-                    <i class="fas fa-code mr-2"></i>CfM
+                <a href="/" class="text-xl font-bold text-indigo-600 flex items-center">
+                    <i class="fas fa-code mr-2"></i>CodePlatform
                 </a>
                 <button @click="mobileMenuOpen = false" class="text-gray-500">
                     <i class="fas fa-times text-xl"></i>
@@ -145,61 +152,119 @@
             
             <div class="p-4 h-full overflow-y-auto">
                 <div class="space-y-2 mb-6">
-                    <a href="{% url 'home' %}" @click="mobileMenuOpen = false"
+                    <a href="/" @click="mobileMenuOpen = false"
                        class="block px-3 py-2 rounded-lg {% if request.path == '/' %}bg-indigo-50 text-indigo-600{% else %}hover:bg-gray-100{% endif %}">
-                        <i class="fas fa-compass mr-2"></i>Explore
+                        <i class="fas fa-compass mr-2"></i>Bosh sahifa
                     </a>
-                    <a href="{% url 'problems' %}" @click="mobileMenuOpen = false"
+                    <a href="/problems/" @click="mobileMenuOpen = false"
                        class="block px-3 py-2 rounded-lg {% if 'problems' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-gray-100{% endif %}">
                         <i class="fas fa-list-ol mr-2"></i>Masalalar
                     </a>
-                    <a href="{% url 'contest' %}" @click="mobileMenuOpen = false"
+                    <a href="/contest/" @click="mobileMenuOpen = false"
                        class="block px-3 py-2 rounded-lg {% if 'contest' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-gray-100{% endif %}">
                         <i class="fas fa-trophy mr-2"></i>Tanlovlar
-                    </a>
-                    <a href="{% url 'comments' %}" @click="mobileMenuOpen = false"
-                       class="block px-3 py-2 rounded-lg {% if 'comments' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-gray-100{% endif %}">
-                        <i class="fas fa-comments mr-2"></i>Munozara
-                    </a>
-                    <a href="{% url 'quiz' %}" @click="mobileMenuOpen = false"
-                       class="block px-3 py-2 rounded-lg {% if 'quiz' in request.path %}bg-indigo-50 text-indigo-600{% else %}hover:bg-gray-100{% endif %}">
-                        <i class="fas fa-question-circle mr-2"></i>Testlar
                     </a>
                 </div>
                 
                 <div class="px-3 py-4 border-t border-gray-200">
                     <h3 class="font-medium text-gray-700 mb-3">Profil</h3>
-                    {% if user.is_authenticated %}
+                    <div id="mobile-auth-buttons">
+                        <a href="/user/login/" @click="mobileMenuOpen = false"
+                           class="w-full block bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg font-medium text-center mb-2">
+                            Kirish
+                        </a>
+                        <a href="/u/register/" @click="mobileMenuOpen = false"
+                           class="w-full block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm text-center">
+                            Ro'yxatdan o'tish
+                        </a>
+                    </div>
+                    <div id="mobile-user-menu" class="hidden">
                         <div class="flex items-center mb-4">
-                            <img src="{% if user_profile.image and user_profile.image.url %}{{ user_profile.image.url }}{% else %}{% static 'user/user.png' %}{% endif %}" 
+                            <img id="mobile-profile-image" src="{% static 'images/default-profile.png' %}" 
                                  alt="Profile" class="rounded-full w-10 h-10 border-2 border-white shadow-sm mr-3">
                             <div>
-                                <p class="font-medium">{{ user.username }}</p>
-                                <p class="text-xs text-gray-500">
-                                    {% if user.profile.is_premium %}Premium a'zo{% else %}Premium a'zo emas{% endif %}
-                                </p>
+                                <p id="mobile-username" class="font-medium"></p>
                             </div>
                         </div>
-                        <a href="#" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm mb-2 block text-center">
-                            <i class="fas fa-crown mr-2"></i>Premiumga o'tish
-                        </a>
-                        <a href="{% url 'logout' %}" class="block text-center text-sm text-gray-600 hover:text-indigo-600 mt-2">
+                        <a href="#" onclick="logoutUser()" class="block text-center text-sm text-gray-600 hover:text-indigo-600 mt-2">
                             <i class="fas fa-sign-out-alt mr-1"></i>Chiqish
                         </a>
-                    {% else %}
-                        <div class="space-y-2">
-                            <a href="{% url 'login' %}" @click="mobileMenuOpen = false"
-                               class="w-full block bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg font-medium text-center">
-                                Kirish
-                            </a>
-                            <a href="{% url 'register' %}" @click="mobileMenuOpen = false"
-                               class="w-full block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm text-center">
-                                Ro'yxatdan o'tish
-                            </a>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </nav>
+
+{% comment %} <script>
+// DOM yuklanganda foydalanuvchi holatini tekshirish
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuthStatus();
+    
+    // Ekran o'lchami o'zgarganda ham tekshirish
+    window.addEventListener('resize', checkAuthStatus);
+});
+
+// Foydalanuvchi kirganligini tekshirish
+function checkAuthStatus() {
+    const token = localStorage.getItem('access_token');
+    const authButtons = document.getElementById('auth-buttons');
+    const userMenu = document.getElementById('user-menu');
+    const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+    const mobileUserMenu = document.getElementById('mobile-user-menu');
+    
+    if (token) {
+        // Foydalanuvchi kirgan - desktop versiya
+        if (authButtons) authButtons.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'flex';
+        
+        // Foydalanuvchi kirgan - mobil versiya
+        if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
+        if (mobileUserMenu) mobileUserMenu.style.display = 'block';
+        
+        // Foydalanuvchi ma'lumotlarini yuklash
+        loadUserProfile();
+    } else {
+        // Foydalanuvchi kirmagan - desktop versiya
+        if (authButtons) authButtons.style.display = 'flex';
+        if (userMenu) userMenu.style.display = 'none';
+        
+        // Foydalanuvchi kirmagan - mobil versiya
+        if (mobileAuthButtons) mobileAuthButtons.style.display = 'block';
+        if (mobileUserMenu) mobileUserMenu.style.display = 'none';
+    }
+}
+
+// Foydalanuvchi profil ma'lumotlarini yuklash
+function loadUserProfile() {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+    
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const username = payload.username || 'Foydalanuvchi';
+        
+        // Desktop versiya
+        const profileImage = document.getElementById('profile-image');
+        const mobileUsername = document.getElementById('mobile-username');
+        const mobileProfileImage = document.getElementById('mobile-profile-image');
+        
+        if (mobileUsername) mobileUsername.textContent = username;
+        
+        // Agar profil rasmi mavjud bo'lsa
+        if (payload.profile_image) {
+            if (profileImage) profileImage.src = payload.profile_image;
+            if (mobileProfileImage) mobileProfileImage.src = payload.profile_image;
+        }
+    } catch (e) {
+        console.error('Profil ma\'lumotlarini yuklashda xatolik:', e);
+    }
+}
+
+// Chiqish funksiyasi
+function logoutUser() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/u/login/';
+}
+</script> {% endcomment %}

@@ -5,12 +5,12 @@ from django.http import HttpResponse
 
 # profile
 def profile_view(request, username):
-    User = get_user_model()
-    user = get_object_or_404(User, username=username)
-    context = {
-        'profile_user': user,
-    }
-    return render(request, "users/profile.html", context)
+    # User = get_user_model()
+    # user = get_object_or_404(User, username=username)
+    # context = {
+    #     'profile_user': user,
+    # }
+    return render(request, "users/profile.html", {})
 
 def register_page_view(request):
     return render(request, "users/register.html", {})

@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CfM{% endblock %}</title>
     
-    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Optimized Tailwind CSS -->
+     
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
         tailwind.config = {
@@ -28,37 +32,92 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- HTMX for AJAX -->
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
 
+    <!--Auth js -->
+    <script src="{% static "js/auth.js" %}" ></script>
+<style>
+    body {
+        background-color: #f8fafc;
+    }
     
-    <style>
-        [x-cloak] { display: none !important; }
-        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
-        .htmx-request .htmx-indicator { opacity: 1; }
-        
-        /* Simplified custom styles */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            @apply bg-gray-50 text-gray-800 min-h-full;
+    /* Progress ring animatsiyasi */
+    .progress-ring {
+        transition: stroke-dashoffset 0.5s ease;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    /* Yuklash animatsiyasi */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    /* Gradient fon effekti */
+    .bg-gradient-to-r {
+        background-size: 200% 200%;
+        animation: gradientBG 15s ease infinite;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Tugmalar uchun transition */
+    button, a {
+        transition: all 0.3s ease;
+    }
+    
+    /* Responsive jadval */
+    @media (max-width: 640px) {
+        .table-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        .gradient-text {
-            @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
-        }
-        
-        .gradient-btn {
-            @apply bg-gradient-to-r from-primary to-secondary transition-all hover:from-indigo-700 hover:to-purple-700;
-        }
-        
-        .card-hover {
-            @apply transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5;
-        }
-        
-        /* Difficulty badges */
-        .difficulty-easy { @apply text-green-600 bg-green-50; }
-        .difficulty-medium { @apply text-yellow-500 bg-yellow-50; }
-        .difficulty-hard { @apply text-red-500 bg-red-50; }
-    </style>
+    }
+    .error-alert {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #fee2e2;
+        border: 1px solid #ef4444;
+        color: #b91c1c;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        z-index: 1000;
+        max-width: 400px;
+    }
+    .success-alert {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #d1fae5;
+        border: 1px solid #10b981;
+        color: #065f46;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        z-index: 1000;
+        max-width: 400px;
+    }
+    .input-error {
+        border-color: #ef4444 !important;
+    }
+    .invalid-feedback {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }    
+</style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-screen" hx-boost="true">
@@ -67,27 +126,26 @@
     {% include "navbar.html" %}
     {% endif %}
     {% endif %}
+    <!-- Xabarlar uchun joy -->
+    <div id="error-message" class="error-alert"></div>
+    <div id="success-message" class="success-alert"></div>
 
     <main class="flex-grow container mx-auto px-4 py-6">
         {% block content %}
         <!-- Main content will be loaded here -->
         {% endblock %}
     </main>
+
     
     {% if request.path == '/' %}
     {% include "footer.html" %}
     {% endif %}
+    
     <!-- Alpine.js for interactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
     
-    <!-- HTMX indicators -->
-    <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 h-1 bg-primary z-50"></div>
-    <div class="htmx-indicator fixed inset-0 bg-white bg-opacity-70 z-40 flex items-center justify-center">
-        <i class="fas fa-spinner fa-spin text-4xl text-primary"></i>
-    </div>
-    
-    <script src="{% static "js/auth.js" %}" ></script>
     {% block extra_js %}{% endblock %}
     
 </body>
 </html>
+
