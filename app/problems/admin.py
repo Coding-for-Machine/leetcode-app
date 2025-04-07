@@ -5,6 +5,7 @@ class ExecutionTestCaseInlineAdmin(admin.StackedInline):
     model = ExecutionTestCase
     extra = 1
 
+
 class FunctionInlineAdmin(admin.StackedInline):  # ModelAdmin emas, StackedInline bo'lishi kerak
     model = Function
     extra = 1
