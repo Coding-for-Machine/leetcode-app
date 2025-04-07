@@ -148,21 +148,34 @@ DATABASES = {
     }
 }
 
+# Database configuration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 DATABASE_URL = config("DATABASE_URL", default=None)
 
-
-
-
-# Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
 if DATABASE_URL:
-    tmpPostgres = urlparse(DATABASE_URL)
+    # Parse the database URL
+    db_info = urlparse(DATABASE_URL)
+    
+    # Extract database name properly (handle special characters in password)
+    db_name = db_info.path[1:]  # Remove the leading slash
+    
+    # Configure PostgreSQL
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": tmpPostgres.path.lstrip("/"),
-        "USER": tmpPostgres.username,
-        "PASSWORD": tmpPostgres.password,
-        "HOST": tmpPostgres.hostname,
-        "PORT": tmpPostgres.port or 5432,
+        "NAME": db_name,
+        "USER": db_info.username,
+        "PASSWORD": db_info.password,
+        "HOST": db_info.hostname,
+        "PORT": db_info.port or 5432,
+        "OPTIONS": {
+            'sslmode': 'require',  # Important for Neon and other cloud databases
+        }
     }
 
 
