@@ -157,26 +157,31 @@ DATABASES = {
 }
 
 DATABASE_URL = config("DATABASE_URL", default=None)
+import dj_database_url
 
-if DATABASE_URL:
-    # Parse the database URL
-    db_info = urlparse(DATABASE_URL)
+DATABASES = {
+    'default': dj_database_url.config(DATABASE_URL)
+}
+
+# if DATABASE_URL:
+#     # Parse the database URL
+#     db_info = urlparse(DATABASE_URL)
     
-    # Extract database name properly (handle special characters in password)
-    db_name = db_info.path[1:]  # Remove the leading slash
+#     # Extract database name properly (handle special characters in password)
+#     db_name = db_info.path[1:]  # Remove the leading slash
     
-    # Configure PostgreSQL
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": db_name,
-        "USER": db_info.username,
-        "PASSWORD": db_info.password,
-        "HOST": db_info.hostname,
-        "PORT": db_info.port or 5432,
-        "OPTIONS": {
-            'sslmode': 'require',  # Important for Neon and other cloud databases
-        }
-    }
+#     # Configure PostgreSQL
+#     DATABASES["default"] = {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": db_name,
+#         "USER": db_info.username,
+#         "PASSWORD": db_info.password,
+#         "HOST": db_info.hostname,
+#         "PORT": db_info.port or 5432,
+#         "OPTIONS": {
+#             'sslmode': 'require',  # Important for Neon and other cloud databases
+#         }
+#     }
 
 
 # ------------ time
