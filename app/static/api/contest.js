@@ -1,4 +1,4 @@
-const API_DATA_CONTEST = 'http://127.0.0.1:8000/api';
+// const API_BASE_URL = 'http://127.0.0.1:8000/api';
 let pastContestsOffset = 0;
 const pastContestsLimit = 7;
 
@@ -66,7 +66,7 @@ async function fetchContestData() {
             </div>
         `;
         
-        const response = await axios.get(`${API_DATA_CONTEST}/contest/upcoming/`, {
+        const response = await axios.get(`${API_BASE_URL}/contest/upcoming/`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
         });
         
@@ -182,7 +182,7 @@ async function fetchPastContests(loadMore = false) {
     }
     
     try {
-        const response = await axios.get(`${API_DATA_CONTEST}/contest/past/?offset=${pastContestsOffset}&limit=${pastContestsLimit}`, {
+        const response = await axios.get(`${API_BASE_URL}/contest/past/?offset=${pastContestsOffset}&limit=${pastContestsLimit}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
         });
         
@@ -294,7 +294,7 @@ async function fetchStatistika(userId) {
             </div>
         `;
         
-        const response = await axios.get(`${API_DATA_CONTEST}/contest/stats/${userId}/`, {
+        const response = await axios.get(`${API_BASE_URL}/contest/stats/${userId}/`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
         });
         
@@ -404,7 +404,7 @@ async function handleRegistration(event) {
     
     try {
         const response = await axios.post(
-            `${API_DATA_CONTEST}/contest/register/`,
+            `${API_BASE_URL}/contest/register/`,
             { contest_id: contestId },
             {
                 headers: {

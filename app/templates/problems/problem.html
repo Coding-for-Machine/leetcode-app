@@ -208,7 +208,9 @@ let editor;
 let currentProblem = null;
 let isResizing = false;
 let lastX = 0;
-const PROBLEM_API = 'http://127.0.0.1:8000/api/problems/ikki-son-yigubdisi/';
+const path = window.location.pathname;
+const slug = path.split('/').filter(Boolean).pop();
+const PROBLEM_API = `http://127.0.0.1:8000/api/problems/${slug}/`;
 const SOLUTION_API = 'http://127.0.0.1:8000/api/solution/create/';
 
 // Initialize the application
@@ -523,9 +525,6 @@ async function submitSolution() {
         showError(`Submission failed: ${error.message}`);
     }
 }
-
-// Rest of the functions remain the same (resetCode, switchTab, showConsole, clearConsole, etc.)
-// ...
     </script>
 </body>
 </html>

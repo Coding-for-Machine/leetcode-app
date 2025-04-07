@@ -67,7 +67,7 @@ def get_problems(request):
         for problem in problems
     ]
 
-@api_problem_router.get("/problem/{slug}/", response=ProblemDetailSchema)
+@api_problem_router.get("/{slug}/", response=ProblemDetailSchema)
 def get_problem_detail(request, slug: str):
     """Berilgan slug bo'yicha masala to'liq ma'lumotini qaytaradi"""
     try:

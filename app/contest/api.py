@@ -5,9 +5,10 @@ from datetime import datetime
 from typing import List, Optional
 from django.shortcuts import get_object_or_404
 from users.models import MyUser
-
+from users.auth import JWTBaseAuth
 # --------- Schemas ---------
 class ContestBase(BaseModel):
+    id: int
     title: str
     contest_type: str
     contest_number: int
@@ -32,7 +33,7 @@ class ContestStats(BaseModel):
 # --------- API ---------
 contest_router = Router(tags=["Contests"])
 
-@contest_router.get("/upcoming/", response=List[ContestDetail])
+@contest_router.get("/upcoming/", response=List[ContestDetail], auth=JWTBaseAuth())
 def upcoming_contests(request):
     contests = Contest.objects.filter(
         is_active=True,
@@ -40,6 +41,7 @@ def upcoming_contests(request):
     ).order_by('start_time')
     
     return [{
+        "id": c.id,
         "title": c.title,
         "contest_type": c.contest_type,
         "contest_number": c.contest_number,
@@ -61,6 +63,7 @@ def past_contests(request, limit: int = 10):
     ).order_by('-start_time')[:limit]
     
     return [{
+        "id": c.id,
         "title": c.title,
         "contest_type": c.contest_type,
         "contest_number": c.contest_number,

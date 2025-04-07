@@ -9,7 +9,7 @@ from .models import Quiz, Question, Answer, QuizAttempt
 from .schemas import QuizAttemptCreate, QuizAttemptOut, QuizDetailOut, QuizList
 from users.models import MyUser
 
-router = Router()
+router = Router(tags=["quiz"])
 
 @router.get("quizzes/", response=List[QuizList])
 def quize_api(request):

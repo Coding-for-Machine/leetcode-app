@@ -166,17 +166,17 @@ DATABASES = {
 #     }
 
 
-# DATABASES = {
-#     "default": {
+DATABASES = {
+    "default": {
         
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
-#         "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
-#         "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
-#         "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
-#         "PORT": config("TIMESCALE_DB_PORT", default="35474"),
-#     }
-# }
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
+        "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
+        "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
+        "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
+        "PORT": config("TIMESCALE_DB_PORT", default="35474"),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
