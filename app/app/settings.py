@@ -148,35 +148,36 @@ DATABASES = {
     }
 }
 
-# DATABASE_URL = config("DATABASE_URL", default=None)
+DATABASE_URL = config("DATABASE_URL", default=None)
 
 
 
 
 # Agar PostgreSQL URL mavjud bo‘lsa, uni asosiy baza sifatida o‘rnatamiz
-# if DATABASE_URL:
-#     tmpPostgres = urlparse(DATABASE_URL)
-#     DATABASES["default"] = {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": tmpPostgres.path.lstrip("/"),
-#         "USER": tmpPostgres.username,
-#         "PASSWORD": tmpPostgres.password,
-#         "HOST": tmpPostgres.hostname,
-#         "PORT": tmpPostgres.port or 5432,
-#     }
-
-
-DATABASES = {
-    "default": {
-        
+if DATABASE_URL:
+    tmpPostgres = urlparse(DATABASE_URL)
+    DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
-        "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
-        "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
-        "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
-        "PORT": config("TIMESCALE_DB_PORT", default="35474"),
+        "NAME": tmpPostgres.path.lstrip("/"),
+        "USER": tmpPostgres.username,
+        "PASSWORD": tmpPostgres.password,
+        "HOST": tmpPostgres.hostname,
+        "PORT": tmpPostgres.port or 5432,
     }
-}
+
+
+# ------------ time
+# DATABASES = {
+#     "default": {
+        
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
+#         "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
+#         "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
+#         "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
+#         "PORT": config("TIMESCALE_DB_PORT", default="35474"),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
