@@ -1,11 +1,18 @@
 from pydantic import BaseModel, EmailStr, StringConstraints, constr
 from typing import Optional, Annotated
 from datetime import datetime
+from ninja import ModelSchema
 
-class UserRegisterSchema(BaseModel):
-    email: EmailStr
-    username: Annotated[str, StringConstraints(min_length=2, max_length=30)]
-    password: Annotated[str, StringConstraints(min_length=6, max_length=128)]
+from .models import MyUser
+
+class UserRegisterSchema(ModelSchema):
+    email: str
+    username: str
+    password: str
+
+    class Config:
+        model = MyUser
+        model_fields = ['email', 'username', 'password']
 
 # Login uchun schema
 class UserLoginSchema(BaseModel):

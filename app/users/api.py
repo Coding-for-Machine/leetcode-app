@@ -1,29 +1,20 @@
 from ninja import Router
 from ninja_jwt.authentication import JWTAuth
 from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import get_object_or_404
 from ninja_jwt.tokens import RefreshToken
 from ninja.errors import HttpError
-from .models import MyUser
-from .schemas import UserRegisterSchema, UserSchema, UserLoginSchema, ProfileUpdateSchema
-from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from ninja import ModelSchema
 from typing import Dict, Optional
 
+from .schemas import UserRegisterSchema, UserSchema, UserLoginSchema
+from .models import MyUser
 # Router yaratamiz
-user_router = Router()
+
+user_router = Router(tags=["Users"])
 
 
-class UserRegisterSchema(ModelSchema):
-    email: str
-    username: str
-    password: str
 
-    class Config:
-        model = MyUser
-        model_fields = ['email', 'username', 'password']
 
 def validate_password(password):
     if len(password) < 8:
@@ -82,26 +73,52 @@ def register(request, data: UserRegisterSchema):
         return 201, user
     except Exception as e:
         return 422, {"error": "Foydalanuvchi yaratishda xatolik", "details": str(e)}
-# Login qilish
-@user_router.post("/login", response={200: Dict[str, str], 401: Dict[str, str]})
+    
+@user_router.post("/login", response={200: dict, 401: dict})
 def login(request, data: UserLoginSchema):
     try:
-
+        # Email yoki username orqali qidirish
         user = MyUser.objects.filter(email=data.email).first()
+        if not user:
+            user = MyUser.objects.filter(username=data.email).first()
         
         if not user:
-            return 401, {"error": "Email not found"}
+            raise HttpError(401, {"error": "Email/username not found"})
         
         if not check_password(data.password, user.password):
-            return 401, {"error": "Incorrect password"}
+            raise HttpError(401, {"error": "Incorrect password"})
         
         refresh = RefreshToken.for_user(user)
+        
+        # Domen nomini olish uchun requestdan foydalanish
+        domain = request.get_host()
+        protocol = 'https' if request.is_secure() else 'http'
+        base_url = f"{protocol}://{domain}"
+        
+        # Avatarning to'liq URL manzilini tayyorlash
+        avatar_url = None
+        if hasattr(user, 'profile') and user.profile.avatar_url:
+            avatar_url = f"{base_url}{user.profile.avatar_url}"
+
+        # Frontend User interfeysiga mos response
         return {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
+            "tokens": {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            "user": {
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,
+                "role": user.role or 'student',
+                "avatar": avatar_url,
+                "isPremium": user.profile.is_premium if hasattr(user, 'profile') else False,
+                "createdAt": user.created_at.strftime('%Y-%m-%d'),
+            }
         }
-    except MyUser.DoesNotExist:
-        return HttpError(404, "Foydalanovchi Topilmadi!")
+        
+    except Exception as e:
+        raise HttpError(500, {"error": str(e)})
 
 # Profilni olish (faqat login qilgan foydalanuvchilar)
 @user_router.get("/me", response={200: UserSchema, 401: Dict[str, str]}, auth=JWTAuth())

@@ -66,9 +66,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     def update_contest_stats(self):
-        """
-        Foydalanuvchi statistikasini avtomatik yangilaydi
-        """
         stats, created = UserContestStats.objects.get_or_create(user=self)
         
         registrations = self.user_contest_register.all()
@@ -112,7 +109,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True, verbose_name="Foydalanuvchi")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True,  verbose_name="Foydalanuvchi")
     first_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ism")
     last_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Familiya")
     image = models.ImageField(
@@ -139,7 +136,7 @@ class Profile(models.Model):
     def avatar_url(self):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
-        return '/static/images/default_avatar.png'
+        return '/static/images/user.png'
     @property
     def is_premium(self):
         return self.user.is_superuser

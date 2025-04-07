@@ -12,7 +12,6 @@ from users.api import user_router
 # API routerlarni qo‘shish
 api.add_router("/problems/", api_problem_router)
 api.add_router("solution/", solution_url_api)
-api.add_router("auth/", user_router)
 
 
 api.add_router("/", router)
