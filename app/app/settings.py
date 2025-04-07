@@ -153,19 +153,17 @@ DATABASE_URL = config("DATABASE_URL", default=None)
 
 if DATABASE_URL:
     try:
-        # Parse the database URL
-        db_info = urlparse(DATABASE_URL)
-        
         # Configure PostgreSQL
         DATABASES["default"] = {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": db_info.path[1:],  # Remove leading slash
-            "USER": db_info.username,
-            "PASSWORD": db_info.password,
-            "HOST": db_info.hostname,
-            "PORT": db_info.port or 5432,
-            "OPTIONS": {
-                'sslmode': 'require',  # Important for Neon and other cloud databases
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='leetcode'),
+            'USER': config('DB_USER', default='leetcode_owner'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST', default='ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
+            'PORT': config('DB_PORT', default='5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+                'options': 'endpoint=ep-restless-hat-a5vszuj5'  # Neon uchun kerak
             }
         }
     except Exception as e:
