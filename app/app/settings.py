@@ -141,6 +141,14 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Database configuration
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -148,33 +156,19 @@ WSGI_APPLICATION = 'app.wsgi.application'
 #     }
 # }
 
+DATABASE_URL = config("DATABASE_URL", default=None)
 
-import dj_database_url
-
+tmpPostgres = urlparse(DATABASE_URL)
 DATABASES = {
-    'default': dj_database_url.config(default=config("DATABASE_URL", default="abs"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+    }
 }
-
-# if DATABASE_URL:
-#     # Parse the database URL
-#     db_info = urlparse(DATABASE_URL)
-    
-#     # Extract database name properly (handle special characters in password)
-#     db_name = db_info.path[1:]  # Remove the leading slash
-    
-#     # Configure PostgreSQL
-#     DATABASES["default"] = {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": db_name,
-#         "USER": db_info.username,
-#         "PASSWORD": db_info.password,
-#         "HOST": db_info.hostname,
-#         "PORT": db_info.port or 5432,
-#         "OPTIONS": {
-#             'sslmode': 'require',  # Important for Neon and other cloud databases
-#         }
-#     }
-
 
 # ------------ time
 # DATABASES = {
