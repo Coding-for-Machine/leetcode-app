@@ -141,6 +141,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Database configuration - Corrected version
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -148,27 +149,32 @@ DATABASES = {
     }
 }
 
-# Database configuration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASE_URL = config("DATABASE_URL", default=None)
 
-tmpPostgres = urlparse(DATABASE_URL)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-    }
-}
+if DATABASE_URL:
+    try:
+        # Parse the database URL
+        db_info = urlparse(DATABASE_URL)
+        
+        # Configure PostgreSQL
+        DATABASES["default"] = {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": db_info.path[1:],  # Remove leading slash
+            "USER": db_info.username,
+            "PASSWORD": db_info.password,
+            "HOST": db_info.hostname,
+            "PORT": db_info.port or 5432,
+            "OPTIONS": {
+                'sslmode': 'require',  # Important for Neon and other cloud databases
+            }
+        }
+    except Exception as e:
+        print(f"Error parsing DATABASE_URL: {e}")
+        # Fall back to SQLite if there's an error
+        DATABASES["default"] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
 
 # ------------ time
 # DATABASES = {
