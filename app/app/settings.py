@@ -144,35 +144,18 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database configuration - Corrected version
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', 'leetcode'),
+        'USER': config('DB_USER', 'leetcode_owner'),
+        'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
+        'HOST': config('DB_HOST', 'ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
+        'PORT': config('DB_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'connect_timeout': 5,  # 5 sekunddan keyin timeout
+        }
     }
 }
-
-DATABASE_URL = config("DATABASE_URL", default=None)
-
-if DATABASE_URL:
-    try:
-        # Configure PostgreSQL
-        DATABASES["default"] = {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='leetcode'),
-            'USER': config('DB_USER', default='leetcode_owner'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST', default='ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
-            'PORT': config('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-                'options': 'endpoint=ep-restless-hat-a5vszuj5'  # Neon uchun kerak
-            }
-        }
-    except Exception as e:
-        print(f"Error parsing DATABASE_URL: {e}")
-        # Fall back to SQLite if there's an error
-        DATABASES["default"] = {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
 
 # ------------ time
 # DATABASES = {
