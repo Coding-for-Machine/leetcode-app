@@ -77,8 +77,9 @@ def past_contests(request, limit: int = 10):
         "progress_percentage": min(100, int(c.contest_register.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
     } for c in contests]
 
-@contest_router.get("/stats/{user_id}/", response=ContestStats)
-def user_stats(request, user_id: int):
+@contest_router.get("/stats/", response=ContestStats, auth=JWTBaseAuth())
+def user_stats(request):
+    user_id = request.user.id
     user = get_object_or_404(MyUser, pk=user_id)
     user.update_contest_stats()
     stats = user.contest_stats  # Avtomatik yaratiladi/yangilanadi
