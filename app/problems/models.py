@@ -70,7 +70,22 @@ class Problem(TimeMixsin):
     
     def get_absolute_url(self):
         return reverse("problem_page", kwargs={"slug": self.slug})
+    def acceptance(self):
+        """Masalani qabul qilinish foizini hisoblaydi"""
+        total_submissions = self.solution.count()
+        if total_submissions == 0:
+            return "0%"
+        
+        accepted_submissions = self.solution.filter(is_correct=True).count()
+        acceptance_rate = (accepted_submissions / total_submissions) * 100
+        return f"{round(acceptance_rate, 1)}%"
     
+    def solved(self, user):
+        """Foydalanuvchi masalani yechganligini tekshiradi"""
+        if not user.is_authenticated:
+            return False
+        return self.problem_status.filter(user=user, is_completed=True).exists()
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)

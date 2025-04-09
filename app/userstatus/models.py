@@ -90,8 +90,8 @@ class UserProblemStatus(TimeMixsin):
         'hard': 5
     }
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problem_statuses')
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problem_status_user')
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='problem_status')
     is_completed = models.BooleanField(default=False)  
     score = models.PositiveIntegerField(default=0)  
     solved_at = models.DateTimeField(null=True, blank=True)

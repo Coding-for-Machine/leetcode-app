@@ -2,7 +2,7 @@ from ninja import Router
 from ninja.errors import HttpError
 from pydantic import BaseModel
 from datetime import datetime
-from .models import Problem, Language, ExecutionTestCase, TestCase, Function
+from .models import Problem, Language, ExecutionTestCase, TestCase, Function, Category
 from typing import List, Optional
 import random
 
@@ -10,6 +10,11 @@ api_problem_router = Router(tags=["Problems"])
 
 # -------------- Schemas --------------
 class LanguageSchema(BaseModel):
+    id: int
+    name: str
+    slug: str
+
+class CategorySchema(BaseModel):
     id: int
     name: str
     slug: str
@@ -32,10 +37,12 @@ class FunctionSchema(BaseModel):
 class ProblemDetailSchema(BaseModel):
     id: int
     languages: List[LanguageSchema]
+    category: List[CategorySchema]
     title: str
     slug: str
     description: str
     difficulty: str
+    points: int
     created_at: datetime
     updated_at: datetime
     execution_test_cases: Optional[List[ExecutionTestCaseSchema]] = []
@@ -47,20 +54,32 @@ class ProblemListSchema(BaseModel):
     title: str
     slug: str
     difficulty: str
+    points: int
+    acceptance: str
+    solved: Optional[bool] = False
+    category: List[str]
     created_at: datetime
     updated_at: datetime
 
 # -------------- Endpointlar --------------
 @api_problem_router.get("/", response=List[ProblemListSchema])
-def get_problems(request):
+def get_problems(request, category: str = None):
     """Barcha faol masalalarni ro'yxatini qaytaradi"""
-    problems = Problem.objects.filter(is_active=True).order_by('order')
+    problems = Problem.objects.filter(is_active=True).prefetch_related('category')
+    
+    if category:
+        problems = problems.filter(category__slug=category)
+    
     return [
         {
             "id": problem.id,
             "title": problem.title,
             "slug": problem.slug,
             "difficulty": problem.get_difficulty_display(),
+            "points": problem.points,
+            "category": [cat.name for cat in problem.category.all()],
+            "acceptance": problem.acceptance(),
+            "solved": problem.solved(request.user),
             "created_at": problem.created_at,
             "updated_at": problem.updated_at,
         }
@@ -73,7 +92,9 @@ def get_problem_detail(request, slug: str):
     try:
         problem = Problem.objects.prefetch_related(
             "language",
+            "category",
             "execution_problem",
+            "execution_problem__language",
             "test_problem",
             "functions",
             "functions__language"
@@ -85,10 +106,15 @@ def get_problem_detail(request, slug: str):
                 {"id": lang.id, "name": lang.name, "slug": lang.slug} 
                 for lang in problem.language.all()
             ],
+            "category": [
+                {"id": cat.id, "name": cat.name, "slug": cat.slug}
+                for cat in problem.category.all()
+            ],
             "title": problem.title,
             "slug": problem.slug,
-            "description": problem.description,  # Tuzatildi - description qaytarilmoqda
+            "description": problem.description,
             "difficulty": problem.get_difficulty_display(),
+            "points": problem.points,
             "created_at": problem.created_at,
             "updated_at": problem.updated_at,
             "execution_test_cases": [
@@ -109,17 +135,20 @@ def get_problem_detail(request, slug: str):
 
 @api_problem_router.get("/random/", response=ProblemListSchema)
 def get_random_problem(request):
-    # problems = Problem.objects.all()
-    # if not problems.exists():
-    #     raise HttpError(404, "Ma'lumotlar bazasida hech qanday masala mavjud emas")
+    """Tasodifiy bir masalani qaytaradi"""
+    problem = Problem.objects.filter(is_active=True).order_by("?").first()
+    if not problem:
+        raise HttpError(404, "Aktiv masalalar topilmadi")
     
-    # problem = random.choice(problems)
-    problem = Problem.objects.order_by("?").first()
     return {
         "id": problem.id,
         "title": problem.title,
         "slug": problem.slug,
         "difficulty": problem.get_difficulty_display(),
+        "points": problem.points,
+        "category": [cat.name for cat in problem.category.all()],
+        "acceptance": problem.acceptance(),
+        "solved": problem.solved(request.user),
         "created_at": problem.created_at,
         "updated_at": problem.updated_at,
     }

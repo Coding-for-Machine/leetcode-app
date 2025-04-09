@@ -9,7 +9,7 @@ User = settings.AUTH_USER_MODEL
 
 class Solution(TimeMixsin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="solution")
     language = models.ForeignKey(Language, on_delete=models.CASCADE)  
     code = models.TextField()
     is_accepted = models.BooleanField(default=False)
