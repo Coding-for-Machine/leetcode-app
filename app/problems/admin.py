@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Problem, Category, TestCase, ExecutionTestCase, Function, Language
+from .models import Problem, Category, Tags, TestCase, ExecutionTestCase, Function, Language, Examples
 
 class ExecutionTestCaseInlineAdmin(admin.StackedInline):
     model = ExecutionTestCase
@@ -38,4 +38,14 @@ class ExecutionTestCaseAdmin(admin.ModelAdmin):
 @admin.register(Function)
 class FunctionAdmin(admin.ModelAdmin):
     list_display = ["id", "function", "created_at", "updated_at"]
+    list_per_page = 20
+
+@admin.register(Examples)
+class ExamplesAdmin(admin.ModelAdmin):
+    list_display = ["id", "input_txt", "output_txt", "explanation"]
+    list_per_page = 20
+
+@admin.register(Tags)
+class ExamplesAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
     list_per_page = 20

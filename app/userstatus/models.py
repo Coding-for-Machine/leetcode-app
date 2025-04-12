@@ -1,4 +1,5 @@
 # models.py
+from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -12,12 +13,6 @@ if TYPE_CHECKING:
 
 User = settings.AUTH_USER_MODEL
 
-
-    
-class UserAvatar(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
-    image = models.ImageField(upload_to='avatars/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class UserActivityDaily(TimeMixsin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_activities')
@@ -35,9 +30,6 @@ class UserActivityDaily(TimeMixsin):
         verbose_name = "User Daily Activity"
         verbose_name_plural = "User Daily Activities"
 
-    def __str__(self):
-        return f"{self.user.email} - {self.date}: {self.activity_count} actions"
-
     @classmethod
     def log_activity(cls, user, activity_type='problem_solved', duration=0, score=0):
         today = timezone.now().date()
@@ -50,6 +42,7 @@ class UserActivityDaily(TimeMixsin):
         activity.score += score
         activity.save()
         return activity
+
 
 class Badge(TimeMixsin):
     BADGE_TYPES = [
@@ -84,19 +77,10 @@ class UserBadge(TimeMixsin):
         return f"{self.user.email} - {self.badge.name}"
 
 class UserProblemStatus(TimeMixsin):
-    DIFFICULTY_SCORES = {
-        'easy': 1,
-        'medium': 3,
-        'hard': 5
-    }
-    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problem_status_user')
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='problem_status')
     is_completed = models.BooleanField(default=False)  
     score = models.PositiveIntegerField(default=0)  
-    solved_at = models.DateTimeField(null=True, blank=True)
-    time_taken = models.PositiveIntegerField(default=0, null=True, blank=True)  # seconds
-    memory_used = models.PositiveIntegerField(default=0, null=True, blank=True)  # KB
 
     class Meta:
         constraints = [
@@ -107,35 +91,21 @@ class UserProblemStatus(TimeMixsin):
         return f"{self.user.email} - {self.problem.title}"
 
     @classmethod
-    def mark_completed(cls, user, problem, difficulty, time_taken=None, memory_used=None):
-        status, created = cls.objects.get_or_create(
-            user=user, 
+    def mark_completed(cls, user, problem):
+        points = {
+                1: 100,
+                2: 250,
+                3: 450,
+                4: 700
+            }.get(problem.points, 100)
+        update, create = cls.objects.get_or_create(
+            user = user,
             problem=problem,
-            defaults={
-                'is_completed': True,
-                'score': cls.DIFFICULTY_SCORES.get(difficulty, 1),
-                'solved_at': timezone.now(),
-                'time_taken': time_taken,
-                'memory_used': memory_used
-            }
+            is_completed=True,
+            score = points
         )
         
-        if not status.is_completed:
-            status.is_completed = True
-            status.score = cls.DIFFICULTY_SCORES.get(difficulty, 1)
-            status.solved_at = timezone.now()
-            status.time_taken = time_taken
-            status.memory_used = memory_used
-            status.save()
-        
-        # Log activity
-        UserActivityDaily.log_activity(
-            user=user,
-            activity_type='problem_solved',
-            score=status.score
-        )
-        
-        return status
+        return update
 
 class UserStats(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='stats')
@@ -143,37 +113,50 @@ class UserStats(models.Model):
     easy_solved = models.PositiveIntegerField(default=0)
     medium_solved = models.PositiveIntegerField(default=0)
     hard_solved = models.PositiveIntegerField(default=0)
+    very_hard_solved = models.PositiveIntegerField(default=0)
     total_score = models.PositiveIntegerField(default=0)
     current_streak = models.PositiveIntegerField(default=0)
     max_streak = models.PositiveIntegerField(default=0)
     last_activity = models.DateTimeField(null=True, blank=True)
 
-    def update_stats(self):
-        # Update solved problems counts
-        self.total_solved = self.user.problem_statuses.filter(is_completed=True).count()
-        self.easy_solved = self.user.problem_statuses.filter(
-            is_completed=True, 
-            problem__difficulty='easy'
-        ).count()
-        self.medium_solved = self.user.problem_statuses.filter(
-            is_completed=True, 
-            problem__difficulty='medium'
-        ).count()
-        self.hard_solved = self.user.problem_statuses.filter(
-            is_completed=True, 
-            problem__difficulty='hard'
-        ).count()
+    @classmethod
+    def update_stats(cls, user):
+        """
+        Foydalanuvchining barcha yechgan masalalarini olish
+        va statistikalarni yangilash
+        """
+        solved_status = user.problem_status_user.filter(is_completed=True)
         
-        self.total_score = self.user.problem_statuses.filter(
-            is_completed=True
-        ).aggregate(Sum('score'))['score__sum'] or 0
+        cls.total_solved = solved_status.count()
+        cls.easy_solved = solved_status.filter(problem__difficulty=1).count()
+        cls.medium_solved = solved_status.filter(problem__difficulty=2).count()
+        cls.hard_solved = solved_status.filter(problem__difficulty=3).count()
+        cls.very_hard_solved = solved_status.filter(problem__difficulty=4).count()
         
-        self.update_streaks()
-        self.save()
+        cls.total_score = solved_status.aggregate(Sum('score'))['score__sum'] or 0
+        
+        # Streakni yangilash
+        cls.update_streaks(user)
 
-    def update_streaks(self):
-        # Streak calculation logic
-        pass
+        # Foydalanuvchining oxirgi faoliyatini yangilash
+        cls.last_activity = solved_status.latest('date_completed').date_completed if solved_status.exists() else None
+        
+        cls.save()
 
-    def __str__(self):
-        return f"{self.user.email} stats"
+    @classmethod
+    def update_streaks(cls, user):
+        """
+        Foydalanuvchining masalalar ketma-ketligini tekshirib, 
+        strekni yangilash
+        """
+        streak_count = 0
+        max_streak = 0
+        for status in user.problem_status_user.filter(is_completed=True).order_by('date_completed'):
+            if status.created_at.date() == (status.created_at - timedelta(days=1)).date():
+                streak_count += 1
+            else:
+                streak_count = 1
+            max_streak = max(max_streak, streak_count)
+        cls.current_streak = streak_count
+        cls.max_streak = max_streak
+        cls.save()

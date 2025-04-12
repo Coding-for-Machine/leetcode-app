@@ -1,13 +1,8 @@
 import os
-from dotenv import load_dotenv
 import httpx
 
-# .env faylini yuklash
-load_dotenv()
-
 # Docker API manzilini yuklash
-DOCKER_API = os.getenv("DOCKER_BACKEND_API", "http://ip172-18-0-76-cupi9liim2rg00eath6g-3000.direct.labs.play-with-docker.com/run-test")
-
+DOCKER_API = "http://ip172-18-0-3-cvsk788l2o90008udir0-3000.direct.labs.play-with-docker.com/execute"
 def post_server(data):
     try:
         print(f"DOCKER_API manzili: {DOCKER_API}")

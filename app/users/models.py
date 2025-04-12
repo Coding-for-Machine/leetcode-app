@@ -56,10 +56,12 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     def delete(self, *args, **kwargs):
         self.is_deleted = True
+        self.is_active=False
         self.save()
 
     def restore(self):
         self.is_deleted = False
+        self.is_active=True
         self.save()
 
     def __str__(self):

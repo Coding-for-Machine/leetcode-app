@@ -6,7 +6,6 @@ from ninja.errors import HttpError
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from typing import Dict, Optional
-
 from .schemas import UserRegisterSchema, UserSchema, UserLoginSchema
 from .models import MyUser
 # Router yaratamiz
@@ -15,8 +14,7 @@ user_router = Router(tags=["Users"])
 
 
 
-
-def validate_password(password):
+def validate_password(password: str):
     if len(password) < 8:
         return False, "Parol kamida 8 ta belgidan iborat bo‘lishi kerak"
     elif not any(char.isdigit() for char in password):
@@ -25,45 +23,42 @@ def validate_password(password):
         return False, "Parolda kamida bitta kichik harf bo‘lishi kerak"
     elif not any(char.isupper() for char in password):
         return False, "Parolda kamida bitta katta harf bo‘lishi kerak"
-    elif not password.char.isalnum():
-        return False, "Parolda kamida bitta maxsus belgi bo‘lishi kerak"
-    
+
     return True, "Parol to‘g‘ri"
 
 def validate_user_data(email: str, username: str, password: str) -> Optional[Dict[str, str]]:
-    # Emailni tekshirish
     try:
         validate_email(email)
     except ValidationError:
-        return {"error": "Noto‘g‘ri email formati"}
-    
-    # Usernameni tekshirish
+        return {"email": "Noto‘g‘ri email formati"}
+
     if len(username) < 4:
-        return {"error": "Username kamida 4 belgidan iborat bo‘lishi kerak"}
+        return {"username": "Username kamida 4 belgidan iborat bo‘lishi kerak"}
     if not username.isalnum():
-        return {"error": "Username faqat harflar va raqamlardan iborat bo‘lishi kerak"}
-    
-    # Parolni tekshirish
+        return {"username": "Username faqat harflar va raqamlardan iborat bo‘lishi kerak"}
+
     is_valid, password_error = validate_password(password)
     if not is_valid:
-        return {"error": password_error}
-    
-    return None  # Agar hamma narsa to‘g‘ri bo‘lsa, xatolik qaytarmaymiz
+        return {"password": password_error}
 
-@user_router.post("/register", response={201: UserSchema, 400: Dict[str, str], 422: Dict[str, str]})
+    return None
+
+@user_router.post("/register", response={201: UserSchema, 400: Dict[str, str]})
 def register(request, data: UserRegisterSchema):
+    # Majburiy maydonlarni tekshirish
     if not data.email or not data.username or not data.password:
-        return 400, {"error": "Barcha maydonlarni to'ldirish shart"}
-    
-    validation_error = validate_user_data(data.email, data.username, data.password)
-    if validation_error:
-        return 400, validation_error
-    
+        raise HttpError(400, "Barcha maydonlarni to'ldirish shart")
+
+    # Validatsiya
+    if validation_errors := validate_user_data(data.email, data.username, data.password):
+        raise HttpError(400, validation_errors)
+
+    # Email va username bandligini tekshirish
     if MyUser.objects.filter(email=data.email).exists():
-        return 400, {"error": "Bu email allaqachon ro'yxatdan o'tgan"}
+        raise HttpError(400, "Bu email allaqachon ro'yxatdan o'tgan")
     if MyUser.objects.filter(username=data.username).exists():
-        return 400, {"error": "Bu username allaqachon band qilingan"}
-    
+        raise HttpError(400, "Bu username allaqachon band qilingan")
+
     try:
         user = MyUser.objects.create(
             email=data.email,
@@ -72,8 +67,9 @@ def register(request, data: UserRegisterSchema):
         )
         return 201, user
     except Exception as e:
-        return 422, {"error": "Foydalanuvchi yaratishda xatolik", "details": str(e)}
-    
+        raise HttpError(500, "Server xatosi")
+
+
 @user_router.post("/login", response={200: dict, 401: dict})
 def login(request, data: UserLoginSchema):
     try:

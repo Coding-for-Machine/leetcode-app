@@ -26,6 +26,12 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+class Tags(TimeMixsin):
+    name = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name
     
 class Language(TimeMixsin):
     name = models.CharField(max_length=250)
@@ -48,17 +54,26 @@ class Language(TimeMixsin):
 class Problem(TimeMixsin):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True, blank=True)
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, null=True, blank=True)
+    tags = models.ManyToManyField(Tags)
     language = models.ManyToManyField(Language, related_name='problems_in_language')
-    category = models.ManyToManyField(Category, related_name='problems_in_category')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='problems_in_category', null=True, blank=True)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=250, blank=True, unique=True)
     description = RichTextUploadingField()
+    constraints = models.TextField(
+        help_text="HTML formatida cheklovlar",
+        default="""
+        <ul>
+            <li><code>2 ≤ nums.length ≤ 10<sup>4</sup></code></li>
+        </ul>
+        """
+    )
     
     difficulty_choices = [
-        (1, '1 - Oson'),
-        (2, '2 - O\'rtacha'),
-        (3, '3 - Qiyin'),
-        (4, '4 - Juda qiyin'),
+        (1, 'Oson'),
+        (2, 'O\'rtacha'),
+        (3, 'Qiyin'),
+        (4, 'Juda qiyin'),
     ]
     difficulty = models.PositiveIntegerField(choices=difficulty_choices, default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -70,18 +85,16 @@ class Problem(TimeMixsin):
     
     def get_absolute_url(self):
         return reverse("problem_page", kwargs={"slug": self.slug})
+    
     def acceptance(self):
-        """Masalani qabul qilinish foizini hisoblaydi"""
         total_submissions = self.solution.count()
         if total_submissions == 0:
             return "0%"
-        
         accepted_submissions = self.solution.filter(is_correct=True).count()
         acceptance_rate = (accepted_submissions / total_submissions) * 100
         return f"{round(acceptance_rate, 1)}%"
     
     def solved(self, user):
-        """Foydalanuvchi masalani yechganligini tekshiradi"""
         if not user.is_authenticated:
             return False
         return self.problem_status.filter(user=user, is_completed=True).exists()
@@ -104,7 +117,18 @@ class Problem(TimeMixsin):
         ordering = ['order']
         verbose_name = "Masala"
         verbose_name_plural = "Masalalar"
-        
+
+class Examples(TimeMixsin):
+    problem = models.ForeignKey(Problem, related_name="examples", on_delete=models.CASCADE)
+    input_txt = models.TextField(help_text="# Kirish ma'lumotlari (masalan: \"[2,7,11,15]\\n9\")")  # Kirish ma'lumotlari (masalan: "[2,7,11,15]\\n9")
+    output_txt = models.TextField(help_text="# Chiqish ma'lumotlari (masalan: \"[0,1]\")")  # Chiqish ma'lumotlari (masalan: "[0,1]")
+    explanation = models.TextField(help_text="# Tushuntirish matni")  # Tushuntirish matni
+    img = models.ImageField(
+        upload_to='problem_examples/',  # Rasmlar saqlanadigan papka
+        blank=True,  # Majburiy emas
+        null=True   # NULL qiymatga ruxsat beriladi
+    )
+
 class Function(TimeMixsin):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     problem = models.ForeignKey(Problem, related_name="functions", on_delete=models.CASCADE)

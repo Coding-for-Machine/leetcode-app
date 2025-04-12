@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, StringConstraints, constr
+from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, constr
 from typing import Optional, Annotated
 from datetime import datetime
 from ninja import ModelSchema
@@ -22,15 +22,13 @@ class UserLoginSchema(BaseModel):
 # Foydalanuvchi ma'lumotlari
 class UserSchema(BaseModel):
     id: int
-    email: EmailStr
+    email: str
     username: str
-    image: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-    created_at: datetime
+    role: str
+    avatar: Optional[str] = None
+    isPremium: Optional[bool] = None
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
 
 # Profil ma'lumotlari
 class ProfileSchema(BaseModel):
