@@ -8,7 +8,7 @@ class SolutionSchema(BaseModel):
     problem_id: int
     language_id: int
     code: str
-    custom_inputs: Optional[List[BaseCustomInput]] = None  # Typo tuzatildi
+    # custom_inputs: Optional[List[BaseCustomInput]] = None  # Typo tuzatildi
 
 class SolutionResponseSchema(BaseModel):
     id: int
@@ -25,4 +25,3 @@ class SolutionResponseSchema(BaseModel):
 class RunCodeSchema(BaseModel):
     language_id: int  # Dasturlash tili ID
     code: str  # Foydalanuvchining kiritgan kodi
-    custom_input: Optional[str] = None  # Foydalanuvchi test qilayotgan input

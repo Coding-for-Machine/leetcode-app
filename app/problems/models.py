@@ -90,7 +90,7 @@ class Problem(TimeMixsin):
         total_submissions = self.solution.count()
         if total_submissions == 0:
             return "0%"
-        accepted_submissions = self.solution.filter(is_correct=True).count()
+        accepted_submissions = self.solution.filter(is_accepted=True).count()
         acceptance_rate = (accepted_submissions / total_submissions) * 100
         return f"{round(acceptance_rate, 1)}%"
     
@@ -154,13 +154,13 @@ class TestCase(TimeMixsin):
     problem = models.ForeignKey(Problem, related_name="test_problem", on_delete=models.CASCADE)
     input_txt = models.CharField(max_length=250, help_text="Test Input")
     output_txt = models.CharField(max_length=250, help_text="Chiqish Output")
+    is_correct = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     def __str__(self):
         return f"Test for {self.problem.title}"
-
-    def is_valid_test_case(self):
-        return bool(self.input_txt and self.output_txt)
-
-    def get_summary(self):
-        return f"Test - Input: {self.input_txt[:30]}..."
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['problem']),
+        ]

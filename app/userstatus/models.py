@@ -79,6 +79,7 @@ class UserBadge(TimeMixsin):
 class UserProblemStatus(TimeMixsin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problem_status_user')
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='problem_status')
+    date_completed = models.DateTimeField(null=True, blank=True)
     is_completed = models.BooleanField(default=False)  
     score = models.PositiveIntegerField(default=0)  
 
@@ -93,20 +94,21 @@ class UserProblemStatus(TimeMixsin):
     @classmethod
     def mark_completed(cls, user, problem):
         points = {
-                1: 100,
-                2: 250,
-                3: 450,
-                4: 700
-            }.get(problem.points, 100)
-        update, create = cls.objects.get_or_create(
-            user = user,
+            1: 100,
+            2: 250,
+            3: 450,
+            4: 700
+        }.get(problem.difficulty, 100)
+        obj, created = cls.objects.update_or_create(
+            user=user,
             problem=problem,
-            is_completed=True,
-            score = points
+            defaults={
+                'is_completed': True,
+                'score': points,
+                'date_completed': timezone.now()  # <-- Yangi qator
+            }
         )
-        
-        return update
-
+        return obj
 class UserStats(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='stats')
     total_solved = models.PositiveIntegerField(default=0)
@@ -121,42 +123,43 @@ class UserStats(models.Model):
 
     @classmethod
     def update_stats(cls, user):
-        """
-        Foydalanuvchining barcha yechgan masalalarini olish
-        va statistikalarni yangilash
-        """
         solved_status = user.problem_status_user.filter(is_completed=True)
         
-        cls.total_solved = solved_status.count()
-        cls.easy_solved = solved_status.filter(problem__difficulty=1).count()
-        cls.medium_solved = solved_status.filter(problem__difficulty=2).count()
-        cls.hard_solved = solved_status.filter(problem__difficulty=3).count()
-        cls.very_hard_solved = solved_status.filter(problem__difficulty=4).count()
+        stats = cls.objects.get_or_create(user=user)[0]
+        stats.total_solved = solved_status.count()
+        stats.easy_solved = solved_status.filter(problem__difficulty=1).count()
+        stats.medium_solved = solved_status.filter(problem__difficulty=2).count()
+        stats.hard_solved = solved_status.filter(problem__difficulty=3).count()
+        stats.very_hard_solved = solved_status.filter(problem__difficulty=4).count()
         
-        cls.total_score = solved_status.aggregate(Sum('score'))['score__sum'] or 0
+        stats.total_score = solved_status.aggregate(Sum('score'))['score__sum'] or 0
         
         # Streakni yangilash
-        cls.update_streaks(user)
+        cls.update_streaks(user, stats)
 
-        # Foydalanuvchining oxirgi faoliyatini yangilash
-        cls.last_activity = solved_status.latest('date_completed').date_completed if solved_status.exists() else None
+        # Oxirgi faoliyatni yangilash
+        last_completed = solved_status.order_by('-date_completed').first()
+        if last_completed:
+            stats.last_activity = last_completed.date_completed
         
-        cls.save()
+        stats.save()
 
     @classmethod
-    def update_streaks(cls, user):
-        """
-        Foydalanuvchining masalalar ketma-ketligini tekshirib, 
-        strekni yangilash
-        """
+    def update_streaks(cls, user, stats):
         streak_count = 0
         max_streak = 0
-        for status in user.problem_status_user.filter(is_completed=True).order_by('date_completed'):
-            if status.created_at.date() == (status.created_at - timedelta(days=1)).date():
+        prev_date = None
+        
+        for status in user.problem_status_user.filter(
+            is_completed=True
+        ).order_by('date_completed'):
+            current_date = status.date_completed.date()
+            if prev_date and (current_date - prev_date).days == 1:
                 streak_count += 1
             else:
                 streak_count = 1
             max_streak = max(max_streak, streak_count)
-        cls.current_streak = streak_count
-        cls.max_streak = max_streak
-        cls.save()
+            prev_date = current_date
+        
+        stats.current_streak = streak_count
+        stats.max_streak = max_streak
