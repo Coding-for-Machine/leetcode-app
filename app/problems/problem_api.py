@@ -44,7 +44,7 @@ class ProblemListSchema(BaseModel):
     points: int
     acceptance: str
     is_solved: bool
-    category: str
+    category: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -127,7 +127,7 @@ def list_problems(request, filters: ProblemFilter = Query(...)):
             "points": p.points,
             "acceptance": p.acceptance(),
             "is_solved": p.solved(request.user) if request.user.is_authenticated else False,
-            "category": p.category.name,
+            "category": p.category.name if p.category else None,
             "created_at": p.created_at,
             "updated_at": p.updated_at,
         }
@@ -156,7 +156,7 @@ def problem_detail(request, slug: str):
             "points": problem.points,
             "acceptance": problem.acceptance(),
             "is_solved": problem.solved(request.user) if request.user.is_authenticated else False,
-            "category": problem.category.name,
+            "category": problem.category.name if problem.category else None,
             "created_at": problem.created_at,
             "updated_at": problem.updated_at,
             "description": problem.description,

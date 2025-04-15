@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Natijalari Chart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal-wrapper {
+            transition: all 0.3s ease;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <button id="showResultsBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+        Test Natijalarini Ko'rsatish
+    </button>
+
+    <!-- Modal for test results -->
+    <div id="testResultsModal" class="modal-wrapper fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="modal-content relative bg-white rounded-lg shadow-lg w-full max-w-4xl transform transition-all duration-300 scale-90 opacity-0">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold">Test Natijalari</h3>
+                <button class="close-modal-btn text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4">
+                <!-- Chart container -->
+                <div class="chart-container mb-6">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+                
+                <!-- Detailed results -->
+                <div id="detailedResults" class="space-y-4">
+                    <!-- Test results will be inserted here -->
+                </div>
+            </div>
+            <div class="flex justify-end p-4 border-t">
+                <button class="close-modal-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Yopish</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Test data - replace with your actual test results
+            const testResults = [
+                {
+                    testName: "Test 1",
+                    input: "25 25",
+                    expected: "50",
+                    actual: "50",
+                    time_ms: 38.031,
+                    memory_kb: 40.37,
+                    passed: true
+                },
+                {
+                    testName: "Test 2",
+                    input: "10 20",
+                    expected: "30",
+                    actual: "30",
+                    time_ms: 25.452,
+                    memory_kb: 38.15,
+                    passed: true
+                },
+                {
+                    testName: "Test 3",
+                    input: "100 50",
+                    expected: "150",
+                    actual: "50",
+                    time_ms: 42.781,
+                    memory_kb: 41.23,
+                    passed: false
+                }
+            ];
+
+            // Modal functions
+            function openModal() {
+                const modal = document.getElementById('testResultsModal');
+                modal.classList.remove('hidden');
+                const modalContent = modal.querySelector('.modal-content');
+                
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-90', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                
+                // Initialize chart and detailed results
+                renderChart(testResults);
+                renderDetailedResults(testResults);
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('testResultsModal');
+                const modalContent = modal.querySelector('.modal-content');
+                
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-90', 'opacity-0');
+                
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            // Event listeners
+            document.getElementById('showResultsBtn').addEventListener('click', openModal);
+            document.querySelectorAll('.close-modal-btn').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+
+            // Chart rendering function
+            function renderChart(results) {
+                const ctx = document.getElementById('resultsChart').getContext('2d');
+                
+                // Destroy previous chart if exists
+                if (window.resultsChart) {
+                    window.resultsChart.destroy();
+                }
+                
+                // Prepare data for chart
+                const labels = results.map(test => test.testName);
+                const timeData = results.map(test => test.time_ms);
+                const memoryData = results.map(test => test.memory_kb);
+                const backgroundColors = results.map(test => test.passed ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)');
+                
+                window.resultsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Vaqt (ms)',
+                                data: timeData,
+                                backgroundColor: backgroundColors,
+                                borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Xotira (KB)',
+                                data: memoryData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1,
+                                type: 'line',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Vaqt (ms)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Xotira (KB)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += context.parsed.y.toFixed(2);
+                                        return label;
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Detailed results rendering function
+            function renderDetailedResults(results) {
+                const container = document.getElementById('detailedResults');
+                container.innerHTML = '';
+                
+                results.forEach(test => {
+                    const status = test.passed ? "✅ Passed" : "❌ Failed";
+                    const statusClass = test.passed ? "text-green-500" : "text-red-500";
+                    
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-gray-50 p-4 rounded-lg';
+                    testElement.innerHTML = `
+                        <h4 class="text-lg font-semibold mb-2 ${statusClass}">${test.testName} - ${status}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-gray-600"><span class="font-medium">📥 Input:</span> ${test.input}</p>
+                                <p class="text-gray-600"><span class="font-medium">📤 Expected:</span> ${test.expected}</p>
+                                <p class="text-gray-600"><span class="font-medium">📊 Actual:</span> ${test.actual}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600"><span class="font-medium">⏱️ Time:</span> ${test.time_ms.toFixed(2)} ms</p>
+                                <p class="text-gray-600"><span class="font-medium">💾 Memory:</span> ${test.memory_kb.toFixed(2)} KB</p>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(testElement);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

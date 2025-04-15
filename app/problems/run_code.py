@@ -15,7 +15,7 @@ def run(data, test_case):
         start_time = time.time()
         
         process = subprocess.run(
-            ["python3", "solution.py", *input_values, expected_output],
+            ["python", "solution.py", *input_values, expected_output],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
