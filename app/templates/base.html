@@ -143,8 +143,55 @@
     
     <!-- Alpine.js for interactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <script>
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
     
-    {% block extra_js %}{% endblock %}
+            const encodedValue = encodeURIComponent(value);
+            const secure = location.protocol === "https:" ? "secure;" : "";
+    
+            document.cookie = `${name}=${encodedValue}; ${expires}; path=/; ${secure} samesite=Lax`;
+            console.log(`${name} cookie'si saqlandi`);
+        }
+    
+        function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.trim().split('=');
+                if (cookieName === name) {
+                    return decodeURIComponent(cookieValue);
+                }
+            }
+            return null;
+        }
+    
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+            console.log(`${name} cookie'si o'chirildi`);
+        }
+        // user data 
+        function getUser() {
+            if (getCookie("refresh_token")){
+                const user = localStorage.getItem("user");
+            }
+            return user ? JSON.parse(user) : null;
+        }
+        
+        function setUser(data) {
+            localStorage.setItem("user", JSON.stringify(data));
+        }
+
+        // Delete user data
+        function deleteUser() {
+            localStorage.removeItem("user");
+        }
+    </script>
+    
+    {% block extra_js %}
+
+    {% endblock %}
     
 </body>
 </html>

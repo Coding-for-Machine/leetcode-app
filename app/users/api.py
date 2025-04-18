@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.http import HttpResponse, JsonResponse
 from ninja import Router
 from ninja_jwt.authentication import JWTAuth
 from django.contrib.auth.hashers import make_password, check_password
@@ -6,6 +8,9 @@ from ninja.errors import HttpError
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from typing import Dict, Optional
+from django.contrib.auth import authenticate
+
+from .utils import delete_jwt_cookies, set_jwt_cookies
 from .schemas import UserRegisterSchema, UserSchema, UserLoginSchema
 from .models import MyUser
 # Router yaratamiz
@@ -14,44 +19,11 @@ user_router = Router(tags=["Users"])
 
 
 
-def validate_password(password: str):
-    if len(password) < 8:
-        return False, "Parol kamida 8 ta belgidan iborat bo‘lishi kerak"
-    elif not any(char.isdigit() for char in password):
-        return False, "Parolda kamida bitta raqam bo‘lishi kerak"
-    elif not any(char.islower() for char in password):
-        return False, "Parolda kamida bitta kichik harf bo‘lishi kerak"
-    elif not any(char.isupper() for char in password):
-        return False, "Parolda kamida bitta katta harf bo‘lishi kerak"
-
-    return True, "Parol to‘g‘ri"
-
-def validate_user_data(email: str, username: str, password: str) -> Optional[Dict[str, str]]:
-    try:
-        validate_email(email)
-    except ValidationError:
-        return {"email": "Noto‘g‘ri email formati"}
-
-    if len(username) < 4:
-        return {"username": "Username kamida 4 belgidan iborat bo‘lishi kerak"}
-    if not username.isalnum():
-        return {"username": "Username faqat harflar va raqamlardan iborat bo‘lishi kerak"}
-
-    is_valid, password_error = validate_password(password)
-    if not is_valid:
-        return {"password": password_error}
-
-    return None
-
 @user_router.post("/register", response={201: UserSchema, 400: Dict[str, str]})
 def register(request, data: UserRegisterSchema):
     # Majburiy maydonlarni tekshirish
     if not data.email or not data.username or not data.password:
         raise HttpError(400, "Barcha maydonlarni to'ldirish shart")
-
-    # Validatsiya
-    if validation_errors := validate_user_data(data.email, data.username, data.password):
-        raise HttpError(400, validation_errors)
 
     # Email va username bandligini tekshirish
     if MyUser.objects.filter(email=data.email).exists():
@@ -70,13 +42,13 @@ def register(request, data: UserRegisterSchema):
         raise HttpError(500, "Server xatosi")
 
 
+
 @user_router.post("/login", response={200: dict, 401: dict})
 def login(request, data: UserLoginSchema):
     try:
-        # Email yoki username orqali qidirish
-        user = MyUser.objects.filter(email=data.email).first()
-        if not user:
-            user = MyUser.objects.filter(username=data.email).first()
+        # Foydalanuvchini topish
+        user = MyUser.objects.filter(email=data.email).first() or \
+               MyUser.objects.filter(username=data.email).first()
         
         if not user:
             raise HttpError(401, {"error": "Email/username not found"})
@@ -84,54 +56,106 @@ def login(request, data: UserLoginSchema):
         if not check_password(data.password, user.password):
             raise HttpError(401, {"error": "Incorrect password"})
         
+        # Tokenlarni yaratish
         refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
         
-        # Domen nomini olish uchun requestdan foydalanish
-        domain = request.get_host()
-        protocol = 'https' if request.is_secure() else 'http'
-        base_url = f"{protocol}://{domain}"
-        
-        # Avatarning to'liq URL manzilini tayyorlash
+        # User ma'lumotlari
         avatar_url = None
         if hasattr(user, 'profile') and user.profile.avatar_url:
-            avatar_url = f"{base_url}{user.profile.avatar_url}"
+            domain = request.get_host()
+            protocol = 'https' if request.is_secure() else 'http'
+            avatar_url = f"{protocol}://{domain}{user.profile.avatar_url}"
 
-        # Frontend User interfeysiga mos response
-        return {
-            "tokens": {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            },
-            "user": {
-                "id": str(user.id),
-                "username": user.username,
-                "email": user.email,
-                "role": user.role or 'student',
-                "avatar": avatar_url,
-                "isPremium": user.profile.is_premium if hasattr(user, 'profile') else False,
-                "createdAt": user.created_at.strftime('%Y-%m-%d'),
-            }
+        user_data = {
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "role": user.role or 'student',
+            "avatar": avatar_url,
+            "isPremium": getattr(user.profile, 'is_premium', False),
+            "createdAt": user.created_at.strftime('%Y-%m-%d'),
         }
+        tokens = {
+            "access": access_token,
+            "refresh": refresh_token,
+        }
+        
+        # Response tayyorlash (faqat JsonResponse ishlating)
+        response = JsonResponse({
+            "message": "Login successful",
+            "tokens": tokens,
+            "user": user_data
+        }, status=200)
+        
+        # Cookie'larni o'rnatish
+        response = set_jwt_cookies(response, access_token, refresh_token)
+        
+        return response
         
     except Exception as e:
         raise HttpError(500, {"error": str(e)})
 
-# Profilni olish (faqat login qilgan foydalanuvchilar)
+@user_router.post("/refresh", response={200: dict, 401: dict})
+def refresh_token(request):
+    refresh_token = request.COOKIES.get('refresh_token')
+    if not refresh_token:
+        raise HttpError(401, {"error": "Refresh token not found"})
+    
+    try:
+        refresh = RefreshToken(refresh_token)
+        access_token = str(refresh.access_token)
+        
+        # Yangi response yaratish
+        response_data = {"message": "Token refreshed successfully"}
+        response = HttpResponse(
+            JsonResponse(response_data).content,
+            content_type='application/json',
+            status=200
+        )
+        
+        # Yangi access token cookie'sini o'rnatish
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite='Lax',
+            max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+            path='/',
+        )
+        
+        return response
+    except Exception as e:
+        raise HttpError(401, {"error": "Invalid refresh token"})
+    
+
+
+@user_router.post("/logout", response={200: dict, 401: dict}, auth=JWTAuth())
+def logout(request):
+    try:
+        # JSON response yaratish
+        response_data = {"message": "Logout successful"}
+        response = HttpResponse(
+            JsonResponse(response_data).content,
+            content_type='application/json',
+            status=200
+        )
+        
+        # Cookie'larni o'chirish
+        response = delete_jwt_cookies(response)
+        
+        return response
+    except Exception as e:
+        raise HttpError(500, {"error": str(e)})  
+# lni olish (faqat login qilgan foydalanuvchilar)
 @user_router.get("/me", response={200: UserSchema, 401: Dict[str, str]}, auth=JWTAuth())
 def get_profile(request):
     user = request.auth
     return 200, user
 
 
-# @user_router.patch("/profile/update", response=UserProfileSchema)
-# def update_profile(request, payload: UpdateProfileSchema):
-#     profile = request.user.profile
-#     for attr, value in payload.dict(exclude_unset=True).items():
-#         setattr(profile, attr, value)
-#     profile.save()
-#     return profile
-
-# Parolni yangilash
 @user_router.post("/profile/change-password", response={200: Dict[str, str], 401: Dict[str, str]}, auth=JWTAuth())
 def change_password(request, old_password: str, new_password: str):
     user = request.auth

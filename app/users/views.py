@@ -4,7 +4,7 @@ from django.http import HttpResponse
 # Create your views here.
 
 # profile
-def profile_view(request, username):
+def profile_view(request):
     # User = get_user_model()
     # user = get_object_or_404(User, username=username)
     # context = {

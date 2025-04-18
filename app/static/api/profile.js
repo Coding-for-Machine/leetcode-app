@@ -1,7 +1,7 @@
 // profile.js
 document.addEventListener('DOMContentLoaded', function() {
-    const userId = window.location.pathname.split('/')[2]; // URL dan user ID ni olish
-    const apiBaseUrl = '/api/v1/profile/';
+    // API bazasi URL
+    const apiBaseUrl = '/api/activaty/';
     
     // State management
     const state = {
@@ -29,59 +29,76 @@ document.addEventListener('DOMContentLoaded', function() {
         editProfileModal: document.getElementById('edit-profile-modal')
     };
     
-    // API Functions
+    // API Functions (HTTP-only cookie bilan ishlaydi)
     const api = {
         fetchUserProfile: async () => {
-            const response = await fetch(`${apiBaseUrl}user/`);
+            const response = await fetch(`/api/user/me/`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch profile');
             return await response.json();
         },
+        
         fetchUserActivities: async () => {
-            const response = await fetch(`${apiBaseUrl}activities/`);
+            const response = await fetch(`${apiBaseUrl}activities`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch activities');
             return await response.json();
         },
+        
         fetchUserBadges: async () => {
-            const response = await fetch(`${apiBaseUrl}badges/`);
+            const response = await fetch(`${apiBaseUrl}badges`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch badges');
             return await response.json();
         },
+        
         fetchSolvedProblems: async () => {
-            const response = await fetch(`${apiBaseUrl}problems/`);
+            const response = await fetch(`${apiBaseUrl}problems`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch problems');
             return await response.json();
         },
+        
         fetchUserStats: async () => {
-            const response = await fetch(`${apiBaseUrl}stats/`);
+            const response = await fetch(`${apiBaseUrl}stats`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch stats');
             return await response.json();
         },
+        
         fetchContributions: async (year) => {
-            const response = await fetch(`${apiBaseUrl}contributions/?year=${year}`);
+            const response = await fetch(`${apiBaseUrl}contributions/?year=${year}`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch contributions');
             return await response.json();
         },
+        
         updateProfile: async (data) => {
-            const response = await fetch(`${apiBaseUrl}update/`, {
+            const response = await fetch(`${apiBaseUrl}update`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
+                credentials: 'include',
                 body: JSON.stringify(data)
             });
+            if (!response.ok) throw new Error('Failed to update profile');
             return await response.json();
         }
     };
     
     // Helper functions
     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
     }
     
     function getColorClass(count) {
@@ -95,6 +112,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatDate(dateStr) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateStr).toLocaleDateString('uz-UZ', options);
+    }
+    
+    // Authentication check
+    async function checkAuth() {
+        try {
+            // Simple check by fetching profile
+            if (getCookie()){
+                return True
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            window.location.href = '/u/login/';
+            return false;
+        }
     }
     
     // Render functions
@@ -190,16 +221,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             data.calendar.forEach(monthData => {
                 const monthDiv = document.createElement('div');
-                monthDiv.textContent = monthData.month;
+                monthDiv.textContent = monthNames[monthData.month - 1];
                 monthDiv.style.marginRight = '8px';
                 elements.monthsContainer.appendChild(monthDiv);
             });
             
-            // Render grid - simplified version
-            // In a real app, you'd need to properly calculate the grid
-            // based on the actual days of the week for each month
+            // Render grid
             let html = '';
-            for (let i = 0; i < 7; i++) { // 7 days in week
+            for (let i = 0; i < 7; i++) {
                 data.calendar.forEach(month => {
                     month.days.forEach(day => {
                         if (new Date(day.date).getDay() === i) {
@@ -243,10 +272,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             function getDifficultyClass(difficulty) {
                 switch (difficulty.toLowerCase()) {
-                    case 'easy': return 'qiyinlik-oson';
-                    case 'medium': return 'qiyinlik-o\'rta';
-                    case 'hard': return 'qiyinlik-qiyin';
-                    default: return 'bg-gray-100';
+                    case 'easy': return 'bg-green-100 text-green-800';
+                    case 'medium': return 'bg-yellow-100 text-yellow-800';
+                    case 'hard': return 'bg-red-100 text-red-800';
+                    default: return 'bg-gray-100 text-gray-800';
                 }
             }
         },
@@ -273,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
         stats: (stats) => {
             // Update progress bars
             const totalSolved = stats.total_solved;
-            const maxProblems = 2000; // Example max value
+            const maxProblems = 2000;
             
             document.querySelectorAll('.progress-ring__circle').forEach(circle => {
                 const percent = (totalSolved / maxProblems) * 100;
@@ -306,26 +335,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
-                // Update active tab
                 tabs.forEach(t => t.classList.remove('tab-faol'));
                 this.classList.add('tab-faol');
                 
-                // Hide all contents
                 elements.tabs.contents.forEach(content => content.classList.add('hidden'));
                 
-                // Show selected content
                 const tabId = this.getAttribute('data-tab') + '-tab';
                 document.getElementById(tabId).classList.remove('hidden');
                 
-                // Update state
                 state.currentTab = this.getAttribute('data-tab');
             });
         });
         
-        // Activate first tab by default
-        if (tabs.length > 0) {
-            tabs[0].click();
-        }
+        if (tabs.length > 0) tabs[0].click();
     }
     
     // Modal management
@@ -346,25 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-        }
-        
-        // Info modal
-        const infoModal = document.getElementById('info-modal');
-        if (infoModal) {
-            document.querySelectorAll('[data-modal-toggle="info-modal"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    infoModal.classList.toggle('hidden');
-                });
-            });
-            
-            infoModal.addEventListener('click', (e) => {
-                if (e.target === infoModal) {
-                    infoModal.classList.add('hidden');
-                }
+                if (e.target === modal) modal.classList.add('hidden');
             });
         }
     }
@@ -427,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadActivities() {
         try {
             state.activities = await api.fetchUserActivities();
-            // Could render activities timeline if needed
         } catch (error) {
             console.error('Failed to load activities:', error);
         }
@@ -447,7 +450,6 @@ document.addEventListener('DOMContentLoaded', function() {
             state.solvedProblems = await api.fetchSolvedProblems();
             render.solvedProblems(state.solvedProblems);
             
-            // Also render skills chart
             if (elements.activityChart) {
                 render.skillsChart(state.solvedProblems);
             }
@@ -477,6 +479,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize everything
     async function init() {
+        // Check authentication first
+        const isAuthenticated = await checkAuth();
+        if (!isAuthenticated) return;
+        
         setupTabs();
         setupModals();
         setupYearSelector();

@@ -109,7 +109,7 @@
                         <div x-show="userMenuOpen" 
                              @click.outside="userMenuOpen = false"
                              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                            <a href="/u/profile/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="/u/profil/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 <i class="fas fa-user mr-2"></i>Profil
                             </a>
                             <a href="/settings/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -196,75 +196,51 @@
     </div>
 </nav>
 
-{% comment %} <script>
-// DOM yuklanganda foydalanuvchi holatini tekshirish
+<script>
+/// DOM yuklanganda foydalanuvchi holatini tekshirish
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthStatus();
+    // Foydalanuvchi ma'lumotlarini localStorage'dan olish
+    const userData = JSON.parse(localStorage.getItem('user'));
     
-    // Ekran o'lchami o'zgarganda ham tekshirish
-    window.addEventListener('resize', checkAuthStatus);
-});
-
-// Foydalanuvchi kirganligini tekshirish
-function checkAuthStatus() {
-    const token = localStorage.getItem('access_token');
-    const authButtons = document.getElementById('auth-buttons');
-    const userMenu = document.getElementById('user-menu');
-    const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
-    const mobileUserMenu = document.getElementById('mobile-user-menu');
-    
-    if (token) {
-        // Foydalanuvchi kirgan - desktop versiya
-        if (authButtons) authButtons.style.display = 'none';
-        if (userMenu) userMenu.style.display = 'flex';
-        
-        // Foydalanuvchi kirgan - mobil versiya
-        if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
-        if (mobileUserMenu) mobileUserMenu.style.display = 'block';
-        
-        // Foydalanuvchi ma'lumotlarini yuklash
-        loadUserProfile();
-    } else {
-        // Foydalanuvchi kirmagan - desktop versiya
-        if (authButtons) authButtons.style.display = 'flex';
-        if (userMenu) userMenu.style.display = 'none';
-        
-        // Foydalanuvchi kirmagan - mobil versiya
-        if (mobileAuthButtons) mobileAuthButtons.style.display = 'block';
-        if (mobileUserMenu) mobileUserMenu.style.display = 'none';
-    }
-}
-
-// Foydalanuvchi profil ma'lumotlarini yuklash
-function loadUserProfile() {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-    
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const username = payload.username || 'Foydalanuvchi';
-        
-        // Desktop versiya
+    // Agar foydalanuvchi ma'lumotlari mavjud bo'lsa
+    if (userData) {
+        // Desktop versiya elementlari
+        const authButtons = document.getElementById('auth-buttons');
+        const userMenu = document.getElementById('user-menu');
+        const usernameDisplay = document.getElementById('username-display');
         const profileImage = document.getElementById('profile-image');
+        
+        // Mobil versiya elementlari
+        const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+        const mobileUserMenu = document.getElementById('mobile-user-menu');
         const mobileUsername = document.getElementById('mobile-username');
         const mobileProfileImage = document.getElementById('mobile-profile-image');
         
-        if (mobileUsername) mobileUsername.textContent = username;
+        // Auth tugmalarini yashirish va foydalanuvchi menyusini ko'rsatish
+        if (authButtons) authButtons.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'flex';
+        if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
+        if (mobileUserMenu) mobileUserMenu.style.display = 'block';
         
-        // Agar profil rasmi mavjud bo'lsa
-        if (payload.profile_image) {
-            if (profileImage) profileImage.src = payload.profile_image;
-            if (mobileProfileImage) mobileProfileImage.src = payload.profile_image;
+        // Foydalanuvchi ma'lumotlarini joylashtirish
+        if (usernameDisplay) usernameDisplay.textContent = userData.username;
+        if (mobileUsername) mobileUsername.textContent = userData.username;
+        
+        // Profil rasmini yangilash (agar mavjud bo'lsa)
+        if (userData.avatar) {
+            if (profileImage) profileImage.src = userData.avatar;
+            if (mobileProfileImage) mobileProfileImage.src = userData.avatar;
         }
-    } catch (e) {
-        console.error('Profil ma\'lumotlarini yuklashda xatolik:', e);
     }
-}
+    
+    // Chiqish funksiyasi
+    window.logoutUser = function() {
+        localStorage.removeItem('user');
+        document.cookie = 'access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        window.location.href = '/u/login/';
+    }
+});
 
-// Chiqish funksiyasi
-function logoutUser() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    window.location.href = '/u/login/';
-}
-</script> {% endcomment %}
+
+</script> 

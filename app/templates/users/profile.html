@@ -1,4 +1,4 @@
-{% comment %} {% extends "base.html" %}  <!-- HAR DOIM BIRINCHI --> {% endcomment %}
+{% extends "base.html" %}  <!-- HAR DOIM BIRINCHI -->
     {% load static %}  <!-- Keyin load taglari -->
     {% block title %}
     CfM | Profile
@@ -792,24 +792,6 @@ def isValid(self, s: str) -> bool:
 
 
 {% block extra_js %}
+<script src="{% static "api/profile.js" %}"></script>
 
-    {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
-    {% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
-    
-    {% comment %} <script>
-        // CSRF token for AJAX requests
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        } {% endcomment %}
 {% endblock extra_js %}

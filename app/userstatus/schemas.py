@@ -35,9 +35,6 @@ class UserProblemStatusSchema(BaseModel):
     problem_title: str
     is_completed: bool
     score: int
-    solved_at: Optional[datetime]
-    time_taken: Optional[int]=0 # seconds
-    memory_used: Optional[int]=0 # KB
 
 # User Stats Schema
 class UserStatsSchema(BaseModel):

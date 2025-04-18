@@ -1,35 +1,179 @@
-import { apiRequest } from "../js/auth";
 
-export async function loginUser(formData) {
-    const errors = {};
+document.addEventListener('DOMContentLoaded', function() {
+    // Avval CSS animatsiyalarni qo'shamiz
+    const style = document.createElement('style');
+    style.textContent = `
+        .error-message {
+            color: #ff6b6b;
+            background: #fff5f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcccc;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes floatReverse {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(20px) rotate(-5deg); }
+        }
+        
+        @keyframes confettiFall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Keyin DOM elementlarini topamiz
+    const loginForm = document.getElementById('login-form');
+    if (!loginForm) return;
     
-    if (!formData.email) errors.email = "Email kiritilishi shart";
-    if (!formData.password) errors.password = "Parol kiritilishi shart";
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    if (!submitBtn) return;
     
-    if (Object.keys(errors).length > 0) {
-        showFormErrors(errors);
-        return { success: false };
+    const API_BASE_URL = 'http://127.0.0.1:8000/api';
+    
+    // Form submit handler
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email')?.value;
+        const password = document.getElementById('password')?.value;
+        
+        if (!email || !password) {
+            showError('Email va parolni kiriting');
+            return;
+        }
+        
+        // Yuklanish holati
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <span class="loading-spinner"></span>
+            <span class="btn-text">Tekshirilmoqda...</span>
+        `;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/login`, {
+                method: 'POST',
+                credentials: 'include', // Cookie'lar uchun zarur
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // 1. Access tokenni cookie'ga saqlash (1 kun muddat)
+                // setCookie('access_token', data.tokens.access, 1);
+                
+                // // 2. Refresh tokenni cookie'ga saqlash (7 kun muddat)
+                // setCookie('refresh_token', data.tokens.refresh, 7);
+                
+                // 3. User ma'lumotlarini localStorage'ga saqlash
+                setUser(data.user)
+                
+                // 4. Muvaffaqiyatli animatsiya
+                submitBtn.innerHTML = `
+                <svg class="success-checkmark" viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="25" fill="none" stroke="white" stroke-width="2"/>
+                    <path fill="none" stroke="white" stroke-width="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+                <span class="btn-text">Kirish muvaffaqiyatli!</span>
+                `;
+                
+                createConfetti();
+                
+                setTimeout(() => {
+                    window.location.href = '/u/profil/';
+                }, 2000);
+                
+            } else {
+                throw new Error(data.detail || data.message || "Kirish muvaffaqiyatsiz tugadi");
+            }
+        } catch (error) {
+            console.error('Xatolik yuz berdi:', error);
+            showError(error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<span class="btn-text">Kirish</span>`;
+        }
+    });
+    
+    // Animatsiya funksiyalari
+    function createConfetti() {
+        const container = document.getElementById('particles-js');
+        if (!container) return;
+        
+        const colors = ['#4a90e2', '#6a5acd', '#ff7f50', '#20b2aa'];
+        const count = 50;
+        
+        for (let i = 0; i < count; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'particle';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            confetti.style.width = `${Math.random() * 8 + 4}px`;
+            confetti.style.height = `${Math.random() * 4 + 2}px`;
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.top = '-20px';
+            confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            
+            container.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, (Math.random() * 3 + 2) * 1000);
+        }
     }
     
-    const result = await apiRequest("user/login", "POST", formData);
-    
-    if (result.success && result.data.access) {
-        localStorage.setItem("access_token", result.data.access);
-        localStorage.setItem("refresh_token", result.data.refresh);
+    // Xatolikni ko'rsatish funksiyasi
+    function showError(message) {
+        let errorElement = document.getElementById('login-error');
         
-        showSuccess("Muvaffaqiyatli kirdingiz!");
+        if (!errorElement) {
+            errorElement = document.createElement('div');
+            errorElement.id = 'login-error';
+            errorElement.className = 'error-message';
+            loginForm.prepend(errorElement);
+        }
         
-        // Foydalanuvchi ma'lumotlarini olish
-        const userData = await getCurrentUser();
-        const username = userData ? userData.username : '';
+        errorElement.textContent = message;
         
-        // Oldingi sahifaga qaytish yoki profilga yo'naltirish
-        const returnUrl = new URLSearchParams(window.location.search).get('return') || `/u/profile/${username}`;
-        setTimeout(() => window.location.href = returnUrl, 1000);
-        
-        return { success: true };
-    } else {
-        showError(result.error?.message || "Email yoki parol noto'g'ri");
-        return { success: false };
+        setTimeout(() => {
+            errorElement.style.opacity = '0';
+            setTimeout(() => errorElement.remove(), 500);
+        }, 5000);
     }
-}
+});
+
+
+
+

@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.db.models import Count
 import calendar
 from typing import List, Optional
+
+from users.auth import JWTBaseAuth
 from .models import UserActivityDaily, UserBadge, UserProblemStatus, UserStats
 from .schemas import (
     ActivitySchema, BadgeSchema, UserProblemStatusSchema, 
@@ -14,7 +16,7 @@ activity_router = Router(tags=["user-status"])
 
 
 
-@activity_router.get("/activities", response=List[ActivitySchema])
+@activity_router.get("/activities", response=List[ActivitySchema], auth=JWTBaseAuth())
 def get_user_activities(request):
     activate = UserActivityDaily.objects.filter(user=request.user).order_by('-date')
     return [
@@ -29,7 +31,7 @@ def get_user_activities(request):
         for a in activate
     ]
 
-@activity_router.get("/badges", response=List[BadgeSchema])
+@activity_router.get("/badges", response=List[BadgeSchema], auth=JWTBaseAuth())
 def get_user_badges(request):
     badges = UserBadge.objects.filter(user=request.user).select_related('badge').order_by('-date_earned')
     return [
@@ -49,7 +51,7 @@ def get_user_badges(request):
         for b in badges
     ]
 
-@activity_router.get("/problems", response=List[UserProblemStatusSchema])
+@activity_router.get("/problems", response=List[UserProblemStatusSchema], auth=JWTBaseAuth())
 def get_user_problems(request):
     return [
         {
@@ -57,17 +59,14 @@ def get_user_problems(request):
             "problem_title": s.problem.title,
             "is_completed": s.is_completed,
             "score": s.score,
-            "solved_at": s.solved_at,
-            "time_taken": s.time_taken,
-            "memory_used": s.memory_used,
         }
         for s in UserProblemStatus.objects.filter(user=request.user, is_completed=True)
     ]
 
-@activity_router.get("/stats", response=UserStatsSchema)
+@activity_router.get("/stats", response=UserStatsSchema, auth=JWTBaseAuth())
 def get_user_stats(request):
     stats, _ = UserStats.objects.get_or_create(user=request.user)
-    stats.update_stats()
+    stats.update_stats(request.user)
     return {
         "total_solved": stats.total_solved,
         "easy_solved": stats.easy_solved,
@@ -79,7 +78,7 @@ def get_user_stats(request):
         "last_activity": stats.last_activity,
     }
 
-@activity_router.get("/contributions", response=ContributionCalendarSchema)
+@activity_router.get("/contributions/", response=ContributionCalendarSchema, auth=JWTBaseAuth())
 def get_contribution_calendar(request, year: Optional[int] = None):
     if not year:
         year = timezone.now().year
