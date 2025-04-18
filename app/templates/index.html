@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
 CfM
 {% endblock title %}
@@ -25,7 +26,7 @@ CfM
                     </div>
                 </div>
                 <div class="md:w-1/2 flex justify-center">
-                    <img src="https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/001/458/126/datas/gallery.jpg" alt="Coding Illustration" class="w-64 h-64 rounded-lg">
+			<img src="{% static 'images/home.png'%}" alt="Coding Illustration" class="w-90 h-100 rounded-lg">
                 </div>
             </div>
         </div>

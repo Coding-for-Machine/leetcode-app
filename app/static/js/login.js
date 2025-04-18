@@ -1,3 +1,38 @@
+
+export async function loginUser(formData) {
+    const errors = {};
+    
+    if (!formData.email) errors.email = "Email kiritilishi shart";
+    if (!formData.password) errors.password = "Parol kiritilishi shart";
+    
+    if (Object.keys(errors).length > 0) {
+        showFormErrors(errors);
+        return { success: false };
+    }
+    
+    const result = await apiRequest("user/login", "POST", formData);
+    
+    if (result.success && result.data.access) {
+        localStorage.setItem("access_token", result.data.access);
+        localStorage.setItem("refresh_token", result.data.refresh);
+        
+        showSuccess("Muvaffaqiyatli kirdingiz!");
+        
+        // Foydalanuvchi ma'lumotlarini olish
+        const userData = await getCurrentUser();
+        const username = userData ? userData.username : '';
+        
+        // Oldingi sahifaga qaytish yoki profilga yo'naltirish
+        const returnUrl = new URLSearchParams(window.location.search).get('return') || `/u/profile/${username}`;
+        setTimeout(() => window.location.href = returnUrl, 1000);
+        
+        return { success: true };
+    } else {
+        showError(result.error?.message || "Email yoki parol noto'g'ri");
+        return { success: false };
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Animatsion elementlarni yaratish
     createParticles();
@@ -6,19 +41,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Formani qo'shish
     const loginForm = document.getElementById('login-form');
     
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const submitBtn = this.querySelector('button[type="submit"]');
-        
-        // Validatsiya
-        if (!email || !password) {
-            alert('Iltimos, barcha maydonlarni to\'ldiring!');
-            return;
-        }
-        
+        console.log(email, password, submitBtn)
         // Loading holati
         submitBtn.disabled = true;
         submitBtn.innerHTML = `
@@ -26,28 +55,34 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="btn-text">Tekshirilmoqda...</span>
         `;
         
-        // API so'rovini simulyatsiya qilish
-        setTimeout(() => {
-            // Muvaffaqiyatli javob
-            submitBtn.innerHTML = `
-                <svg class="success-checkmark" viewBox="0 0 52 52">
-                    <circle cx="26" cy="26" r="25" fill="none" stroke="white" stroke-width="2"/>
-                    <path fill="none" stroke="white" stroke-width="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-                <span class="btn-text">Kirish muvaffaqiyatli!</span>
-            `;
+        try {
+            const result = await loginUser({email: email, password: password});
             
-            // Animatsiyalar
-            createConfetti();
-            
-            // Bosh sahifaga yo'naltirish
-            setTimeout(() => {
-                alert('Kirish muvaffaqiyatli amalga oshirildi!\nEmail: ' + email + '\nParol: ' + password);
+            if (result.success) {
+                submitBtn.innerHTML = `
+                    <svg class="success-checkmark" viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="25" fill="none" stroke="white" stroke-width="2"/>
+                        <path fill="none" stroke="white" stroke-width="4" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                    <span class="btn-text">Kirish muvaffaqiyatli!</span>
+                `;
+                
+                // Animatsiyalar
+                createConfetti();
+                
+                // API javobi muvaffaqiyatli bo'lsa, u o'zi yo'naltiradi
+            } else {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<span class="btn-text">Kirish</span>`;
-            }, 1500);
-        }, 2000);
+            }
+        } catch (error) {
+            console.error('Xatolik yuz berdi:', error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<span class="btn-text">Kirish</span>`;
+            alert('Xatolik yuz berdi: ' + (error.message || 'Noma\'lum xatolik'));
+        }
     });
+    
     
     // Animatsion elementlarni yaratish funksiyalari
     function createParticles() {
