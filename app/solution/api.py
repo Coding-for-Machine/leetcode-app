@@ -11,12 +11,14 @@ from problems.models import Problem, Language, ExecutionTestCase
 from .schemas import RunCodeSchema, SolutionSchema, SolutionResponseSchema
 from .run_code import post_server
 from problems.run_code import run
+from users.auth import JWTBaseAuth
 
 solution_url_api = Router(tags=["Run-Code"])
 
-@solution_url_api.post("/create/", response=dict)
+@solution_url_api.post("/create/", response=dict, auth=JWTBaseAuth())
 def create_solution(request, payload: SolutionSchema):
     user = request.user
+    print(user)
     problem = get_object_or_404(Problem, id=payload.problem_id)
     language = get_object_or_404(Language, id=payload.language_id)
     execution_test_case = get_object_or_404(ExecutionTestCase, problem=problem, language=language)

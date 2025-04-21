@@ -91,10 +91,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (response.ok) {
                 // 1. Access tokenni cookie'ga saqlash (1 kun muddat)
-                // setCookie('access_token', data.tokens.access, 1);
+                setCookie('access_token', data.tokens.access, 1);
                 
                 // // 2. Refresh tokenni cookie'ga saqlash (7 kun muddat)
-                // setCookie('refresh_token', data.tokens.refresh, 7);
+                setCookie('refresh_token', data.tokens.refresh, 7);
                 
                 // 3. User ma'lumotlarini localStorage'ga saqlash
                 setUser(data.user)

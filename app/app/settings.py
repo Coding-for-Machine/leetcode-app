@@ -161,32 +161,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'app.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 
 # Database configuration - Corrected version
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME', 'leetcode'),
-#         'USER': config('DB_USER', 'leetcode_owner'),
-#         'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
-#         'HOST': config('DB_HOST', 'ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
-#         'PORT': config('DB_PORT', '5432'),
-#         'OPTIONS': {
-#             'sslmode': 'require',
-#             'connect_timeout': 5,  # 5 sekunddan keyin timeout
-#         }
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', 'leetcode'),
+        'USER': config('DB_USER', 'leetcode_owner'),
+        'PASSWORD': config('DB_PASSWORD', 'npg_Wzf0CyF2KSmb'),
+        'HOST': config('DB_HOST', 'ep-restless-hat-a5vszuj5-pooler.us-east-2.aws.neon.tech'),
+        'PORT': config('DB_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'connect_timeout': 5,  # 5 sekunddan keyin timeout
+        }
+    }
+}
 
 # ------------ time
 # DATABASES = {

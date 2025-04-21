@@ -1,5 +1,3 @@
-import { getCookie } from "../js/cookie";
-import { apiRequest } from "../js/auth";
 // const API_BASE_URL = 'http://127.0.0.1:8000/api';
 let pastContestsOffset = 0;
 const pastContestsLimit = 7;
@@ -257,37 +255,7 @@ function formatDate(dateString) {
 }
 
 // Xabarnoma ko'rsatish
-function showAlert(type, message, callback = null) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `fixed top-6 right-6 z-50 flex items-center p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
-        type === 'error' ? 'bg-red-50 text-red-800 border-l-4 border-red-500' : 
-        type === 'success' ? 'bg-green-50 text-green-800 border-l-4 border-green-500' : 
-        'bg-blue-50 text-blue-800 border-l-4 border-blue-500'
-    }`;
-    
-    alertDiv.innerHTML = `
-        <div class="mr-3 text-xl">
-            ${type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : 
-             type === 'success' ? '<i class="fas fa-check-circle"></i>' : 
-             '<i class="fas fa-info-circle"></i>'}
-        </div>
-        <div>
-            <p class="font-medium">${message}</p>
-        </div>
-        <button class="ml-4 text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    setTimeout(() => {
-        alertDiv.classList.add('opacity-0');
-        setTimeout(() => {
-            alertDiv.remove();
-            if (callback) callback();
-        }, 300);
-    }, 5000);
-}
+
 
 // "Ko'proq yuklash" tugmasi uchun event listener
 document.querySelector('.load-more-btn')?.addEventListener('click', () => {

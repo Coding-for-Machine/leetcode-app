@@ -1,6 +1,10 @@
 // profile.js
+
+const token = getCookie("access_token")
+console.log("Profile")
 document.addEventListener('DOMContentLoaded', function() {
     // API bazasi URL
+    console.log("Ishga tushdi")
     const apiBaseUrl = '/api/activaty/';
     
     // State management
@@ -33,31 +37,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const api = {
         fetchUserProfile: async () => {
             const response = await fetch(`/api/user/me/`, {
-                credentials: 'include'
+                method: "GIT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch profile');
             return await response.json();
         },
         
         fetchUserActivities: async () => {
+            
             const response = await fetch(`${apiBaseUrl}activities`, {
-                credentials: 'include'
+                method: "GIT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch activities');
             return await response.json();
         },
         
         fetchUserBadges: async () => {
+            
             const response = await fetch(`${apiBaseUrl}badges`, {
-                credentials: 'include'
+                method: "GIT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch badges');
             return await response.json();
         },
         
         fetchSolvedProblems: async () => {
+            
             const response = await fetch(`${apiBaseUrl}problems`, {
-                credentials: 'include'
+                method: "GIT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch problems');
             return await response.json();
@@ -65,7 +92,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         fetchUserStats: async () => {
             const response = await fetch(`${apiBaseUrl}stats`, {
-                credentials: 'include'
+                method: "GIT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch stats');
             return await response.json();
@@ -73,7 +105,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         fetchContributions: async (year) => {
             const response = await fetch(`${apiBaseUrl}contributions/?year=${year}`, {
-                credentials: 'include'
+                method: "GIT",
+                credentials: 'include', // Cookie'lar uchun zarur
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             if (!response.ok) throw new Error('Failed to fetch contributions');
             return await response.json();
@@ -84,9 +122,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                credentials: 'include',
                 body: JSON.stringify(data)
             });
             if (!response.ok) throw new Error('Failed to update profile');
