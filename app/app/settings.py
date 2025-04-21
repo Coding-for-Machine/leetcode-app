@@ -177,19 +177,26 @@ DATABASES = {
         }
     }
 }
+# Add these at the top of your settings.py
+import os
+from dotenv import load_dotenv
+from urllib.parse import urlparse
 
-# ------------ time
-# DATABASES = {
-#     "default": {
-        
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": config("TIMESCALE_DB_NAME", default="tsdb"),
-#         "USER": config("TIMESCALE_DB_USER", default="tsdbadmin"),
-#         "PASSWORD": config("TIMESCALE_DB_PASSWORD", default="Asadbek20020107"),
-#         "HOST": config("TIMESCALE_DB_HOST", default="obku7pi8tr.p202ne1nfm.tsdb.cloud.timescale.com"),
-#         "PORT": config("TIMESCALE_DB_PORT", default="35474"),
-#     }
-# }
+load_dotenv()
+
+# Replace the DATABASES section of your settings.py with this
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
