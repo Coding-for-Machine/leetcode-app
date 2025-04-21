@@ -22,8 +22,8 @@ const path = window.location.pathname;
 const slug = path.split('/').filter(Boolean).pop();
 
 const token = getCookie("access_token");
-const PROBLEM_API = `http://127.0.0.1:8000/api/problems/${slug}/`;
-const SOLUTION_API = 'http://127.0.0.1:8000/api/solution/create/';
+const PROBLEM_API = `/api/problems/${slug}/`;
+const SOLUTION_API = '/api/solution/create/';
 const LOGIN_URL = '/u/login';
 
 // Submit tugmasini sozlash

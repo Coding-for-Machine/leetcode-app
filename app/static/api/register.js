@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = RegisterForm.querySelector('button[type="submit"]');
     if (!submitBtn) return;
     
-    const API_BASE_URL = 'http://127.0.0.1:8000/api';
+    const API_BASE_URL = '/api';
     
     // Form submit handler
     RegisterForm.addEventListener('submit', async function(e) {

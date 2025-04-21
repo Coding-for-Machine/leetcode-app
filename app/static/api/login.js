@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = loginForm.querySelector('button[type="submit"]');
     if (!submitBtn) return;
     
-    const API_BASE_URL = 'http://127.0.0.1:8000/api';
+    const API_BASE_URL = '/api';
     
     // Form submit handler
     loginForm.addEventListener('submit', async function(e) {
