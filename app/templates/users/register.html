@@ -38,13 +38,13 @@
             
             <form id="register-form" class="space-y-4 animate__animated animate__fadeIn animate__delay-1s">
                 <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-gray-700 transition-colors">Foydalanuvchi nomi yoki elektron pochta</label>
+                    <label for="email" class="block text-sm font-medium text-gray-700 transition-colors">Elektron pochta</label>
                     <input type="email" id="email" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required autofocus>
                 </div>
 
                 <div class="space-y-2">
-                    <label for="username" class="block text-sm font-medium text-gray-700 transition-colors">Foydalanuvchi nomi yoki elektron pochta</label>
-                    <input type="text" id="username" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required autofocus>
+                    <label for="username" class="block text-sm font-medium text-gray-700 transition-colors">Foydalanuvchi nomi</label>
+                    <input type="text" id="username" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
                 </div>
                 
                 <div class="space-y-2">
@@ -54,6 +54,11 @@
                     </div>
                     <input type="password" id="password" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
                 </div>
+
+                <div class="space-y-2">
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 transition-colors">Parolni tasdiqlang</label>
+                    <input type="password" id="confirm-password" class="github-input w-full px-4 py-2 rounded-md focus:outline-none" required>
+                </div>
                 
                 <button type="submit" class="github-btn text-white w-full py-2.5 px-4 rounded-md font-medium">
                     Ro'yxatdan o'tish
@@ -61,7 +66,7 @@
             </form>
             
             <div class="mt-6 text-center text-sm animate__animated animate__fadeIn animate__delay-2s">
-                <p class="text-gray-600">CfM da yangimisiz? <a href="#" class="text-orange-500 font-medium hover:underline transition-colors">Hisob yarating</a>.</p>
+                <p class="text-gray-600">Allaqachon hisobingiz bormi? <a href="/u/login" class="text-orange-500 font-medium hover:underline transition-colors">Kirish</a>.</p>
             </div>
             
             <div class="mt-8 border-t border-gray-200 pt-6 animate__animated animate__fadeIn animate__delay-2s">
@@ -82,10 +87,10 @@
         <!-- Animatsion footer -->
         <div class="mt-8 text-center text-xs text-gray-500 animate__animated animate__fadeIn animate__delay-3s">
             <ul class="flex flex-wrap justify-center space-x-4">
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Shartlar</a></li>
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Maxfiylik</a></li>
+                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Foydalanish shartlari</a></li>
+                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Maxfiylik siyosati</a></li>
                 <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Xavfsizlik</a></li>
-                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Aloqa</a></li>
+                <li><a href="#" class="hover:text-orange-500 hover:underline transition-colors">Bog'lanish</a></li>
             </ul>
         </div>
     </div>
