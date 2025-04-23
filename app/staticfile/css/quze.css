@@ -1,0 +1,38 @@
+.quiz-timer {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 100;
+}
+
+.question-card {
+    transition: all 0.3s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.answer-option {
+    transition: all 0.2s ease;
+}
+
+.answer-option:hover {
+    background-color: #f3f4f6;
+}
+
+.answer-option.selected {
+    background-color: #e0e7ff;
+    border-color: #6366f1;
+}
+
+.answer-option.correct {
+    background-color: #d1fae5;
+    border-color: #10b981;
+}
+
+.answer-option.incorrect {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
