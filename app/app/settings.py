@@ -3,6 +3,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 from decouple import config
 from django.core.management.utils import get_random_secret_key
+
+from .admin_site import get_jazzmin_settings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +31,7 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,7 +56,11 @@ INSTALLED_APPS = [
     'courses',
     'quizs.apps.QuizsConfig',
     'lessons',
+    
 ]
+
+JAZZMIN_SETTINGS = get_jazzmin_settings()
+
 AUTH_USER_MODEL = "users.MyUser"
 # JWT Settings
 from datetime import timedelta
@@ -96,6 +103,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware', # add
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,12 +115,6 @@ MIDDLEWARE = [
 # Hammaga ruxsat berish (faqat ishlab chiqish uchun)
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Yoki aniq manbalarga ruxsat berish (production uchun yaxshiroq)
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "https://sizning-saytingiz.com",
-# ]
 
 # Qo'shimcha CORS sozlamalari (ixtiyoriy)
 CORS_ALLOW_METHODS = [
@@ -123,6 +125,8 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -177,26 +181,7 @@ DATABASES = {
         }
     }
 }
-# Add these at the top of your settings.py
-import os
-from dotenv import load_dotenv
-from urllib.parse import urlparse
 
-load_dotenv()
-
-# Replace the DATABASES section of your settings.py with this
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -239,10 +224,21 @@ EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)  # EUse MAIL_P
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGE_CODE = 'uz'
+
+LANGUAGES = [
+    ('uz', _('Oʻzbekcha')),
+    ('ru', _('Русский')),
+    ('en', _('English')),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_TZ = True
