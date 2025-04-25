@@ -75,25 +75,25 @@ def get_jazzmin_settings():
             "ru": {"name": "Русский", "flag": "ru"},
             "en": {"name": "English", "flag": "gb"},
         },
-        
-        # =============================================
-        # Top menyu sozlamalari
-        # =============================================
         "topmenu_links": [
             {"name": "Bosh sahifa", "url": "admin:index", "permissions": ["auth.view_user"]},
             {"name": "Saytga o'tish", "url": "/", "new_window": True},
             {"model": "auth.User"},
             {"app": "shop"},
             {
-            "name": "Language",
-            "children": [
-                {"name": "Oʻzbekcha", "url": "/i18n/setlang/?language=uz"},
-                {"name": "Русский", "url": "/i18n/setlang/?language=ru"},
-                {"name": "English", "url": "/i18n/setlang/?language=en"},
-            ]
-        },
+                "name": "Tilni tanlash",
+                "children": [
+                    {"name": "Oʻzbekcha", "url": "/i18n/setlang/?language=uz"},
+                    {"name": "Русский", "url": "/i18n/setlang/?language=ru"},
+                    {"name": "English", "url": "/i18n/setlang/?language=en"},
+                ],
+                "icon": "fas fa-language",
+            },
         ],
         
+        # =============================================
+        # Top menyu sozlamalari
+        # =============================================
         # =============================================
         # Foydalanuvchi menyusi
         # =============================================
