@@ -1,4 +1,4 @@
-# Django admin paneli tarjima fayli (Ruscha)
+# Административная панель Django - Русский перевод
 # Copyright (C) 2024 MyCompany
 msgid ""
 msgstr ""
@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: dev@mycompany.com\n"
 "POT-Creation-Date: 2024-04-25 15:30+0500\n"
 "PO-Revision-Date: 2024-04-25 15:35+0500\n"
-"Last-Translator: Ism Familiya <ism@mycompany.com>\n"
+"Last-Translator: Имя Фамилия <email@mycompany.com>\n"
 "Language-Team: Русский <ru@mycompany.com>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -15,112 +15,167 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: settings.py:232
-msgid "Oʻzbekcha"
-msgstr "Узбекский"
-
-#: settings.py:233
-msgid "Русский"
-msgstr "Русский"
-
-#: settings.py:234
-msgid "English"
-msgstr "Английский"
-
-#: urls.py:39
-msgid "Sayt Maʼmuriyati"
-msgstr "Администрация сайта"
-
-#: urls.py:40
-msgid "Sayt Boshqaruvi"
-msgstr "Управление сайтом"
-
-#: urls.py:41
-msgid "Boshqaruv Paneli"
+# Общие термины
+msgid "Dashboard"
 msgstr "Панель управления"
 
-#: users/apps.py:8
-msgid "Foydalanuvchilar"
-msgstr "Пользователи"
-
-#: contrib/admin/templates/admin/base.html:28
-msgid "Django administration"
-msgstr "Администрирование Django"
-
-#: contrib/admin/templates/admin/base.html:48
-msgid "View site"
-msgstr "Посмотреть сайт"
-
-#: contrib/admin/templates/admin/base.html:56
-msgid "Welcome, %(username)s."
-msgstr "Добро пожаловать, %(username)s."
-
-#: contrib/admin/templates/admin/change_form.html:23
-msgid "Save"
-msgstr "Сохранить"
-
-#: contrib/admin/templates/admin/change_list.html:56
-msgid "Add %(name)s"
-msgstr "Добавить %(name)s"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-msgid "Delete"
-msgstr "Удалить"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save and add another"
-msgstr "Сохранить и добавить другой"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-msgid "Change password"
-msgstr "Изменить пароль"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Welcome"
-msgstr "Добро пожаловать"
-
-#: contrib/admin/templates/admin/login.html:35
-msgid "Username"
-msgstr "Имя пользователя"
-
-#: contrib/admin/templates/admin/login.html:41
-msgid "Password"
-msgstr "Пароль"
-
-#: contrib/admin/templates/admin/login.html:50
-msgid "Log in"
-msgstr "Войти"
-
-#: contrib/admin/templates/admin/index.html:20
 msgid "Home"
 msgstr "Главная"
 
-#: contrib/admin/templates/admin/filter.html:2
-msgid "Filter"
-msgstr "Фильтр"
+msgid "View site"
+msgstr "Посмотреть сайт"
 
-#: contrib/admin/templates/admin/actions.html:14
-msgid "Run selected action"
-msgstr "Выполнить выбранное действие"
+msgid "Welcome"
+msgstr "Добро пожаловать"
 
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "Показать все"
+msgid "Save"
+msgstr "Сохранить"
 
-#: contrib/admin/templates/admin/search_form.html:7
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Change"
+msgstr "Изменить"
+
 msgid "Search"
 msgstr "Поиск"
 
-#: contrib/admin/templates/admin/object_history.html:11
-msgid "History"
-msgstr "История"
+msgid "Filter"
+msgstr "Фильтр"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:28
-msgid "Remove"
-msgstr "Удалить"
+msgid "Actions"
+msgstr "Действия"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:13
-msgid "Password confirmation"
-msgstr "Подтверждение пароля"
+msgid "Yes"
+msgstr "Да"
 
+msgid "No"
+msgstr "Нет"
+
+# Аутентификация
+msgid "Username"
+msgstr "Имя пользователя"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Log in"
+msgstr "Войти"
+
+msgid "Log out"
+msgstr "Выйти"
+
+msgid "Change password"
+msgstr "Изменить пароль"
+
+# Админ-панель
+msgid "Django administration"
+msgstr "Администрирование Django"
+
+msgid "Site administration"
+msgstr "Администрирование сайта"
+
+msgid "Recent actions"
+msgstr "Последние действия"
+
+msgid "My actions"
+msgstr "Мои действия"
+
+msgid "Add %(name)s"
+msgstr "Добавить %(name)s"
+
+msgid "Save and add another"
+msgstr "Сохранить и добавить другой"
+
+msgid "Save and continue editing"
+msgstr "Сохранить и продолжить редактирование"
+
+msgid "Please correct the error below."
+msgstr "Исправьте ошибку ниже."
+
+msgid "Please correct the errors below."
+msgstr "Исправьте ошибки ниже."
+
+# Названия моделей
+msgid "Users"
+msgstr "Пользователи"
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid "Products"
+msgstr "Продукты"
+
+msgid "Categories"
+msgstr "Категории"
+
+msgid "Orders"
+msgstr "Заказы"
+
+# Сообщения
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" был успешно добавлен."
+
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" был успешно изменён."
+
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" был успешно удалён."
+
+# Даты/время
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "Now"
+msgstr "Сейчас"
+
+# Пагинация
+msgid "Show all"
+msgstr "Показать все"
+
+msgid "first"
+msgstr "первая"
+
+msgid "last"
+msgstr "последняя"
+
+# Поиск
+msgid "Search Users..."
+msgstr "Поиск пользователей..."
+
+msgid "Search Products..."
+msgstr "Поиск продуктов..."
+
+# Jazzmin (если используется)
+msgid "Main navigation"
+msgstr "Основное меню"
+
+msgid "Toggle navigation"
+msgstr "Переключить меню"
+
+msgid "Toggle side menu"
+msgstr "Переключить боковое меню"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "Profile"
+msgstr "Профиль"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Notifications"
+msgstr "Уведомления"
+
+msgid "Messages"
+msgstr "Сообщения"
+
+msgid "Tasks"
+msgstr "Задачи"
+
+msgid "Activity"
+msgstr "Активность"

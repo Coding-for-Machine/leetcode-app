@@ -15,83 +15,167 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: settings.py:232
-msgid "Oʻzbekcha"
-msgstr "Oʻzbekcha"
+# General terms
+msgid "Dashboard"
+msgstr "Boshqaruv paneli"
 
-#: settings.py:233
-msgid "Русский"
-msgstr "Ruscha"
-
-#: settings.py:234
-msgid "English"
-msgstr "Inglizcha"
-
-#: urls.py:39
-msgid "Sayt Maʼmuriyati"
-msgstr "Sayt Maʼmuriyati"
-
-#: urls.py:40
-msgid "Sayt Boshqaruvi"
-msgstr "Sayt Boshqaruvi"
-
-#: urls.py:41
-msgid "Boshqaruv Paneli"
-msgstr "Boshqaruv Paneli"
-
-#: users/apps.py:8
-msgid "Foydalanuvchilar"
-msgstr "Foydalanuvchilar"
-
-#: contrib/admin/templates/admin/base.html:28
-msgid "Django administration"
-msgstr "Django maʼmuriyati"
-
-#: contrib/admin/templates/admin/base.html:48
-msgid "View site"
-msgstr "Saytni koʻrish"
-
-#: contrib/admin/templates/admin/base.html:56
-msgid "Welcome, %(username)s."
-msgstr "Xush kelibsiz, %(username)s."
-
-#: contrib/admin/templates/admin/change_form.html:23
-msgid "Save"
-msgstr "Saqlash"
-
-#: contrib/admin/templates/admin/change_list.html:56
-msgid "Add %(name)s"
-msgstr "%(name)s qoʻshish"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-msgid "Delete"
-msgstr "Oʻchirish"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save and add another"
-msgstr "Saqlash va yangisini qoʻshish"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:33
-msgid "Change password"
-msgstr "Parolni oʻzgartirish"
-
-#: contrib/admin/templates/admin/login.html:18
-msgid "Welcome"
-msgstr "Xush kelibsiz"
-
-#: contrib/admin/templates/admin/login.html:35
-msgid "Username"
-msgstr "Foydalanuvchi nomi"
-
-#: contrib/admin/templates/admin/login.html:41
-msgid "Password"
-msgstr "Parol"
-
-#: contrib/admin/templates/admin/login.html:50
-msgid "Log in"
-msgstr "Kirish"
-
-#: contrib/admin/templates/admin/index.html:20
 msgid "Home"
 msgstr "Bosh sahifa"
 
+msgid "View site"
+msgstr "Saytni koʻrish"
+
+msgid "Welcome"
+msgstr "Xush kelibsiz"
+
+msgid "Save"
+msgstr "Saqlash"
+
+msgid "Delete"
+msgstr "Oʻchirish"
+
+msgid "Add"
+msgstr "Qoʻshish"
+
+msgid "Change"
+msgstr "Oʻzgartirish"
+
+msgid "Search"
+msgstr "Qidirish"
+
+msgid "Filter"
+msgstr "Filtr"
+
+msgid "Actions"
+msgstr "Amallar"
+
+msgid "Yes"
+msgstr "Ha"
+
+msgid "No"
+msgstr "Yoʻq"
+
+# Authentication
+msgid "Username"
+msgstr "Foydalanuvchi nomi"
+
+msgid "Password"
+msgstr "Parol"
+
+msgid "Log in"
+msgstr "Kirish"
+
+msgid "Log out"
+msgstr "Chiqish"
+
+msgid "Change password"
+msgstr "Parolni oʻzgartirish"
+
+# Admin specific
+msgid "Django administration"
+msgstr "Django maʼmuriyati"
+
+msgid "Site administration"
+msgstr "Sayt maʼmuriyati"
+
+msgid "Recent actions"
+msgstr "Soʻnggi amallar"
+
+msgid "My actions"
+msgstr "Mening amallarim"
+
+msgid "Add %(name)s"
+msgstr "%(name)s qoʻshish"
+
+msgid "Save and add another"
+msgstr "Saqlash va yangisini qoʻshish"
+
+msgid "Save and continue editing"
+msgstr "Saqlash va tahrirlashda davom etish"
+
+msgid "Please correct the error below."
+msgstr "Quyidagi xatoni tuzating."
+
+msgid "Please correct the errors below."
+msgstr "Quyidagi xatolarni tuzating."
+
+# Model names
+msgid "Users"
+msgstr "Foydalanuvchilar"
+
+msgid "Groups"
+msgstr "Guruhlar"
+
+msgid "Products"
+msgstr "Mahsulotlar"
+
+msgid "Categories"
+msgstr "Kategoriyalar"
+
+msgid "Orders"
+msgstr "Buyurtmalar"
+
+# Messages
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "\"%(obj)s\" %(name)s muvaffaqiyatli qoʻshildi."
+
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "\"%(obj)s\" %(name)s muvaffaqiyatli oʻzgartirildi."
+
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "\"%(obj)s\" %(name)s muvaffaqiyatli oʻchirildi."
+
+# Date/time
+msgid "Today"
+msgstr "Bugun"
+
+msgid "Now"
+msgstr "Hozir"
+
+# Pagination
+msgid "Show all"
+msgstr "Hammasini koʻrsatish"
+
+msgid "first"
+msgstr "birinchi"
+
+msgid "last"
+msgstr "oxirgi"
+
+# Search
+msgid "Search Users..."
+msgstr "Foydalanuvchilarni qidirish..."
+
+msgid "Search Products..."
+msgstr "Mahsulotlarni qidirish..."
+
+# Jazzmin specific (if using)
+msgid "Main navigation"
+msgstr "Asosiy menyu"
+
+msgid "Toggle navigation"
+msgstr "Menyuni koʻrsatish/yashirish"
+
+msgid "Toggle side menu"
+msgstr "Yon menyuni koʻrsatish/yashirish"
+
+msgid "User"
+msgstr "Foydalanuvchi"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Settings"
+msgstr "Sozlamalar"
+
+msgid "Notifications"
+msgstr "Bildirishnomalar"
+
+msgid "Messages"
+msgstr "Xabarlar"
+
+msgid "Tasks"
+msgstr "Vazifalar"
+
+msgid "Activity"
+msgstr "Faollik"
