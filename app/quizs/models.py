@@ -1,18 +1,14 @@
 from django.db import models
-# from django.utils.text import slugify
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from users.models import MyUser
 from problems.gnerate_slug import generate_slug_with_case
 from problems.models import TimeMixsin
 
 from lessons.models import Lesson
 from courses.models import MyModules
-from django.contrib.contenttypes.fields import GenericRelation
 
 
 class Quiz(TimeMixsin):
-    bob = models.ForeignKey(MyModules, on_delete=models.SET_NULL, null=True, blank=True)
+    module = models.ForeignKey(MyModules, on_delete=models.SET_NULL, null=True, blank=True) 
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
@@ -24,9 +20,14 @@ class Quiz(TimeMixsin):
     
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_slug_with_case(self.title)
+        super().save(*args, **kwargs)
 
 class Question(TimeMixsin):
-    quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, blank=True, null=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, blank=True, null=True, related_name='questions')
     lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField()
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)

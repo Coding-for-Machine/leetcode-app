@@ -36,7 +36,7 @@ Test - {{ quiz.title }}
                 <strong class="font-bold">Diqqat!</strong>
                 <span class="block sm:inline">Siz bu testni qayta ishlay olmaysiz. Urinishlar soni chegaralangan.</span>
             </div>
-            <a href="/quizzes/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm text-lg inline-block">
+            <a href="/test/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm text-lg inline-block">
                 Boshqa Testlar
             </a>
         </div>
@@ -68,14 +68,21 @@ Test - {{ quiz.title }}
         // Load quiz data from API
         const quizId = window.location.pathname.split('/')[2];
         let quizData = {};
-        
+        let quizSlug;
         // Start quiz button
         document.getElementById('startQuizBtn').addEventListener('click', function() {
-            window.location.href = `/quizzes/${quizId}/attempt/`;
+            window.location.href = `/test/quize/${quizSlug}`;
         });
-
+        let  token = getCookie("access_token")
         // Load quiz data
-        fetch(`/api/quizzes/${quizId}/`)
+        fetch(`/api/quizzes/${quizId}/`, {
+            method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -85,13 +92,15 @@ Test - {{ quiz.title }}
             .then(data => {
                 quizData = data;
                 renderQuizData(data);
-                
+                quizSlug = data.slug
                 // Show/hide start button based on can_take_quiz
-                if (data.can_take_quiz) {
-                    document.getElementById('startQuizBtn').classList.remove('hidden');
-                } else {
-                    document.getElementById('cannotTakeQuiz').classList.remove('hidden');
-                }
+                const canTake = data.can_take_quiz ?? (data.attempts_allowed > data.user_attempts_count);
+    
+                    if (canTake) {
+                        document.getElementById('startQuizBtn').classList.remove('hidden');
+                    } else {
+                        document.getElementById('cannotTakeQuiz').classList.remove('hidden');
+                    }
                 
                 // Load previous attempts if any
                 if (data.attempts && data.attempts.length > 0) {

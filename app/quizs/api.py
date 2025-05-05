@@ -6,7 +6,6 @@ from datetime import datetime
 from django.utils.timezone import now
 from django.db.models import Count
 
-from app.api import api
 from .models import Quiz, Question, Answer, QuizAttempt
 from .schemas import QuizAttemptCreate, QuizAttemptOut, QuizDetailOut, QuizList, QuizResults, ErrorResponse
 from users.models import MyUser
@@ -42,13 +41,8 @@ def quiz_list(request):
 @router.get("/quizzes/{quiz_id}/", response=QuizDetailOut, auth=JWTBaseAuth())
 def get_quiz_details(request, quiz_id: str):
     """Get detailed information about a specific quiz"""
-    quiz = get_object_or_404(
-        Quiz.objects.prefetch_related(
-            'questions__answers',
-            'quizattempt_set'
-        ),
-        slug=quiz_id
-    )
+    quiz = get_object_or_404(Quiz, slug=quiz_id)
+    user_attempts_count = quiz.quizattempt_set.filter(user=request.user).count()
     
     # Prepare questions data
     questions = []
@@ -75,13 +69,14 @@ def get_quiz_details(request, quiz_id: str):
             "passed": attempt.passed,
             "started_at": attempt.started_at,
             "completed_at": attempt.completed_at,
-            "duration": attempt.duration().total_seconds() if attempt.completed_at else None
+            "duration": attempt.duration() if attempt.completed_at else None
         })
     
     return {
         "id": quiz.id,
         "title": quiz.title,
         "slug": quiz.slug,
+        "can_take_quiz": quiz.attempts_allowed > user_attempts_count,
         "description": quiz.description,
         "time_limit": quiz.time_limit,
         "passing_score": quiz.passing_score,
@@ -96,7 +91,6 @@ def get_quiz_details(request, quiz_id: str):
     }
 
 def check_answers(quiz: Quiz, user_answers: Dict[str, int]) -> Dict:
-    """Check user answers against correct answers and calculate score"""
     questions = quiz.questions.prefetch_related('answers')
     total_questions = questions.count()
     correct_answers = 0
@@ -129,6 +123,8 @@ def check_answers(quiz: Quiz, user_answers: Dict[str, int]) -> Dict:
     
     return {
         "total_questions": total_questions,
+        "correct_answers": correct_answers,  # soni
+        "correct_answers_map": correct_answers_map,
         "correct_answers": correct_answers,
         "score_percentage": round(score_percentage, 2),
         "passed": score_percentage >= quiz.passing_score,

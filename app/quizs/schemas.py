@@ -36,6 +36,7 @@ class QuizList(Schema):
     user_attempts_count: int
 
 class QuizDetailOut(QuizList):
+    
     questions: List[QuestionOut] = []
     attempts: List[AttemptOut] = []
 

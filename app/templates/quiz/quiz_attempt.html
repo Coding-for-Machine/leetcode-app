@@ -1,105 +1,169 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}
-Test - {{ quiz.title }}
-{% endblock title %}
+{% block title %}Test - {{ quiz.title }}{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <!-- Quiz Header -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-        <h1 class="text-2xl font-bold text-slate-800">{{ quiz.title }}</h1>
+        <h1 class="text-2xl font-bold text-slate-800" id="quizTitle"></h1>
         <div class="flex items-center mt-4 md:mt-0">
             <div id="timer" class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-medium mr-4">
                 <i class="far fa-clock mr-2"></i>
-                <span id="timeDisplay">${Math.floor(quiz.time_limit / 60)}:00</span>
+                <span id="timeDisplay"></span>
             </div>
             <div class="bg-slate-100 text-slate-800 px-4 py-2 rounded-lg font-medium">
-                <span id="currentQuestion">1</span> / ${quiz.questions_count}
+                <span id="currentQuestion">0</span> / <span id="totalQuestions">0</span>
             </div>
         </div>
     </div>
 
-    <!-- Quiz Progress -->
+    <!-- Progress Bar -->
     <div class="mb-6">
         <div class="w-full bg-slate-200 rounded-full h-2">
-            <div id="quizProgress" class="bg-indigo-600 h-2 rounded-full" style="width: 0%"></div>
+            <div id="quizProgress" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
         </div>
     </div>
 
     <!-- Quiz Content -->
     <div id="quizContainer" class="bg-white rounded-xl shadow-sm p-6">
-        <!-- Questions will be loaded here dynamically -->
-        <div id="loadingQuestions" class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <div id="loading" class="text-center py-12">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
             <p class="mt-4 text-slate-600">Test yuklanmoqda...</p>
         </div>
     </div>
 
-    <!-- Quiz Navigation -->
+    <!-- Navigation Buttons -->
     <div class="flex justify-between mt-6">
-        <button id="prevBtn" class="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-slate-50 hidden">
-            <i class="fas fa-arrow-left mr-2"></i> Oldingi
-        </button>
-        <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm ml-auto">
-            Keyingi <i class="fas fa-arrow-right ml-2"></i>
-        </button>
-        <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm hidden">
-            Yakunlash <i class="fas fa-check ml-2"></i>
-        </button>
+        <button id="prevBtn" class="btn-prev hidden">← Oldingi</button>
+        <div>
+            <button id="nextBtn" class="btn-next hidden">Keyingi →</button>
+            <button id="submitBtn" class="btn-submit hidden">Yakunlash</button>
+        </div>
     </div>
 </div>
 
 <script>
-    let quizData = {};
+
+    // Quiz ma'lumotlari
+    let quizData = {
+        questions: [],
+        time_limit: 0,
+        attempts_allowed: 0
+    };
+    
     let currentQuestionIndex = 0;
     let userAnswers = {};
-    let timerInterval;
-    let timeLeft = {{ quiz.time_limit }};
+    let timer;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const quizId = window.location.pathname.split('/')[2];
+    document.addEventListener('DOMContentLoaded', () => {
+        const quizSlug = document.location.pathname.split("/")[3];
+        console.log("quiz", quizSlug)
         
-        // Load quiz questions
-        fetch(`/api/quizzes/${quizId}/`)
-            .then(response => response.json())
-            .then(data => {
-                quizData = data;
-                timeLeft = data.time_limit;
-                updateTimerDisplay();
-                startTimer();
-                showQuestion(0);
-            })
-            .catch(error => {
-                console.error('Error loading quiz:', error);
-                document.getElementById('loadingQuestions').innerHTML = `
-                    <div class="text-center">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-4">
-                            <i class="fas fa-exclamation-triangle text-xl"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-slate-800 mb-2">Xatolik yuz berdi</h3>
-                        <p class="text-slate-600 mb-4">Test yuklanmadi. Iltimos, keyinroq urunib ko'ring.</p>
-                        <button onclick="window.location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
-                            Qayta urunish
-                        </button>
-                    </div>
-                `;
-            });
-        
-        // Navigation buttons
-        document.getElementById('prevBtn').addEventListener('click', goToPreviousQuestion);
-        document.getElementById('nextBtn').addEventListener('click', goToNextQuestion);
+        // 1. Quiz ma'lumotlarini yuklash
+        fetch(`/api/quizzes/${quizSlug}/`, {
+            headers: {
+                'Authorization': `Bearer ${getCookie('access_token')}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                if(response.status === 403) window.location = '/u/login/';
+                throw new Error('Network error');
+            }
+            return response.json();
+        })
+        .then(data => {
+            quizData = data;
+            initializeQuiz();
+        })
+        .catch(error => showError(error.message));
+
+        // 2. Navigatsiya tugmalari
+        document.getElementById('prevBtn').addEventListener('click', showPrevQuestion);
+        document.getElementById('nextBtn').addEventListener('click', showNextQuestion);
         document.getElementById('submitBtn').addEventListener('click', submitQuiz);
     });
 
+    function initializeQuiz() {
+        // Sarlavhani yangilash
+        document.getElementById('quizTitle').textContent = quizData.title;
+        
+        // Timer sozlash
+        timeLeft = quizData.time_limit;
+        startTimer();
+        
+        // Progress bar
+        document.getElementById('totalQuestions').textContent = quizData.questions_count;
+        
+        // Boshlang'ich savolni ko'rsatish
+        showQuestion(0);
+        
+        // Tugmalarni faollashtirish
+        toggleNavigation();
+    }
+
+    function showQuestion(index) {
+        currentQuestionIndex = index;
+        const question = quizData.questions[index];
+        
+        // Progress yangilash
+        document.getElementById('currentQuestion').textContent = index + 1;
+        document.getElementById('quizProgress').style.width = 
+            `${((index + 1) / quizData.questions_count * 100)}%`;
+
+        // Savol HTML
+        const answersHTML = question.answers.map(answer => `
+            <div class="answer-item">
+                <input type="radio" 
+                    id="answer-${answer.id}" 
+                    name="question-${question.id}" 
+                    value="${answer.id}"
+                    ${userAnswers[question.id] === answer.id ? 'checked' : ''}
+                    class="answer-radio"
+                >
+                <label for="answer-${answer.id}" class="answer-label">
+                    ${answer.description}
+                </label>
+            </div>
+        `).join('');
+
+        document.getElementById('quizContainer').innerHTML = `
+            <div class="question-container">
+                <h3 class="question-text">${question.description}</h3>
+                <div class="answers-list">${answersHTML}</div>
+            </div>
+        `;
+
+        // Radio tugmalariga event listener
+        document.querySelectorAll('.answer-radio').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                userAnswers[question.id] = parseInt(e.target.value);
+                toggleNavigation();
+            });
+        });
+
+        toggleNavigation();
+    }
+
+    function toggleNavigation() {
+        document.getElementById('prevBtn').classList.toggle('hidden', currentQuestionIndex === 0);
+        document.getElementById('nextBtn').classList.toggle('hidden', 
+            currentQuestionIndex === quizData.questions_count - 1 || !userAnswers[quizData.questions[currentQuestionIndex].id]
+        );
+        document.getElementById('submitBtn').classList.toggle('hidden', 
+            currentQuestionIndex !== quizData.questions_count - 1
+        );
+    }
+
     function startTimer() {
-        clearInterval(timerInterval);
-        timerInterval = setInterval(function() {
+        timer = setInterval(() => {
             timeLeft--;
             updateTimerDisplay();
             
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
+            if(timeLeft <= 0) {
+                clearInterval(timer);
                 submitQuiz();
             }
         }, 1000);
@@ -109,138 +173,84 @@ Test - {{ quiz.title }}
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         document.getElementById('timeDisplay').textContent = 
-            `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-            
-        // Change color when time is running out
-        if (timeLeft < 60) {
-            document.getElementById('timer').classList.remove('bg-red-100', 'text-red-800');
-            document.getElementById('timer').classList.add('bg-red-500', 'text-white');
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if(timeLeft < 60) {
+            document.getElementById('timer').classList.add('time-critical');
         }
     }
 
-    function showQuestion(index) {
-        if (index < 0 || index >= quizData.questions.length) return;
+    async function submitQuiz() {
+        clearInterval(timer);
         
-        currentQuestionIndex = index;
-        const question = quizData.questions[index];
-        
-        // Update progress
-        document.getElementById('currentQuestion').textContent = index + 1;
-        document.getElementById('quizProgress').style.width = `${((index + 1) / quizData.questions.length) * 100}%`;
-        
-        // Build question HTML
-        let questionHTML = `
-            <div class="mb-6">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">${index + 1}. ${question.description}</h3>
-                <div class="space-y-3">
-        `;
-        
-        question.answers.forEach((answer, i) => {
-            const isChecked = userAnswers[question.id] === answer.id ? 'checked' : '';
-            questionHTML += `
-                <div class="flex items-center">
-                    <input type="radio" id="answer-${answer.id}" name="question-${question.id}" value="${answer.id}" 
-                        ${isChecked} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300">
-                    <label for="answer-${answer.id}" class="ml-3 block text-slate-700">${answer.description}</label>
-                </div>
-            `;
-        });
-        
-        questionHTML += `
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('loadingQuestions').classList.add('hidden');
-        document.getElementById('quizContainer').innerHTML = questionHTML;
-        
-        // Update navigation buttons
-        document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
-        document.getElementById('nextBtn').classList.toggle('hidden', index === quizData.questions.length - 1);
-        document.getElementById('submitBtn').classList.toggle('hidden', index !== quizData.questions.length - 1);
-        
-        // Add event listeners to radio buttons
-        question.answers.forEach(answer => {
-            document.getElementById(`answer-${answer.id}`).addEventListener('change', function() {
-                userAnswers[question.id] = answer.id;
+        try {
+            const response = await fetch(`/api/quizzes/${quizData.slug}/attempt/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getCookie('access_token')}`,
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    answers: userAnswers,
+                    time_spent: quizData.time_limit - timeLeft
+                })
             });
-        });
-    }
 
-    function goToPreviousQuestion() {
-        if (currentQuestionIndex > 0) {
-            showQuestion(currentQuestionIndex - 1);
+            if(!response.ok) throw new Error('Server error');
+            
+            const result = await response.json();
+            window.location.href = `/quiz/${result.id}/`;
+            
+        } catch (error) {
+            showError(error.message);
         }
     }
 
-    function goToNextQuestion() {
-        if (currentQuestionIndex < quizData.questions.length - 1) {
-            showQuestion(currentQuestionIndex + 1);
-        }
-    }
-
-    function submitQuiz() {
-        clearInterval(timerInterval);
-        
-        // Show loading state
+    function showError(message) {
         document.getElementById('quizContainer').innerHTML = `
-            <div class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
-                <p class="text-slate-600">Test javoblari tekshirilmoqda...</p>
+            <div class="error-message">
+                <div class="error-icon">⚠️</div>
+                <h3>Xatolik yuz berdi</h3>
+                <p>${message}</p>
+                <button onclick="window.location.reload()">Qayta urunish</button>
             </div>
         `;
-        document.getElementById('prevBtn').classList.add('hidden');
-        document.getElementById('nextBtn').classList.add('hidden');
-        document.getElementById('submitBtn').classList.add('hidden');
-        
-        // Calculate score
-        const quizId = window.location.pathname.split('/')[2];
-        fetch(`/api/quizzes/${quizId}/attempt/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: JSON.stringify({
-                answers: userAnswers,
-                time_spent: quizData.time_limit - timeLeft
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            window.location.href = `/attempts/${data.id}/`;
-        })
-        .catch(error => {
-            console.error('Error submitting quiz:', error);
-            document.getElementById('quizContainer').innerHTML = `
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-4">
-                        <i class="fas fa-exclamation-triangle text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-slate-800 mb-2">Xatolik yuz berdi</h3>
-                    <p class="text-slate-600 mb-4">Test javoblari saqlanmadi. Iltimos, keyinroq urunib ko'ring.</p>
-                    <button onclick="window.location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
-                        Qayta urunish
-                    </button>
-                </div>
-            `;
-        });
-    }
-
-    // Helper function to get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
     }
 </script>
-{% endblock content %}
+
+<style>
+    .btn-prev, .btn-next, .btn-submit {
+        @apply px-6 py-2 rounded-lg font-medium transition-all;
+    }
+    
+    .btn-prev {
+        @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+    }
+    
+    .btn-next {
+        @apply bg-indigo-600 text-white hover:bg-indigo-700;
+    }
+    
+    .btn-submit {
+        @apply bg-green-600 text-white hover:bg-green-700;
+    }
+    
+    .answer-item {
+        @apply flex items-center p-3 my-2 rounded-lg bg-gray-50 hover:bg-indigo-50 transition-colors;
+    }
+    
+    .answer-radio {
+        @apply h-5 w-5 text-indigo-600 focus:ring-indigo-500;
+    }
+    
+    .answer-label {
+        @apply ml-3 text-gray-700 cursor-pointer;
+    }
+    
+    .time-critical {
+        @apply bg-red-500 text-white animate-pulse;
+    }
+</style>
+
+{% endblock %}
