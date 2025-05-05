@@ -6,13 +6,13 @@ from users.models import MyUser
 from problems.gnerate_slug import generate_slug_with_case
 from problems.models import TimeMixsin
 
+from lessons.models import Lesson
 from courses.models import MyModules
-
-
 from django.contrib.contenttypes.fields import GenericRelation
 
 
 class Quiz(TimeMixsin):
+    bob = models.ForeignKey(MyModules, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
@@ -22,51 +22,20 @@ class Quiz(TimeMixsin):
     show_correct_answers = models.BooleanField(default=True)
     attempts_allowed = models.PositiveIntegerField(default=1)
     
-    # GenericRelation qo'shamiz
-    questions = GenericRelation(
-        'Question',
-        content_type_field='content_type',
-        object_id_field='object_id',
-        related_query_name='quiz_questions'
-    )
-
+    def __str__(self):
+        return self.title
 
 class Question(TimeMixsin):
-    content_type = models.ForeignKey(
-        ContentType, 
-        on_delete=models.CASCADE,
-        limit_choices_to={'model__in': ['quiz', 'problem', 'lesson']} 
-    )
-    object_id = models.PositiveIntegerField()  # Bog‘langan model ID si
-    content_object = GenericForeignKey('content_type', 'object_id')  # GenericForeignKey
+    quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, blank=True, null=True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField()
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Question"
         verbose_name_plural = "Questions"
-
-    def save(self, *args, **kwargs):
-        if self.content_object:
-            self.content_type = ContentType.objects.get_for_model(self.content_object.__class__)
-            self.object_id = self.content_object.id
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"{self.get_related_object()} - {self.description[:50]}"
-
-    def get_related_object(self):
-        return self.content_object
-
-    def get_quiz_or_topic_name(self):
-        related_object = self.get_related_object()
-        return related_object.description if hasattr(related_object, 'title') else related_object.description
-
-    def get_model_type(self):
-        return self.content_type.model
-    
-    
-
+        return f"Savol-> {self.description[:50]}"
 
 
 class Answer(TimeMixsin):
@@ -79,6 +48,7 @@ class Answer(TimeMixsin):
 
     def __str__(self):
         return f"{self.description}"
+    
 
 class QuizAttempt(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
@@ -94,5 +64,4 @@ class QuizAttempt(models.Model):
         unique_together = ['user', 'quiz', 'started_at']
 
     def duration(self):
-        """Test topshirish uchun sarflangan vaqt"""
-        return self.completed_at - self.started_at
+        return (self.completed_at - self.started_at).total_seconds()

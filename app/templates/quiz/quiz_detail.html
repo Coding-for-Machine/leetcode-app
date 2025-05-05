@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Test - {{ quiz.title }}
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Quiz Info Section -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 mb-2" id="quizTitle">Yuklanmoqda...</h1>
+                <p class="text-slate-600" id="quizDescription"></p>
+            </div>
+            <div class="mt-4 md:mt-0 flex flex-wrap gap-2" id="quizStats">
+                <!-- Stats will be loaded here -->
+            </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-6">
+            <h3 class="text-lg font-medium text-slate-800 mb-4">Test qoidalari:</h3>
+            <ul class="list-disc list-inside space-y-2 text-slate-600" id="quizRules">
+                <!-- Rules will be loaded here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Start Quiz Button -->
+    <div class="text-center">
+        <button id="startQuizBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm text-lg hidden">
+            Testni Boshlash
+        </button>
+        <div id="cannotTakeQuiz" class="hidden">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Diqqat!</strong>
+                <span class="block sm:inline">Siz bu testni qayta ishlay olmaysiz. Urinishlar soni chegaralangan.</span>
+            </div>
+            <a href="/quizzes/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm text-lg inline-block">
+                Boshqa Testlar
+            </a>
+        </div>
+    </div>
+
+    <!-- Previous Attempts (if any) -->
+    <div id="attemptsHistory" class="mt-12 hidden">
+        <h2 class="text-xl font-bold text-slate-800 mb-4">Oldingi Urinishlar</h2>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Sana</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ball</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Holat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"></th>
+                    </tr>
+                </thead>
+                <tbody id="attemptsList" class="bg-white divide-y divide-slate-200">
+                    <!-- Attempts will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load quiz data from API
+        const quizId = window.location.pathname.split('/')[2];
+        let quizData = {};
+        
+        // Start quiz button
+        document.getElementById('startQuizBtn').addEventListener('click', function() {
+            window.location.href = `/quizzes/${quizId}/attempt/`;
+        });
+
+        // Load quiz data
+        fetch(`/api/quizzes/${quizId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                quizData = data;
+                renderQuizData(data);
+                
+                // Show/hide start button based on can_take_quiz
+                if (data.can_take_quiz) {
+                    document.getElementById('startQuizBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('cannotTakeQuiz').classList.remove('hidden');
+                }
+                
+                // Load previous attempts if any
+                if (data.attempts && data.attempts.length > 0) {
+                    renderAttempts(data.attempts, data.passing_score);
+                    document.getElementById('attemptsHistory').classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading quiz:', error);
+                document.getElementById('quizTitle').textContent = 'Xatolik yuz berdi';
+                document.getElementById('quizDescription').textContent = 'Test ma\'lumotlarini yuklashda xatolik yuz berdi. Iltimos, keyinroq urunib ko\'ring.';
+            });
+    });
+
+    function renderQuizData(data) {
+        // Basic info
+        document.getElementById('quizTitle').textContent = data.title;
+        document.getElementById('quizDescription').textContent = data.description;
+        
+        // Stats
+        const statsHtml = `
+            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                <i class="far fa-clock mr-1"></i> ${Math.floor(data.time_limit / 60)} minut
+            </span>
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                <i class="far fa-star mr-1"></i> ${data.passing_score}% minimal ball
+            </span>
+            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                <i class="far fa-question-circle mr-1"></i> ${data.questions_count} ta savol
+            </span>
+        `;
+        document.getElementById('quizStats').innerHTML = statsHtml;
+        
+        // Rules
+        const rulesHtml = `
+            <li>Testni boshlaganingizdan so'ng vaqt hisoblana boshlaydi</li>
+            <li>Testni faqat ${data.attempts_allowed} marta ishlash mumkin</li>
+            <li>Testni yakunlaganingizdan so'ng ${data.show_correct_answers ? 'to\'g\'ri javoblarni ko\'rishingiz mumkin' : 'to\'g\'ri javoblarni ko\'rolmaysiz'}</li>
+            <li>Testni ${data.time_limit} sekund ichida yakunlashingiz kerak</li>
+            ${data.user_attempts_count > 0 ? `<li>Siz bu testni ${data.user_attempts_count} marta urinib ko'rdingiz</li>` : ''}
+        `;
+        document.getElementById('quizRules').innerHTML = rulesHtml;
+    }
+
+    function renderAttempts(attempts, passingScore) {
+        const container = document.getElementById('attemptsList');
+        container.innerHTML = '';
+        
+        attempts.forEach(attempt => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-slate-50';
+            
+            const date = new Date(attempt.finished_at || attempt.started_at);
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            
+            const isPassed = attempt.score >= passingScore;
+            
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${formattedDate}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${isPassed ? 'text-green-600' : 'text-red-600'}">${attempt.score}%</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full ${isPassed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                        ${isPassed ? 'Muvaffaqiyatli' : 'Muvaffaqiyatsiz'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="/test/${attempt.id}/" class="text-indigo-600 hover:text-indigo-900">Ko'rish</a>
+                </td>
+            `;
+            container.appendChild(row);
+        });
+    }
+</script>
+{% endblock content %}

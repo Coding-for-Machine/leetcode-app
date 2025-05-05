@@ -4,8 +4,12 @@ from django.http import HttpResponse
 
 
 def quiz_views(request):
-    return render(request, "quiz/q.html")
+    return render(request, "quiz/quizzes.html")
 
 def quiz_detail(request, slug):
     print(slug)
-    return render(request, "quiz/question.html", {})
+    return render(request, "quiz/quiz_detail.html", {})
+
+def quiz_attempt_start(request, slug):
+    print(slug)
+    return render(request, "quiz/quiz_attempt.html", {})

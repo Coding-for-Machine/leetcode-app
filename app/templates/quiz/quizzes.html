@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Testlar
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-800">Testlar</h1>
+        <div class="mt-4 md:mt-0">
+            <input type="text" id="searchInput" placeholder="Testlarni qidirish..." class="border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <p class="mt-2 text-slate-600">Yuklanmoqda...</p>
+    </div>
+
+    <!-- Quizzes List -->
+    <div id="quizzesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <!-- Quizzes will be loaded here dynamically -->
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="hidden text-center py-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-4">
+            <i class="fas fa-exclamation-triangle text-xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-slate-800 mb-2">Xatolik yuz berdi</h3>
+        <p class="text-slate-600 mb-4" id="errorText">Testlarni yuklashda xatolik yuz berdi. Iltimos, keyinroq urunib ko'ring.</p>
+        <button onclick="loadQuizzes()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+            Qayta urunish
+        </button>
+    </div>
+</div>
+
+<script>
+    // Load quizzes when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadQuizzes();
+        
+        // Add search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const quizCards = document.querySelectorAll('.quiz-card');
+            
+            quizCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    async function loadQuizzes() {
+        // Show loading, hide others
+        document.getElementById('loadingIndicator').classList.remove('hidden');
+        document.getElementById('quizzesContainer').classList.add('hidden');
+        document.getElementById('errorMessage').classList.add('hidden');
+        
+        try {
+            // Get token from cookies
+            const token = getCookie('access_token');
+            
+            // Fetch quizzes from API
+            const response = await fetch('/api/quizzes/', {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch quizzes');
+            }
+            
+            const quizzes = await response.json();
+            
+            // Hide loading, show quizzes
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            document.getElementById('quizzesContainer').classList.remove('hidden');
+            
+            renderQuizzes(quizzes);
+        } catch (error) {
+            console.error('Error loading quizzes:', error);
+            
+            // Show error message
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            document.getElementById('errorText').textContent = error.message || 'Testlarni yuklashda xatolik yuz berdi';
+            document.getElementById('errorMessage').classList.remove('hidden');
+        }
+    }
+
+    function renderQuizzes(quizzes) {
+        const container = document.getElementById('quizzesContainer');
+        container.innerHTML = '';
+        
+        if (quizzes.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-4">
+                        <i class="far fa-folder-open text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-800 mb-2">Testlar topilmadi</h3>
+                    <p class="text-slate-600">Hozircha mavjud testlar mavjud emas.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        quizzes.forEach(quiz => {
+            const quizCard = document.createElement('div');
+            quizCard.className = 'quiz-card bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200 hover:shadow-md transition-all duration-200';
+            quizCard.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">${quiz.title}</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${quiz.questions_count || 0} ta savol</span>
+                    </div>
+                    
+                    <p class="text-slate-600 mb-4">${quiz.description || 'Tavsif mavjud emas'}</p>
+                    
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-slate-100 text-slate-800 text-xs px-2 py-1 rounded">${Math.floor(quiz.time_limit / 60)} minut</span>
+                        <span class="bg-slate-100 text-slate-800 text-xs px-2 py-1 rounded">${quiz.passing_score}% minimal ball</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">${quiz.user_attempts_count || 0} marta ishlangan</span>
+                        <a href="/test/${quiz.slug}/" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                            Boshlash
+                        </a>
+                    </div>
+                </div>
+            `;
+            container.appendChild(quizCard);
+        });
+    }
+
+    // Helper function to get cookie value
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<style>
+    .hidden {
+        display: none;
+    }
+    .card-hover:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock content %}

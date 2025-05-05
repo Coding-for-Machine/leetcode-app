@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Test Natijalari - {{ quiz.title }}
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Result Header -->
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${attempt.score >= quiz.passing_score ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} mb-6">
+            <i class="fas fa-${attempt.score >= quiz.passing_score ? 'check' : 'times'} text-2xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">
+            ${attempt.score >= quiz.passing_score ? 'Tabriklaymiz!' : 'Afsuski'}
+        </h1>
+        <p class="text-xl text-slate-600 mb-6">
+            Siz testni ${attempt.score}% ball bilan yakunladingiz
+            (minimal ${quiz.passing_score}% talab qilinadi)
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+                <p class="text-sm text-slate-500">To'g'ri javoblar</p>
+                <p class="text-2xl font-bold ${attempt.score >= quiz.passing_score ? 'text-green-600' : 'text-red-600'}">${Math.round(attempt.score / 100 * quiz.questions_count)} / ${quiz.questions_count}</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+                <p class="text-sm text-slate-500">Sarflangan vaqt</p>
+                <p class="text-2xl font-bold text-slate-800">${Math.floor(attempt.time_spent / 60)}m ${attempt.time_spent % 60}s</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-slate-200">
+                <p class="text-sm text-slate-500">Holat</p>
+                <p class="text-2xl font-bold ${attempt.score >= quiz.passing_score ? 'text-green-600' : 'text-red-600'}">${attempt.score >= quiz.passing_score ? 'Muvaffaqiyatli' : 'Muvaffaqiyatsiz'}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Results -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Test natijalari</h2>
+        
+        <div class="space-y-8">
+            {% for question in quiz.questions %}
+            <div class="border-b border-slate-200 pb-6 last:border-0 last:pb-0">
+                <div class="flex items-start mb-4">
+                    <div class="flex-shrink-0 mr-4">
+                        {% if attempt.answers[question.id] and attempt.answers[question.id].is_correct %}
+                        <div class="flex items-center justify-center h-6 w-6 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        {% else %}
+                        <div class="flex items-center justify-center h-6 w-6 rounded-full bg-red-100 text-red-600">
+                            <i class="fas fa-times text-xs"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-slate-800">${question.description}</h3>
+                        {% if attempt.answers[question.id] %}
+                        <p class="mt-1 text-sm text-slate-600">
+                            Sizning javobingiz: <span class="${attempt.answers[question.id].is_correct ? 'text-green-600' : 'text-red-600'} font-medium">${attempt.answers[question.id].description}</span>
+                        </p>
+                        {% else %}
+                        <p class="mt-1 text-sm text-red-600 font-medium">Siz bu savolga javob bermadingiz</p>
+                        {% endif %}
+                        
+                        {% if not attempt.answers[question.id]?.is_correct and quiz.show_correct_answers %}
+                        <p class="mt-1 text-sm text-slate-600">
+                            To'g'ri javob: <span class="text-green-600 font-medium">${question.answers.find(a => a.is_correct).description}</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+        {% if attempt.attempt_number < quiz.attempts_allowed %}
+        <a href="/quizzes/${quiz.id}/attempt/" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm text-center">
+            Qayta Urunish
+        </a>
+        {% endif %}
+        <a href="/quizzes/${quiz.id}/" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 rounded-lg font-medium shadow-sm text-center">
+            Test Sahifasiga Qaytish
+        </a>
+        <a href="/quizzes/" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 rounded-lg font-medium shadow-sm text-center">
+            Boshqa Testlar
+        </a>
+    </div>
+</div>
+{% endblock content %}

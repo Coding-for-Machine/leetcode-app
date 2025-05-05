@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+Test - {{ quiz.title }}
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Quiz Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold text-slate-800">{{ quiz.title }}</h1>
+        <div class="flex items-center mt-4 md:mt-0">
+            <div id="timer" class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-medium mr-4">
+                <i class="far fa-clock mr-2"></i>
+                <span id="timeDisplay">${Math.floor(quiz.time_limit / 60)}:00</span>
+            </div>
+            <div class="bg-slate-100 text-slate-800 px-4 py-2 rounded-lg font-medium">
+                <span id="currentQuestion">1</span> / ${quiz.questions_count}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Progress -->
+    <div class="mb-6">
+        <div class="w-full bg-slate-200 rounded-full h-2">
+            <div id="quizProgress" class="bg-indigo-600 h-2 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Quiz Content -->
+    <div id="quizContainer" class="bg-white rounded-xl shadow-sm p-6">
+        <!-- Questions will be loaded here dynamically -->
+        <div id="loadingQuestions" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+            <p class="mt-4 text-slate-600">Test yuklanmoqda...</p>
+        </div>
+    </div>
+
+    <!-- Quiz Navigation -->
+    <div class="flex justify-between mt-6">
+        <button id="prevBtn" class="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-slate-50 hidden">
+            <i class="fas fa-arrow-left mr-2"></i> Oldingi
+        </button>
+        <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm ml-auto">
+            Keyingi <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+        <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm hidden">
+            Yakunlash <i class="fas fa-check ml-2"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    let quizData = {};
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    let timerInterval;
+    let timeLeft = {{ quiz.time_limit }};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const quizId = window.location.pathname.split('/')[2];
+        
+        // Load quiz questions
+        fetch(`/api/quizzes/${quizId}/`)
+            .then(response => response.json())
+            .then(data => {
+                quizData = data;
+                timeLeft = data.time_limit;
+                updateTimerDisplay();
+                startTimer();
+                showQuestion(0);
+            })
+            .catch(error => {
+                console.error('Error loading quiz:', error);
+                document.getElementById('loadingQuestions').innerHTML = `
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-4">
+                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-slate-800 mb-2">Xatolik yuz berdi</h3>
+                        <p class="text-slate-600 mb-4">Test yuklanmadi. Iltimos, keyinroq urunib ko'ring.</p>
+                        <button onclick="window.location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                            Qayta urunish
+                        </button>
+                    </div>
+                `;
+            });
+        
+        // Navigation buttons
+        document.getElementById('prevBtn').addEventListener('click', goToPreviousQuestion);
+        document.getElementById('nextBtn').addEventListener('click', goToNextQuestion);
+        document.getElementById('submitBtn').addEventListener('click', submitQuiz);
+    });
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timeDisplay').textContent = 
+            `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            
+        // Change color when time is running out
+        if (timeLeft < 60) {
+            document.getElementById('timer').classList.remove('bg-red-100', 'text-red-800');
+            document.getElementById('timer').classList.add('bg-red-500', 'text-white');
+        }
+    }
+
+    function showQuestion(index) {
+        if (index < 0 || index >= quizData.questions.length) return;
+        
+        currentQuestionIndex = index;
+        const question = quizData.questions[index];
+        
+        // Update progress
+        document.getElementById('currentQuestion').textContent = index + 1;
+        document.getElementById('quizProgress').style.width = `${((index + 1) / quizData.questions.length) * 100}%`;
+        
+        // Build question HTML
+        let questionHTML = `
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">${index + 1}. ${question.description}</h3>
+                <div class="space-y-3">
+        `;
+        
+        question.answers.forEach((answer, i) => {
+            const isChecked = userAnswers[question.id] === answer.id ? 'checked' : '';
+            questionHTML += `
+                <div class="flex items-center">
+                    <input type="radio" id="answer-${answer.id}" name="question-${question.id}" value="${answer.id}" 
+                        ${isChecked} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                    <label for="answer-${answer.id}" class="ml-3 block text-slate-700">${answer.description}</label>
+                </div>
+            `;
+        });
+        
+        questionHTML += `
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('loadingQuestions').classList.add('hidden');
+        document.getElementById('quizContainer').innerHTML = questionHTML;
+        
+        // Update navigation buttons
+        document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
+        document.getElementById('nextBtn').classList.toggle('hidden', index === quizData.questions.length - 1);
+        document.getElementById('submitBtn').classList.toggle('hidden', index !== quizData.questions.length - 1);
+        
+        // Add event listeners to radio buttons
+        question.answers.forEach(answer => {
+            document.getElementById(`answer-${answer.id}`).addEventListener('change', function() {
+                userAnswers[question.id] = answer.id;
+            });
+        });
+    }
+
+    function goToPreviousQuestion() {
+        if (currentQuestionIndex > 0) {
+            showQuestion(currentQuestionIndex - 1);
+        }
+    }
+
+    function goToNextQuestion() {
+        if (currentQuestionIndex < quizData.questions.length - 1) {
+            showQuestion(currentQuestionIndex + 1);
+        }
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        
+        // Show loading state
+        document.getElementById('quizContainer').innerHTML = `
+            <div class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+                <p class="text-slate-600">Test javoblari tekshirilmoqda...</p>
+            </div>
+        `;
+        document.getElementById('prevBtn').classList.add('hidden');
+        document.getElementById('nextBtn').classList.add('hidden');
+        document.getElementById('submitBtn').classList.add('hidden');
+        
+        // Calculate score
+        const quizId = window.location.pathname.split('/')[2];
+        fetch(`/api/quizzes/${quizId}/attempt/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({
+                answers: userAnswers,
+                time_spent: quizData.time_limit - timeLeft
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.href = `/attempts/${data.id}/`;
+        })
+        .catch(error => {
+            console.error('Error submitting quiz:', error);
+            document.getElementById('quizContainer').innerHTML = `
+                <div class="text-center py-12">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-4">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-800 mb-2">Xatolik yuz berdi</h3>
+                    <p class="text-slate-600 mb-4">Test javoblari saqlanmadi. Iltimos, keyinroq urunib ko'ring.</p>
+                    <button onclick="window.location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                        Qayta urunish
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock content %}
