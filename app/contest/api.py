@@ -1,11 +1,12 @@
 from ninja import Router
-from .models import Contest
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
 from django.shortcuts import get_object_or_404
 from users.models import MyUser
 from users.auth import JWTBaseAuth
+from .models import Contest, ContestRegistration
+
 # --------- Schemas ---------
 class ContestBase(BaseModel):
     id: int
@@ -15,6 +16,7 @@ class ContestBase(BaseModel):
     start_time: datetime
     duration: int
     problem_count: int
+    is_user_register: bool
     is_active: bool
 
 class ContestDetail(ContestBase):
@@ -51,6 +53,7 @@ def upcoming_contests(request):
         "problem_count": c.problem_count,
         "description": c.description,
         "created_at": c.created_at,
+        "is_user_register": ContestRegistration.objects.filter(user=request.user, contest=c).exists(),
         "registered_participants": c.contest_register.count(),  # registration modeli bo'lishi kerak
         "progress_percentage": min(100, int(c.contest_register.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
     } for c in contests]
@@ -73,12 +76,15 @@ def past_contests(request, limit: int = 10):
         "problem_count": c.problem_count,
         "description": c.description,
         "created_at": c.created_at,
+        "is_user_register": c.contest_register ,
+        "is_user_register": ContestRegistration.objects.filter(user=request.user, contest=c).exists(),
         "registered_participants": c.contest_register.count(),  # registration modeli bo'lishi kerak
         "progress_percentage": min(100, int(c.contest_register.count() / 1000 * 100))  # 1000 - maqsadli ishtirokchilar
     } for c in contests]
 
 @contest_router.get("/stats/", response=ContestStats, auth=JWTBaseAuth())
 def user_stats(request):
+    print(request.user)
     user_id = request.user.id
     user = get_object_or_404(MyUser, pk=user_id)
     user.update_contest_stats()
@@ -91,22 +97,29 @@ def user_stats(request):
         "total_points": stats.total_points,
         "last_contest": stats.last_contest.title if stats.last_contest else None
     }
-# @contest_router.post("/register/")
-# def register_for_contest(request, data: ContestRegistrationSchema):
-#     try:
-#         # Foydalanuvchi va tanlov mavjudligini tekshirish
-#         user = User.objects.get(pk=data.user_id)
-#         contest = Contest.objects.get(pk=data.contest_id)
+
+
+
+@contest_router.post("/register/", response=dict, auth=JWTBaseAuth())
+def register_for_contest(request, contest_id: int):
+    try:
+        # Foydalanuvchi va tanlov mavjudligini tekshirish
+        user = request.user
+        contest = Contest.objects.get(pk=contest_id)
         
-#         # Ro'yxatdan o'tganligini tekshirish
-#         if ContestRegistration.objects.filter(user=user, contest=contest).exists():
-#             return {"success": False, "message": "Siz allaqachon ro'yxatdan o'tgansiz"}
+        # Ro'yxatdan o'tganligini tekshirish
+        if ContestRegistration.objects.filter(user=user, contest=contest).exists():
+            return {"success": False, "message": "Siz allaqachon ro'yxatdan o'tgansiz"}
         
-#         # Yangi ro'yxat
-#         ContestRegistration.objects.create(user=user, contest=contest)
-#         return {"success": True, "message": "Muvaffaqiyatli ro'yxatdan o'tdingiz"}
-    
-#     except User.DoesNotExist:
-#         return {"success": False, "message": "Foydalanuvchi topilmadi"}
-#     except Contest.DoesNotExist:
-#         return {"success": False, "message": "Tanlov topilmadi"}
+        # Yangi ro'yxat
+        ContestRegistration.objects.create(user=user, contest=contest)
+        return {"success": True, "message": "Muvaffaqiyatli ro'yxatdan o'tdingiz"}
+    except Contest.DoesNotExist:
+        return {"success": False, "message": "Tanlov topilmadi"}
+
+# @contest_router.get("/register-get/", response=dict, auth=JWTBaseAuth())
+# def resgiter_get_contest(request, contest_id:int):
+#     contest_get = get_object_or_404(ContestRegistration, user=request.user contest__id=contest_id)
+#     return {
+#         ""
+#     }
