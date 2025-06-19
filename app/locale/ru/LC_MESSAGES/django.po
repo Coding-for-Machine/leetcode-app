@@ -194,3 +194,12 @@ msgstr "Пароль *"
 
 msgid "User Daily Activity"
 msgstr "User Daily Activity"
+
+msgid "You have been successfully logged out from the administration"
+msgstr "Вы успешно вышли из системы администрирования."
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Спасибо за то, что уделили время нашему веб-сайту сегодня."
+
+msgid "Log in again"
+msgstr "Войти снова."

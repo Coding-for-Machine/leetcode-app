@@ -186,3 +186,12 @@ msgstr "Return to site"
 
 msgid "User Daily Activity"
 msgstr "Ежедневная активность пользователя"
+
+msgid "You have been successfully logged out from the administration"
+msgstr "You have been successfully logged out from the administration"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Thanks for spending some quality time with the web site today."
+
+msgid "Log in again"
+msgstr "Log in again"

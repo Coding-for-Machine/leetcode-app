@@ -197,3 +197,12 @@ msgstr "Saytga qaytish"
 
 msgid "User Daily Activity"
 msgstr "Foydalanuvchining kundalik faoliyati"
+
+msgid "You have been successfully logged out from the administration"
+msgstr "Siz administratsiyadan muvaffaqiyatli chiqdingiz."
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Bugun veb-sayt bilan sifatli vaqt o'tkazganingiz uchun rahmat."
+
+msgid "Log in again"
+msgstr "Qayta kirish."
