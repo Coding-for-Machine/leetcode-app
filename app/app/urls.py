@@ -6,29 +6,22 @@ from django.conf.urls.i18n import i18n_patterns
 
 # API uchun routerlar
 from .api import api
-from problems.problem_api import api_problem_router
-from solution.api import solution_url_api
-from quizs.api import router
-from users.api import user_router
-# API routerlarni qo‘shish
-api.add_router("/problems/", api_problem_router)
-api.add_router("solution/", solution_url_api)
 
 
-api.add_router("/", router)
-# Home Page uchun view
 from .views import HomePage
 
 urlpatterns = [
     # Bosh sahifa
     path("", HomePage, name="home"),  # Agar CBV bo‘lsa, .as_view() qo‘shildi
     path("api/", api.urls),  # API yo‘nalishlari
+    # path('unfold25/25/', include('unfold.urls')),
     path("problems/", include("problems.urls")),  # Problems moduli yo‘nalishi
     path("contest/", include("contest.urls")),  # Problems moduli yo‘nalishi
     path("test/", include("quizs.urls")),
     path("u/", include("users.my_urls")),  # Users moduli yo‘nalishi
     path("munozara/", include("commits.urls")),  # Users moduli yo‘nalishi
     path("courses/", include("courses.urls")),
+    
     path("ckeditor/", include("ckeditor_uploader.urls")),  # CKEditor yuklash yo‘nalishi
     path('i18n/', include('django.conf.urls.i18n')),
     

@@ -1,6 +1,17 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, StackedInline
+
+from unfold.admin import ModelAdmin
+from import_export.admin import ImportExportModelAdmin
+from unfold.contrib.import_export.forms import ExportForm, ImportForm, SelectableFieldsExportForm
+
 from .models import Problem, Category, Tags, TestCase, ExecutionTestCase, Function, Language, Examples
+
+class TestCaseAdminUi(ModelAdmin, ImportExportModelAdmin):
+    import_form_class = ImportForm
+    export_form_class = ExportForm
+
+admin.site.register(TestCase, TestCaseAdminUi)
 
 
 class ExecutionTestCaseInlineAdmin(StackedInline):  # unfold.admin.StackedInline
@@ -32,10 +43,10 @@ class CategoryAdmin(ModelAdmin):
     list_display = ["id", "name", "slug"]
 
 
-@admin.register(TestCase)
-class TestCaseAdmin(ModelAdmin):
-    list_display = ["id", "input_txt", "output_txt"]
-    list_per_page = 20
+# @admin.register(TestCase)
+# class TestCaseAdmin(ModelAdmin):
+#     list_display = ["id", "input_txt", "output_txt"]
+#     list_per_page = 20
 
 
 @admin.register(ExecutionTestCase)
