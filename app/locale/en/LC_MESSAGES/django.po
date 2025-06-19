@@ -172,8 +172,8 @@ msgstr "Activity"
 msgid "Welcome back to"
 msgstr "Welcome back to"
 
-msgid "LeetCode Uz | Admin"
-msgstr "LeetCode Uz | Admin"
+msgid "Coding-for-Machine| Admin"
+msgstr "Coding-for-Machine | Admin"
 
 msgid "Email manzil *"
 msgstr "Email address *"
@@ -183,9 +183,6 @@ msgstr "Password *"
 
 msgid "Return to site"
 msgstr "Return to site"
-
-msgid "Return to site"
-msgstr "Вернуться на сайт"
 
 msgid "User Daily Activity"
 msgstr "Ежедневная активность пользователя"

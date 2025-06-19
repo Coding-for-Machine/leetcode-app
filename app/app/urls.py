@@ -14,18 +14,17 @@ urlpatterns = [
     # Bosh sahifa
     path("", HomePage, name="home"),  # Agar CBV bo‘lsa, .as_view() qo‘shildi
     path("api/", api.urls),  # API yo‘nalishlari
-    # path('unfold25/25/', include('unfold.urls')),
     path("problems/", include("problems.urls")),  # Problems moduli yo‘nalishi
     path("contest/", include("contest.urls")),  # Problems moduli yo‘nalishi
     path("test/", include("quizs.urls")),
     path("u/", include("users.my_urls")),  # Users moduli yo‘nalishi
     path("munozara/", include("commits.urls")),  # Users moduli yo‘nalishi
     path("courses/", include("courses.urls")),
-    
     path("ckeditor/", include("ckeditor_uploader.urls")),  # CKEditor yuklash yo‘nalishi
     path('i18n/', include('django.conf.urls.i18n')),
     
 ]
+
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
 )
