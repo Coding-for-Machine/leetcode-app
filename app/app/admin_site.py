@@ -95,14 +95,19 @@ UNFOLD = {
             "link": "/problems/",
         },
         {
-            "icon": "leaderboard",
-            "title": _("Leaderboard"),
-            "link": "/leaderboard/",
+            "icon": "trophy",
+            "title": _("Olimpiada"),
+            "link": "/contest/",
         },
         {
             "icon": "analytics",
             "title": _("Statistika"),
-            "link": "/stats/",
+            "link": "/admin/problems/problem/",
+        },
+         {
+            "icon": "chat-bubble-left-ellipsis",
+            "title": _("Statistika"),
+            "link": "/admin/problems/problem/",
         },
     ],
     "SHOW_HISTORY": True,
