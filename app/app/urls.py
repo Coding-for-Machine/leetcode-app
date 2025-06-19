@@ -31,6 +31,7 @@ urlpatterns = [
     path("courses/", include("courses.urls")),
     path("ckeditor/", include("ckeditor_uploader.urls")),  # CKEditor yuklash yo‘nalishi
     path('i18n/', include('django.conf.urls.i18n')),
+    
 ]
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),

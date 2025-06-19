@@ -1,9 +1,0 @@
-{% extends "admin/base_site.html" %}
-{% load i18n %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Asosiy menyu' %}</a>
-{% if title %} &rsaquo; {{ title|escape }}{% endif %}
-</div>
-{% endblock %}

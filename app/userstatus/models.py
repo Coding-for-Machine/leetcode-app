@@ -5,8 +5,11 @@ from django.utils import timezone
 from django.conf import settings
 from problems.models import Problem
 from django.db.models import Sum, Count
+from django.utils.translation import gettext_lazy as _
+
 from typing import TYPE_CHECKING
 from problems.models import TimeMixsin
+
 
 if TYPE_CHECKING:
     from solution.models import Solution
@@ -27,8 +30,8 @@ class UserActivityDaily(TimeMixsin):
             models.UniqueConstraint(fields=['user', 'date'], name='unique_user_date')
         ]
         ordering = ['-date']
-        verbose_name = "User Daily Activity"
-        verbose_name_plural = "User Daily Activities"
+        verbose_name = _("User Daily Activity")
+        verbose_name_plural = _("User Daily Activities")
 
     @classmethod
     def log_activity(cls, user, activity_type='problem_solved', duration=0, score=0):
@@ -46,10 +49,10 @@ class UserActivityDaily(TimeMixsin):
 
 class Badge(TimeMixsin):
     BADGE_TYPES = [
-        ('streak', 'Streak'),
-        ('solved', 'Problems Solved'),
-        ('contest', 'Contest Performance'),
-        ('skill', 'Skill Mastery'),
+        ('streak', _('Streak')),
+        ('solved', _('Problems Solved')),
+        ('contest', _('Contest Performance')),
+        ('skill', _('Skill Mastery')),
     ]
     
     name = models.CharField(max_length=255)
@@ -58,6 +61,11 @@ class Badge(TimeMixsin):
     badge_type = models.CharField(max_length=20, choices=BADGE_TYPES)
     threshold = models.IntegerField()  # Minimum requirement to earn
     color = models.CharField(max_length=20, default='#6366f1')  # Badge color
+
+    class Meta:
+        verbose_name = _("User Badge")
+        verbose_name_plural = _("User Badge")
+
 
     def __str__(self):
         return self.name

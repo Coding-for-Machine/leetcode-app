@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 from django.core.management.utils import get_random_secret_key
 
-from .admin_site import get_jazzmin_settings
+from .admin_site import get_unfoldadmin_settings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,8 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str, default=get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
-
+# DEBUG = config("DJANGO_DEBUG", cast=bool, default=True)
+DEBUG = True
 ALLOWED_HOSTS = [
     "*",
     ".railway.app"
@@ -32,7 +33,13 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    "unfold.contrib.simple_history",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,7 +67,8 @@ INSTALLED_APPS = [
     
 ]
 
-JAZZMIN_SETTINGS = get_jazzmin_settings()
+
+UNFOLD = get_unfoldadmin_settings()
 
 AUTH_USER_MODEL = "users.MyUser"
 # JWT Settings
@@ -225,14 +233,13 @@ EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)  # EUse MAIL_P
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-from django.utils.translation import gettext_lazy as _
 
 LANGUAGE_CODE = 'uz'
 
 LANGUAGES = [
-    ('uz', _('Oʻzbekcha')),
-    ('ru', _('Русский')),
-    ('en', _('English')),
+    ('uz', 'Oʻzbekcha'),
+    ('ru', 'Русский'),
+    ('en', 'English'),
 ]
 
 LOCALE_PATHS = [

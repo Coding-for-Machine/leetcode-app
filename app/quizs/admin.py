@@ -1,36 +1,42 @@
 from django.contrib import admin
-from django import forms
-from django.contrib.contenttypes.models import ContentType
+from unfold.admin import ModelAdmin, TabularInline  
 from lessons.models import Lesson
 from .models import Quiz, Question, Answer, QuizAttempt
 
 
-admin.site.register(QuizAttempt)
+@admin.register(QuizAttempt)
+class QuizAttemptAdmin(ModelAdmin):
+    list_display = ("id", "user", "quiz", "score", "completed_at")
+    list_filter = ("quiz", "completed_at")
+    search_fields = ("user__username", "quiz__title")
 
 
-class AnswerInline(admin.TabularInline):
+class AnswerInline(TabularInline):  
     model = Answer
     extra = 1 
     min_num = 1
     fields = ('description', 'is_correct')
 
+
 @admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
+class QuizAdmin(ModelAdmin):  
     list_display = ('title', 'slug', 'time_limit', 'is_active', 'created_at')
     list_filter = ('title', 'is_active')
     prepopulated_fields = {'slug': ('title',)} 
     search_fields = ('title', 'description')
     ordering = ('-created_at',)
 
+
 @admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(ModelAdmin):  
     list_display = ('description', 'created_at')
     search_fields = ('description',)
     ordering = ('-created_at',)
-    inlines = [AnswerInline]
+    inlines = [AnswerInline] 
+
 
 @admin.register(Answer)
-class AnswerAdmin(admin.ModelAdmin):
+class AnswerAdmin(ModelAdmin): 
     list_display = ('description', 'question', 'is_correct')
     list_filter = ('is_correct',)
     search_fields = ('description',)

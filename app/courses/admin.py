@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import Course, Enrollment, MyModules
 from django.utils.text import slugify
+from unfold.admin import ModelAdmin
 
 # Course Admin
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(ModelAdmin):
     list_display = ('title', 'slug', 'price', 'lesson_count', 'created_at', 'updated_at')
     search_fields = ('title', 'slug')
     list_filter = ('title',)
@@ -24,7 +25,7 @@ admin.site.register(Course, CourseAdmin)
 
 
 # Enrollment Admin
-class EnrollmentAdmin(admin.ModelAdmin):
+class EnrollmentAdmin(ModelAdmin):
     list_display = ('user', 'course', 'is_paid', 'created_at', 'updated_at')
     search_fields = ('user__email', 'course__title')
     list_filter = ('is_paid',)
@@ -33,7 +34,7 @@ admin.site.register(Enrollment, EnrollmentAdmin)
 
 
 # Module Admin
-class ModuleAdmin(admin.ModelAdmin):
+class ModuleAdmin(ModelAdmin):
     list_display = ('title', 'course', 'slug', 'created_at', 'updated_at')
     search_fields = ('title', 'course__title', 'slug')
     list_filter = ('course',)

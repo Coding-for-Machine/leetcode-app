@@ -1,46 +1,191 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# English translation file (optional, usually default in Django)
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-25 09:41+0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: MyProject 1.0\n"
+"Report-Msgid-Bugs-To: dev@mycompany.com\n"
+"POT-Creation-Date: 2024-04-25 15:30+0500\n"
+"PO-Revision-Date: 2024-04-25 15:35+0500\n"
+"Last-Translator: Your Name <your@email.com>\n"
+"Language-Team: English <en@mycompany.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: app/settings.py:232
-msgid "Oʻzbekcha"
-msgstr ""
 
-#: app/settings.py:233
-msgid "Русский"
-msgstr ""
+msgid "Dashboard"
+msgstr "Dashboard"
 
-#: app/settings.py:234
-msgid "English"
-msgstr ""
+msgid "Home"
+msgstr "Home"
 
-#: app/urls.py:39
-msgid "Sayt Maʼmuriyati"
-msgstr ""
+msgid "View site"
+msgstr "View site"
 
-#: app/urls.py:40
-msgid "Sayt Boshqaruvi"
-msgstr ""
+msgid "Welcome"
+msgstr "Welcome"
 
-#: app/urls.py:41
-msgid "Boshqaruv Paneli"
-msgstr ""
+msgid "Save"
+msgstr "Save"
 
-#: users/apps.py:8
-msgid "Foydalanuvchilar"
-msgstr ""
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Add"
+msgstr "Add"
+
+msgid "Change"
+msgstr "Change"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Log in"
+msgstr "Log in"
+
+msgid "Log out"
+msgstr "Log out"
+
+msgid "Change password"
+msgstr "Change password"
+
+msgid "Django administration"
+msgstr "Django administration"
+
+msgid "Site administration"
+msgstr "Site administration"
+
+msgid "Recent actions"
+msgstr "Recent actions"
+
+msgid "My actions"
+msgstr "My actions"
+
+msgid "Add %(name)s"
+msgstr "Add %(name)s"
+
+msgid "Save and add another"
+msgstr "Save and add another"
+
+msgid "Save and continue editing"
+msgstr "Save and continue editing"
+
+msgid "Please correct the error below."
+msgstr "Please correct the error below."
+
+msgid "Please correct the errors below."
+msgstr "Please correct the errors below."
+
+msgid "Users"
+msgstr "Users"
+
+msgid "Groups"
+msgstr "Groups"
+
+msgid "Products"
+msgstr "Products"
+
+msgid "Categories"
+msgstr "Categories"
+
+msgid "Orders"
+msgstr "Orders"
+
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "The %(name)s \"%(obj)s\" was added successfully."
+
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "The %(name)s \"%(obj)s\" was changed successfully."
+
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "The %(name)s \"%(obj)s\" was deleted successfully."
+
+msgid "Today"
+msgstr "Today"
+
+msgid "Now"
+msgstr "Now"
+
+msgid "Show all"
+msgstr "Show all"
+
+msgid "first"
+msgstr "first"
+
+msgid "last"
+msgstr "last"
+
+msgid "Search Users..."
+msgstr "Search Users..."
+
+msgid "Search Products..."
+msgstr "Search Products..."
+
+msgid "Main navigation"
+msgstr "Main navigation"
+
+msgid "Toggle navigation"
+msgstr "Toggle navigation"
+
+msgid "Toggle side menu"
+msgstr "Toggle side menu"
+
+msgid "User"
+msgstr "User"
+
+msgid "Profile"
+msgstr "Profile"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Messages"
+msgstr "Messages"
+
+msgid "Tasks"
+msgstr "Tasks"
+
+msgid "Activity"
+msgstr "Activity"
+
+msgid "Welcome back to"
+msgstr "Welcome back to"
+
+msgid "LeetCode Uz | Admin"
+msgstr "LeetCode Uz | Admin"
+
+msgid "Email manzil *"
+msgstr "Email address *"
+
+msgid "Parol *"
+msgstr "Password *"
+
+msgid "Return to site"
+msgstr "Return to site"
+
+msgid "Return to site"
+msgstr "Вернуться на сайт"
+
+msgid "User Daily Activity"
+msgstr "Ежедневная активность пользователя"

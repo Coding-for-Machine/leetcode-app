@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-# General terms
+# General
 msgid "Dashboard"
 msgstr "Boshqaruv paneli"
 
@@ -55,7 +55,7 @@ msgstr "Ha"
 msgid "No"
 msgstr "Yoʻq"
 
-# Authentication
+# Auth
 msgid "Username"
 msgstr "Foydalanuvchi nomi"
 
@@ -71,7 +71,7 @@ msgstr "Chiqish"
 msgid "Change password"
 msgstr "Parolni oʻzgartirish"
 
-# Admin specific
+# Admin
 msgid "Django administration"
 msgstr "Django maʼmuriyati"
 
@@ -99,7 +99,7 @@ msgstr "Quyidagi xatoni tuzating."
 msgid "Please correct the errors below."
 msgstr "Quyidagi xatolarni tuzating."
 
-# Model names
+# Models
 msgid "Users"
 msgstr "Foydalanuvchilar"
 
@@ -125,7 +125,7 @@ msgstr "\"%(obj)s\" %(name)s muvaffaqiyatli oʻzgartirildi."
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" %(name)s muvaffaqiyatli oʻchirildi."
 
-# Date/time
+# Time
 msgid "Today"
 msgstr "Bugun"
 
@@ -149,7 +149,7 @@ msgstr "Foydalanuvchilarni qidirish..."
 msgid "Search Products..."
 msgstr "Mahsulotlarni qidirish..."
 
-# Jazzmin specific (if using)
+# Jazzmin (if used)
 msgid "Main navigation"
 msgstr "Asosiy menyu"
 
@@ -179,3 +179,21 @@ msgstr "Vazifalar"
 
 msgid "Activity"
 msgstr "Faollik"
+
+msgid "Welcome back to"
+msgstr "Qaytganingiz bilan tabriklaymiz"
+
+msgid "LeetCode Uz | Admin"
+msgstr "LeetCode Uz | Admin paneli"
+
+msgid "Email manzil *"
+msgstr "Email manzil *"
+
+msgid "Parol *"
+msgstr "Parol *"
+
+msgid "Return to site"
+msgstr "Saytga qaytish"
+
+msgid "User Daily Activity"
+msgstr "Foydalanuvchining kundalik faoliyati"

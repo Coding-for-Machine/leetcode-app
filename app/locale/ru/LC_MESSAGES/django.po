@@ -149,7 +149,7 @@ msgstr "Поиск пользователей..."
 msgid "Search Products..."
 msgstr "Поиск продуктов..."
 
-# Jazzmin (если используется)
+# Jazzmin
 msgid "Main navigation"
 msgstr "Основное меню"
 
@@ -179,3 +179,18 @@ msgstr "Задачи"
 
 msgid "Activity"
 msgstr "Активность"
+
+msgid "Welcome back to"
+msgstr "С возвращением в"
+
+msgid "LeetCode Uz | Admin"
+msgstr "LeetCode Uz | Админ панель"
+
+msgid "Email manzil *"
+msgstr "Адрес электронной почты *"
+
+msgid "Parol *"
+msgstr "Пароль *"
+
+msgid "User Daily Activity"
+msgstr "User Daily Activity"

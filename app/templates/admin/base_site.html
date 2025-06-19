@@ -1,0 +1,204 @@
+<!-- templates/admin/base_site.html -->
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ site_title|default:_("Coding-for-Machine Admin") }}{% endblock %}
+
+{% load static %}
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        /* Maxsus admin stillari */
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .language-selector {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .language-selector:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+        
+        .branding h1 {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .branding h1 a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .branding h1 a:hover {
+            color: #667eea;
+        }
+        
+        .nav-global {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .branding {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+            
+            .nav-global {
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+    <div class="branding" style="display: flex; align-items: center; gap: 15px; padding: 10px 0;">
+        <!-- Logo -->
+        <img src="{% static 'favicon.ico' %}" 
+             alt="LeetCode UZ Logo" 
+             style="width: 40px; height: 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        
+        <!-- Site nomi -->
+        <div>
+            <h1 id="site-name" style="margin: 0; font-size: 24px; font-weight: 600;">
+                <a href="{% url 'admin:index' %}" style="color: #333; text-decoration: none;">
+                    {{ site_header|default:_("LeetCode Admin Paneli") }}
+                </a>
+            </h1>
+            <p style="margin: 0; font-size: 14px; color: #666;">
+                {% trans "Dasturlash masalalarini boshqarish" %}
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block nav-global %}
+    <div class="nav-global" style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+        <!-- Foydalanuvchi ma'lumotlari -->
+        {% if user.is_authenticated %}
+            <div style="display: flex; align-items: center; gap: 10px; color: #555;">
+                <span style="font-size: 14px;">
+                    {% trans "Salom" %}, <strong>{{ user.get_full_name|default:user.username }}</strong>
+                </span>
+                {% if user.is_superuser %}
+                    <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                        {% trans "Super Admin" %}
+                    </span>
+                {% elif user.is_staff %}
+                    <span style="background: #17a2b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                        {% trans "Staff" %}
+                    </span>
+                {% endif %}
+            </div>
+            
+            <!-- Ajratuvchi chiziq -->
+            <div style="width: 1px; height: 30px; background: #ddd;"></div>
+        {% endif %}
+        
+        <!-- Til tanlash -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 14px; color: #555;">🌐</span>
+            <form action="{% url 'set_language' %}" method="post" style="margin: 0;">
+                {% csrf_token %}
+                <select name="language" 
+                        onchange="this.form.submit()" 
+                        class="language-selector"
+                        title="{% trans 'Tilni tanlang' %}">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% for lang in LANGUAGES %}
+                        <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>
+                            {% if lang.0 == 'uz' %}🇺🇿 O'zbekcha
+                            {% elif lang.0 == 'en' %}🇺🇸 English
+                            {% elif lang.0 == 'ru' %}🇷🇺 Русский
+                            {% else %}{{ lang.1 }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        
+        <!-- Saytga o'tish tugmasi -->
+        <a href="/" 
+           style="background: #667eea; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 5px;"
+           title="{% trans 'Saytga o\'tish' %}">
+            <span>🏠</span>
+            <span>{% trans "Sayt" %}</span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div id="footer" style="text-align: center; padding: 20px; background: #f8f9fa; margin-top: 40px; border-radius: 8px;">
+        <p style="margin: 0; color: #666; font-size: 14px;">
+            © {% now "Y" %} LeetCode UZ. 
+            <span style="margin: 0 10px;">|</span>
+            {% trans "Django Admin Panel" %} v{{ django_version }}
+            <span style="margin: 0 10px;">|</span>
+            <a href="https://unfoldadmin.com/" target="_blank" style="color: #667eea; text-decoration: none;">
+                Unfold Admin
+            </a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script>
+        // Til o'zgarishi animatsiyasi
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageSelect = document.querySelector('.language-selector');
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    // Loading effekti
+                    this.style.opacity = '0.7';
+                    this.disabled = true;
+                    
+                    // Sahifa o'zgarishidan oldin loading ko'rsatish
+                    const loadingText = this.options[this.selectedIndex].text;
+                    console.log('Tilni o\'zgartirish: ' + loadingText);
+                });
+            }
+            
+            // Admin panel welcome message
+            console.log('%c🚀 LeetCode UZ Admin Panel', 'color: #667eea; font-size: 16px; font-weight: bold;');
+            console.log('%cUnfold Django Admin orqali yaratilgan', 'color: #666; font-size: 12px;');
+        });
+        
+        // Responsive navigation
+        function toggleMobileNav() {
+            const navGlobal = document.querySelector('.nav-global');
+            if (navGlobal && window.innerWidth <= 768) {
+                navGlobal.style.display = navGlobal.style.display === 'none' ? 'flex' : 'none';
+            }
+        }
+        
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            const navGlobal = document.querySelector('.nav-global');
+            if (navGlobal && window.innerWidth > 768) {
+                navGlobal.style.display = 'flex';
+            }
+        });
+    </script>
+{% endblock %}
